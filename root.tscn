@@ -1,0 +1,59 @@
+[gd_scene format=3 uid="uid://c2jn1b4uyjt8n"]
+
+[ext_resource type="Script" uid="uid://bynu3i6uj6t7r" path="res://scripts/TileGrid.cs" id="1_jnlp7"]
+[ext_resource type="PackedScene" uid="uid://bvkmb23pk35le" path="res://Tile.tscn" id="1_pyidc"]
+[ext_resource type="Texture2D" uid="uid://drabk7btini6x" path="res://sprites/villagetile.png" id="3_jnlp7"]
+[ext_resource type="Script" uid="uid://uaer1wt5dso1" path="res://scripts/CameraController.cs" id="3_vvh5c"]
+[ext_resource type="Texture2D" uid="uid://ceb6fnywpv652" path="res://sprites/towntile.png" id="4_l8v81"]
+[ext_resource type="Script" uid="uid://bisk33v27s82j" path="res://scripts/EmpireController.cs" id="5_bf3um"]
+[ext_resource type="LabelSettings" uid="uid://brmmuo7fvryem" path="res://UI_Base_Label_Settings.tres" id="6_l8v81"]
+[ext_resource type="Texture2D" uid="uid://dh42xxhofapix" path="res://sprites/coin_icon.png" id="6_vyht1"]
+
+[node name="RootNode2D" type="Node2D" unique_id=1161755743]
+
+[node name="TileGrid" type="Node2D" parent="." unique_id=1726203210]
+script = ExtResource("1_jnlp7")
+TileScene = ExtResource("1_pyidc")
+villageTileTexture = ExtResource("3_jnlp7")
+townTileTexture = ExtResource("4_l8v81")
+
+[node name="EmpireController" type="Node2D" parent="." unique_id=1584417600]
+script = ExtResource("5_bf3um")
+
+[node name="EmpireController2" type="Node2D" parent="." unique_id=2121754653]
+script = ExtResource("5_bf3um")
+
+[node name="Camera" type="Node2D" parent="." unique_id=676000897]
+script = ExtResource("3_vvh5c")
+PanSpeed = 400.0
+
+[node name="Camera2D" type="Camera2D" parent="Camera" unique_id=429827703]
+zoom = Vector2(2, 2)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1097156129]
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer" unique_id=38136347]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -577.0
+offset_right = 577.0
+offset_bottom = 45.0
+grow_horizontal = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/HBoxContainer" unique_id=2101533760]
+layout_mode = 2
+size_flags_horizontal = 6
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/HBoxContainer/HBoxContainer" unique_id=1366772080]
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("6_vyht1")
+stretch_mode = 2
+
+[node name="Coins" type="Label" parent="CanvasLayer/HBoxContainer/HBoxContainer" unique_id=2049750665]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "999"
+label_settings = ExtResource("6_l8v81")
