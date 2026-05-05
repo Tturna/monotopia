@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://c4ae5yt0wa1il"]
+
+[ext_resource type="Script" uid="uid://qgwwxsqbl0v6" path="res://scripts/CityController.cs" id="1_hrcst"]
+[ext_resource type="PackedScene" uid="uid://bvkmb23pk35le" path="res://scenes/Tile.tscn" id="1_muise"]
+[ext_resource type="Texture2D" uid="uid://drabk7btini6x" path="res://sprites/villagetile.png" id="2_hrcst"]
+
+[node name="City" type="Node2D" unique_id=1510732706]
+script = ExtResource("1_hrcst")
+
+[node name="Sprite2D" parent="." unique_id=1765061921 instance=ExtResource("1_muise")]
+texture = ExtResource("2_hrcst")

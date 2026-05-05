@@ -4,3 +4,4 @@
 
 [node name="Sprite2D" type="Sprite2D" unique_id=1765061921]
 texture = ExtResource("1_j13wd")
+centered = false

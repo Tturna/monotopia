@@ -1,3 +1,4 @@
+using System;
 using Godot;
 
 #nullable enable
@@ -5,6 +6,8 @@ public partial class TileGrid : Node2D
 {
     [Export]
     public required PackedScene TileScene;
+    [Export]
+    public required PackedScene CityScene;
     [Export]
     public required Texture2D villageTileTexture;
     [Export]
@@ -14,7 +17,8 @@ public partial class TileGrid : Node2D
 
     public static TileGrid Instance = null!;
 
-    private int tileGap = 2;
+    private static Vector2 tilePixelSize = Vector2.Zero;
+    private static int tileGap = 2;
     private static Vector2[] villageTileSpawnPoints => [
         new(0, 0),
         new(TilesWidth - 1, TilesHeight - 1)
@@ -29,34 +33,57 @@ public partial class TileGrid : Node2D
 
 	public override void _Ready()
 	{
+        InitializeGeneralTileSize();
+
         for (var y = 0; y < TilesHeight; y++)
         {
             for (var x = 0; x < TilesHeight; x++)
             {
-                AddTile(x, y);
+                AddMapElement(x, y, TileScene);
             }
         }
 	}
 
-    private void AddTile(int tilePosX, int tilePosY, Texture2D? texture = null)
+    private void InitializeGeneralTileSize()
     {
-        var tileInstanceNode = (Sprite2D)TileScene.Instantiate();
+        var tileSceneState = TileScene.GetState();
+        var nodeIndex = 0; // First node in the scene
+        var propertyIndex = 0; // First propery in the node (should be texture for Sprite2D)
+        var tileTextureVariant = tileSceneState.GetNodePropertyValue(nodeIndex, propertyIndex);
+        var tileTexture = (Texture2D)tileTextureVariant;
+        tilePixelSize = tileTexture.GetSize();
+    }
 
-        if (texture is not null)
+    private void SetMapElementPositionFromTileCoords(int tilePosX, int tilePosY, Node2D mapElement)
+    {
+        var tileWidth = tilePixelSize.X;
+        var tileHeight = tilePixelSize.Y;
+        var halfWorldWidth = (TilesWidth * tileWidth + (TilesWidth - 1) * tileGap) / 2;
+        var halfWorldHeight = (TilesHeight * tileHeight + (TilesHeight - 1) * tileGap) / 2;
+        var xPosition = tilePosX * tileWidth + tilePosX * tileGap - halfWorldWidth;
+        var yPosition = tilePosY * tileHeight + tilePosY * tileGap - halfWorldHeight;
+        mapElement.Position = new Vector2(xPosition, yPosition);
+    }
+
+    private Node2D InstantiateMapElement(PackedScene scene)
+    {
+        var mapElementInstance = scene.Instantiate();
+
+        if (mapElementInstance is null)
         {
-            tileInstanceNode.Texture = texture;
+            throw new ArgumentException();
         }
 
-        var textureSize = tileInstanceNode.Texture.GetSize();
-        var tileWidth = textureSize.X;
-        var tileHeight = textureSize.Y;
-        var halfWorldWidth = TilesWidth * tileWidth / 2;
-        var halfWorldHeight = TilesHeight * tileHeight / 2;
-        var xPosition = tilePosX * tileWidth - halfWorldWidth;
-        var yPosition = tilePosY * tileHeight - halfWorldHeight;
-        tileInstanceNode.Position = new Vector2(xPosition + tileGap * tilePosX, yPosition + tileGap * tilePosY);
+        AddChild(mapElementInstance);
 
-        AddChild(tileInstanceNode);
+        return (Node2D)mapElementInstance;
+    }
+
+    private Node2D AddMapElement(int tilePosX, int tilePosY, PackedScene scene)
+    {
+        var mapElementInstance = InstantiateMapElement(scene);
+        SetMapElementPositionFromTileCoords(tilePosX, tilePosY, mapElementInstance);
+        return mapElementInstance;
     }
 
     public static bool TryGetVillageTileSpawnPoint(out int spawnPointX, out int spawnPointY)
@@ -77,8 +104,28 @@ public partial class TileGrid : Node2D
         return true;
     }
 
-    public static void AddCity(int tilePosX, int tilePosY)
+    public static CityController AddCity(int tilePosX, int tilePosY)
     {
-        Instance.AddTile(tilePosX, tilePosY, Instance.villageTileTexture);
+        var cityNode = Instance.AddMapElement(tilePosX, tilePosY, Instance.CityScene);
+        return (CityController)cityNode;
+    }
+
+    public static (int tilePosX, int tilePosY) WorldToTilePosition(Vector2 worldPosition)
+    {
+        var tileWidth = tilePixelSize.X;
+        var tileHeight = tilePixelSize.Y;
+        var halfWorldWidth = (TilesWidth * tileWidth + (TilesWidth - 1) * tileGap) / 2;
+        var halfWorldHeight = (TilesHeight * tileHeight + (TilesHeight - 1) * tileGap) / 2;
+
+        // var xPosition = tilePosX * tileWidth + tilePosX * tileGap - halfWorldWidth;
+        // When you factor this: tilePosX * tileWidth + tilePosX * tileGap - halfWorldWidth
+        // You get: tilePosX * (tileWidth + tileGap) - halfWorldWidth
+        // Therefore the reverse coordinate translation would be:
+        // tilePosX = (xPos + halfWorldWidth) / (tileWidth + tileGap)
+
+        var tilePosX = (worldPosition.X + halfWorldWidth) / (tileWidth + tileGap);
+        var tilePosY = (worldPosition.Y + halfWorldHeight) / (tileHeight + tileGap);
+
+        return (Mathf.FloorToInt(tilePosX), Mathf.FloorToInt(tilePosY));
     }
 }

@@ -1,0 +1,141 @@
+[gd_scene format=3 uid="uid://c2jn1b4uyjt8n"]
+
+[ext_resource type="Script" uid="uid://bynu3i6uj6t7r" path="res://scripts/TileGrid.cs" id="1_jnlp7"]
+[ext_resource type="PackedScene" uid="uid://bvkmb23pk35le" path="res://scenes/Tile.tscn" id="1_pyidc"]
+[ext_resource type="PackedScene" uid="uid://c4ae5yt0wa1il" path="res://scenes/City.tscn" id="3_85syf"]
+[ext_resource type="Texture2D" uid="uid://drabk7btini6x" path="res://sprites/villagetile.png" id="3_jnlp7"]
+[ext_resource type="Script" uid="uid://uaer1wt5dso1" path="res://scripts/CameraController.cs" id="3_vvh5c"]
+[ext_resource type="Texture2D" uid="uid://ceb6fnywpv652" path="res://sprites/towntile.png" id="4_l8v81"]
+[ext_resource type="Script" uid="uid://bisk33v27s82j" path="res://scripts/EmpireController.cs" id="5_bf3um"]
+[ext_resource type="Script" uid="uid://14p5a2axlcx1" path="res://scripts/TurnSystem.cs" id="6_huihk"]
+[ext_resource type="LabelSettings" uid="uid://brmmuo7fvryem" path="res://UI_Base_Label_Settings.tres" id="6_l8v81"]
+[ext_resource type="Texture2D" uid="uid://dh42xxhofapix" path="res://sprites/coin_icon.png" id="6_vyht1"]
+
+[node name="RootNode2D" type="Node2D" unique_id=1161755743]
+
+[node name="TileGrid" type="Node2D" parent="." unique_id=1726203210]
+script = ExtResource("1_jnlp7")
+TileScene = ExtResource("1_pyidc")
+CityScene = ExtResource("3_85syf")
+villageTileTexture = ExtResource("3_jnlp7")
+townTileTexture = ExtResource("4_l8v81")
+
+[node name="EmpireController" type="Node2D" parent="." unique_id=1584417600]
+script = ExtResource("5_bf3um")
+
+[node name="EmpireController2" type="Node2D" parent="." unique_id=2121754653]
+script = ExtResource("5_bf3um")
+
+[node name="TurnSystem" type="Node2D" parent="." unique_id=1613588411]
+script = ExtResource("6_huihk")
+
+[node name="Camera" type="Node2D" parent="." unique_id=676000897]
+script = ExtResource("3_vvh5c")
+PanSpeed = 400.0
+
+[node name="Camera2D" type="Camera2D" parent="Camera" unique_id=429827703]
+zoom = Vector2(2, 2)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1097156129]
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="CanvasLayer" unique_id=400011857]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -576.0
+offset_right = 576.0
+offset_bottom = 648.0
+grow_horizontal = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+ratio = 1.7778
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/AspectRatioContainer" unique_id=1432756150]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Top Row HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer" unique_id=38136347]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+alignment = 1
+
+[node name="Left HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox" unique_id=432380358]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="Center HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox" unique_id=2101533760]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox" unique_id=1366772080]
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("6_vyht1")
+stretch_mode = 2
+
+[node name="Coins Label" type="Label" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox" unique_id=2049750665]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+text = "999"
+label_settings = ExtResource("6_l8v81")
+
+[node name="Right HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox" unique_id=937397110]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_vertical = 0
+alignment = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Right HBox" unique_id=829046455]
+layout_mode = 2
+
+[node name="Turn Count Label" type="Label" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Right HBox/VBoxContainer" unique_id=1927878021]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Turn 999"
+label_settings = ExtResource("6_l8v81")
+
+[node name="Bot Row HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer" unique_id=448409960]
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox" unique_id=982840399]
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 8
+
+[node name="Turn Timer Label" type="Label" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer" unique_id=1178126591]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+text = "66:66"
+label_settings = ExtResource("6_l8v81")
+
+[node name="CenterContainer" type="CenterContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer" unique_id=1197203940]
+custom_minimum_size = Vector2(150, 50)
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/CenterContainer" unique_id=1215099027]
+custom_minimum_size = Vector2(150, 50)
+layout_mode = 2
+color = Color(0.28482667, 0.44, 0.23759998, 1)
+
+[node name="End Turn Label" type="Label" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/CenterContainer" unique_id=1467600873]
+layout_mode = 2
+text = "End Turn"
+label_settings = ExtResource("6_l8v81")
+
+[node name="End Turn Button" type="Button" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/CenterContainer" unique_id=63129807]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 50)
+layout_mode = 2
+flat = true
