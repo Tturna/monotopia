@@ -26,6 +26,15 @@ script = ExtResource("5_bf3um")
 [node name="EmpireController2" type="Node2D" parent="." unique_id=2121754653]
 script = ExtResource("5_bf3um")
 
+[node name="EmpireController3" type="Node2D" parent="." unique_id=859245962]
+script = ExtResource("5_bf3um")
+
+[node name="EmpireController4" type="Node2D" parent="." unique_id=1989616607]
+script = ExtResource("5_bf3um")
+
+[node name="EmpireController5" type="Node2D" parent="." unique_id=391796868]
+script = ExtResource("5_bf3um")
+
 [node name="TurnSystem" type="Node2D" parent="." unique_id=1613588411]
 script = ExtResource("6_huihk")
 

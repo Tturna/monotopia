@@ -13,13 +13,13 @@ public partial class EmpireController : Node2D
     {
         TurnSystem.Instance.TurnStarted += OnTurnStarted;
 
-        if (!TileGrid.TryGetVillageTileSpawnPoint(out var spawnPointX, out var spawnPointY))
+        if (!TileGrid.TryGetVillageTileSpawnPoint(out var tileSpawnPoint))
         {
             GD.PrintErr("Couldn't get spawn point for empire!");
             return;
         }
 
-        AddCityToEmpire(spawnPointX, spawnPointY);
+        AddCityToEmpire(tileSpawnPoint);
     }
 
     public override void _UnhandledInput(InputEvent inputEvent)
@@ -33,7 +33,7 @@ public partial class EmpireController : Node2D
         var mouseWorldPosition = GetViewport().GetCamera2D().GetGlobalMousePosition();
         var mouseTilePosition = TileGrid.WorldToTilePosition(mouseWorldPosition);
 
-        AddCityToEmpire(mouseTilePosition.tilePosX, mouseTilePosition.tilePosY);
+        AddCityToEmpire(mouseTilePosition);
     }
 
     private void UpdateCoinsLabel()
@@ -55,9 +55,10 @@ public partial class EmpireController : Node2D
         totalCoinsDelta = total;
     }
 
-    private void AddCityToEmpire(int spawnPointX, int spawnPointY)
+    private void AddCityToEmpire(Vector2Int tileSpawnPoint)
     {
-        var cityController = TileGrid.AddCity(spawnPointX, spawnPointY);
+        var cityController = TileGrid.AddCity(tileSpawnPoint);
+        cityController.InitializeCity(tileSpawnPoint);
         cities.Add(cityController);
         totalCoinsDelta += cityController.CoinsGenerated;
         UpdateTotalCoinDelta();

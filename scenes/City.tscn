@@ -3,9 +3,13 @@
 [ext_resource type="Script" uid="uid://qgwwxsqbl0v6" path="res://scripts/CityController.cs" id="1_hrcst"]
 [ext_resource type="PackedScene" uid="uid://bvkmb23pk35le" path="res://scenes/Tile.tscn" id="1_muise"]
 [ext_resource type="Texture2D" uid="uid://drabk7btini6x" path="res://sprites/villagetile.png" id="2_hrcst"]
+[ext_resource type="Texture2D" uid="uid://ddcism33jpe0a" path="res://sprites/pixel.png" id="3_xw602"]
 
 [node name="City" type="Node2D" unique_id=1510732706]
 script = ExtResource("1_hrcst")
+TileScene = ExtResource("1_muise")
+PixelTexture = ExtResource("3_xw602")
 
 [node name="Sprite2D" parent="." unique_id=1765061921 instance=ExtResource("1_muise")]
+show_behind_parent = true
 texture = ExtResource("2_hrcst")
