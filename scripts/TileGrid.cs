@@ -138,9 +138,14 @@ public partial class TileGrid : Node2D
         return new Vector2Int(tilePosX, tilePosY);
     }
 
+    public static bool IsTileInBounds(Vector2Int tilePosition)
+    {
+        return tileOwners.ContainsKey(tilePosition);
+    }
+
     public static bool IsTileOwned(Vector2Int tilePosition)
     {
-        return tileOwners.ContainsKey(tilePosition) && tileOwners[tilePosition] is not null;
+        return IsTileInBounds(tilePosition) && tileOwners[tilePosition] is not null;
     }
 
     public static void SetTileOwner(Vector2Int tilePosition, CityController owner)
@@ -153,5 +158,24 @@ public partial class TileGrid : Node2D
         {
             tileOwners.Add(tilePosition, owner);
         }
+    }
+
+    public static bool TryGetTileOwner(Vector2Int tilePosition, out CityController? owner)
+    {
+        owner = null;
+
+        if (tileOwners.TryGetValue(tilePosition, out var ownerCity))
+        {
+            if (ownerCity is null)
+            {
+                return false;
+            }
+
+            owner = ownerCity;
+
+            return true;
+        }
+
+        return false;
     }
 }

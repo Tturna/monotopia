@@ -23,16 +23,13 @@ townTileTexture = ExtResource("4_l8v81")
 [node name="EmpireController" type="Node2D" parent="." unique_id=1584417600]
 script = ExtResource("5_bf3um")
 
-[node name="EmpireController2" type="Node2D" parent="." unique_id=2121754653]
+[node name="EmpireController2" type="Node2D" parent="." unique_id=655458223]
 script = ExtResource("5_bf3um")
 
-[node name="EmpireController3" type="Node2D" parent="." unique_id=859245962]
+[node name="EmpireController3" type="Node2D" parent="." unique_id=1867115032]
 script = ExtResource("5_bf3um")
 
-[node name="EmpireController4" type="Node2D" parent="." unique_id=1989616607]
-script = ExtResource("5_bf3um")
-
-[node name="EmpireController5" type="Node2D" parent="." unique_id=391796868]
+[node name="EmpireController4" type="Node2D" parent="." unique_id=647569359]
 script = ExtResource("5_bf3um")
 
 [node name="TurnSystem" type="Node2D" parent="." unique_id=1613588411]

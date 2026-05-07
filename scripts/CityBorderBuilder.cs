@@ -143,9 +143,29 @@ public static class CityBorderBuilder
         var currentVertex = currentEdge.A;
         var startingVertex = currentVertex;
         var goingToB = true;
+        var failsafe = 100;
 
         while (true)
         {
+            failsafe--;
+
+            if (failsafe <= 5)
+            {
+                GD.Print($"""
+                    =====
+                    Failsafe close to firing! Printing everything:
+                    Current vertex: {currentVertex},
+                    Current edge: {currentEdge},
+                    Starting vertex: {startingVertex},
+                    Going towards B: {goingToB}
+                """);
+            }
+
+            if (failsafe <= 0)
+            {
+                throw new Exception(message: "Failsafe!");
+            }
+
             orderedBorderTileVertices.Add(Vector2Int.FromVector2(currentVertex));
 
             var nextVertex = goingToB ? currentEdge.B : currentEdge.A;
@@ -170,7 +190,7 @@ public static class CityBorderBuilder
         return orderedBorderTileVertices.ToArray();
     }
 
-    public static Polygon2D Polygon2DFromTilePositions(Vector2Int[] tilePositions)
+    public static Vector2[] Polygon2DFromTilePositions(Vector2Int[] tilePositions)
     {
         var borderEdges = TilePositionsToTileBorderEdges(tilePositions);
         var polygonTileVertices = BorderEdgesToPolygonTileVertices(borderEdges);
@@ -181,9 +201,123 @@ public static class CityBorderBuilder
             polygonVertices[i] = TileGrid.TileToWorldPosition(polygonTileVertices[i]);
         }
 
-        var polygon = new Polygon2D();
-        polygon.Polygon = polygonVertices;
+        return polygonVertices;
+    }
 
-        return polygon;
+#nullable enable
+    public static bool TryGetNextBorderExpansionTile(
+        Vector2Int[] controlledTiles,
+        Vector2Int cityTilePosition,
+        CityController owner,
+        out Vector2Int tilePosition,
+        Vector2Int? expansionDirection = null)
+    {
+        tilePosition = Vector2Int.Zero;
+        HashSet<Vector2Int> availableNeighborTileSet = new();
+
+        // Check tiles in expanding "rings" around the city center to find the first
+        // layer with uncontrolled tiles. Later the results can be filtered based on
+        // player's target expansion direction. This way the city grows somewhat evenly
+        // and shouldn't form holes in its own borders naturally.
+
+        var maxRingOffset = 5; // The city can't grow more than 5 tiles away.
+        Vector2Int[] cardinalDirections = [
+            new(1, 0), new(-1, 0), new(0, -1), new(0, 1)
+        ];
+
+        for (var ringOffsetFromCenter = 1; ringOffsetFromCenter <= maxRingOffset; ringOffsetFromCenter++)
+        {
+            for (var y = -ringOffsetFromCenter; y <= ringOffsetFromCenter; y++)
+            {
+                for (var x = -ringOffsetFromCenter; x <= ringOffsetFromCenter; x++)
+                {
+                    // Skip checking tiles enclosed by the current ring
+                    if (Math.Abs(x) != ringOffsetFromCenter && Math.Abs(y) != ringOffsetFromCenter)
+                    {
+                        continue;
+                    }
+
+                    var offset = new Vector2Int(x, y);
+                    var testTilePosition = cityTilePosition + offset;
+
+                    if (!TileGrid.IsTileInBounds(testTilePosition)) continue;
+                    if (TileGrid.IsTileOwned(testTilePosition)) continue;
+
+                    // Ensure the tile we're about to accept as available is actually
+                    // next to a controlled tile.
+                    var hasNeighbor = false;
+
+                    foreach (var dir in cardinalDirections)
+                    {
+                        if (TileGrid.TryGetTileOwner(testTilePosition + dir, out var tileOwner))
+                        {
+                            if (tileOwner is not null && tileOwner == owner)
+                            {
+                                hasNeighbor = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!hasNeighbor) continue;
+
+                    availableNeighborTileSet.Add(testTilePosition);
+                }
+            }
+
+            if (availableNeighborTileSet.Count > 0) break;
+        }
+
+        if (availableNeighborTileSet.Count == 0) return false;
+
+        var availableNeighborTiles = new Vector2Int[availableNeighborTileSet.Count];
+        availableNeighborTileSet.CopyTo(availableNeighborTiles);
+
+        if (expansionDirection is null)
+        {
+            var rng = Random.Shared.Next(availableNeighborTileSet.Count);
+            tilePosition = availableNeighborTiles[rng];
+
+            return true;
+        }
+
+        List<Vector2Int> availableTilePositionsInRightDirection = new();
+
+        foreach (var availableTilePos in availableNeighborTiles)
+        {
+            var diffFromCity = availableTilePos - cityTilePosition;
+            var dirFromCity = ((Vector2)diffFromCity).Normalized();
+            var dot = dirFromCity.Dot(Vector2.Up);
+
+            if (dot >= 0.5f && expansionDirection == Vector2Int.Up)
+            {
+                availableTilePositionsInRightDirection.Add(availableTilePos);
+            }
+            else if (dot <= -0.5 && expansionDirection == Vector2Int.Down)
+            {
+                availableTilePositionsInRightDirection.Add(availableTilePos);
+            }
+            else if (dot < 0.5f && dot > -0.5f && expansionDirection.Y == 0)
+            {
+                if (dirFromCity.X > 0 && expansionDirection.X > 0 ||
+                    dirFromCity.X < 0 && expansionDirection.X < 0)
+                {
+                    availableTilePositionsInRightDirection.Add(availableTilePos);
+                }
+            }
+        }
+
+        if (availableTilePositionsInRightDirection.Count > 0)
+        {
+            var rng = Random.Shared.Next(availableTilePositionsInRightDirection.Count);
+            tilePosition = availableTilePositionsInRightDirection[rng];
+        }
+        else
+        {
+            var rng = Random.Shared.Next(availableNeighborTileSet.Count);
+            tilePosition = availableNeighborTiles[rng];
+        }
+
+        return true;
     }
 }

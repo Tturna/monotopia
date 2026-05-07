@@ -2,26 +2,60 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
+#nullable enable
 public partial class CityController : Node2D
 {
+    [Export]
+    public bool Freeze;
+
     public int CoinsGenerated = 2;
 
-    private Vector2Int cityTilePosition;
+    private Vector2Int cityTilePosition = null!;
     private List<Vector2Int> controlledTilePositions = new();
+    private Vector2Int? borderExpansionDirectionFocus = null;
+    private Polygon2D borderPolygon = new();
 
-    private void GrowCityBorder(Vector2Int tilePosition)
+    private void OnTurnStarted()
+    {
+        if (Freeze) return;
+
+        var nextTileAvailable = CityBorderBuilder.TryGetNextBorderExpansionTile(
+            controlledTilePositions.ToArray(),
+            cityTilePosition,
+            owner: this,
+            out var nextTilePosition,
+            borderExpansionDirectionFocus);
+
+        if (nextTileAvailable)
+        {
+            TakeControlOfTile(nextTilePosition);
+            UpdateBorderPolygon();
+        }
+    }
+
+    private void TakeControlOfTile(Vector2Int tilePosition)
     {
         if (tilePosition == cityTilePosition) return;
+        if (!TileGrid.IsTileInBounds(tilePosition)) return;
         if (TileGrid.IsTileOwned(tilePosition)) return;
 
         controlledTilePositions.Add(tilePosition);
         TileGrid.SetTileOwner(tilePosition, this);
     }
 
+    private void UpdateBorderPolygon()
+    {
+        var polygonVertices = CityBorderBuilder.Polygon2DFromTilePositions(controlledTilePositions.ToArray());
+        borderPolygon.Polygon = polygonVertices;
+    }
+
     public void InitializeCity(Vector2Int tilePosition)
     {
+        TurnSystem.Instance.TurnStarted += OnTurnStarted;
+
         cityTilePosition = tilePosition;
         controlledTilePositions.Add(cityTilePosition);
+        TileGrid.SetTileOwner(cityTilePosition, this);
 
         // Grow one tile outwards if possible, taking up a max of 3x3 tiles.
         for (var y = -1; y < 2; y++)
@@ -29,16 +63,16 @@ public partial class CityController : Node2D
             for (var x = -1; x < 2; x++)
             {
                 var controlledTilePosition = cityTilePosition + new Vector2Int(x, y);
-                GrowCityBorder(controlledTilePosition);
+                TakeControlOfTile(controlledTilePosition);
             }
         }
 
-        GrowCityBorder(cityTilePosition + new Vector2Int(0, -2));
-        GrowCityBorder(cityTilePosition + new Vector2Int(0, 2));
-        GrowCityBorder(cityTilePosition + new Vector2Int(2, 0));
-        GrowCityBorder(cityTilePosition + new Vector2Int(-2, 0));
+        TakeControlOfTile(cityTilePosition + new Vector2Int(0, -2));
+        TakeControlOfTile(cityTilePosition + new Vector2Int(0, 2));
+        TakeControlOfTile(cityTilePosition + new Vector2Int(2, 0));
+        TakeControlOfTile(cityTilePosition + new Vector2Int(-2, 0));
 
-        var borderPolygon = CityBorderBuilder.Polygon2DFromTilePositions(controlledTilePositions.ToArray());
+        UpdateBorderPolygon();
         AddChild(borderPolygon);
         // Set global pos to 0 to prevent offsetting border when the border
         // child node inherits the city position from the parent node.
@@ -47,6 +81,7 @@ public partial class CityController : Node2D
         var r = (float)Random.Shared.NextDouble();
         var g = (float)Random.Shared.NextDouble();
         var b = (float)Random.Shared.NextDouble();
-        borderPolygon.Color = new Color(r, g, b, 1f);
+        var a = 0.65f;
+        borderPolygon.Color = new Color(r, g, b, a);
     }
 }
