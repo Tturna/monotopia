@@ -44,7 +44,7 @@ public partial class EmpireController : Node2D
 		{
 			var rootNode = GetTree().Root;
 			var warrior = UnitSpawner.Instance.SpawnUnit<WarriorUnit>();
-			warrior.SetUnitPosition(mouseTilePosition);
+			warrior.SetUnitTilePosition(mouseTilePosition);
 		}
 	}
 

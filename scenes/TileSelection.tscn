@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://cmjujoq33e31k"]
+
+[ext_resource type="Texture2D" uid="uid://02qx5wh51yov" path="res://sprites/tileselection.png" id="1_mpfmc"]
+
+[node name="Sprite2D" type="Sprite2D" unique_id=1765061921]
+texture = ExtResource("1_mpfmc")
+centered = false
