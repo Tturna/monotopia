@@ -3,72 +3,84 @@ using Godot;
 
 public partial class EmpireController : Node2D
 {
-    private Label coinsLabel => (Label)GetNode("%Coins Label");
+	[Export]
+	public bool Frozen;
 
-    private List<CityController> cities = new();
-    private int coins;
-    private int totalCoinsDelta;
+	private Label coinsLabel => (Label)GetNode("%Coins Label");
 
-    public override void _Ready()
-    {
-        TurnSystem.Instance.TurnStarted += OnTurnStarted;
+	private List<CityController> cities = new();
+	private int coins;
+	private int totalCoinsDelta;
 
-        if (!TileGrid.TryGetVillageTileSpawnPoint(out var spawnPoint))
-        {
-            GD.PrintErr("Couldn't get spawn point for empire!");
-            return;
-        }
+	public override void _Ready()
+	{
+		TurnSystem.Instance.TurnStarted += OnTurnStarted;
 
-        AddCityToEmpire(spawnPoint);
-    }
+		if (!TileGrid.TryGetVillageTileSpawnPoint(out var spawnPoint))
+		{
+			GD.PrintErr("Couldn't get spawn point for empire!");
+			return;
+		}
 
-    public override void _UnhandledInput(InputEvent inputEvent)
-    {
-        if (inputEvent is not InputEventKey keyEvent) return;
+		AddCityToEmpire(spawnPoint);
+	}
 
-        if (!keyEvent.IsPressed()) return;
+	public override void _UnhandledInput(InputEvent inputEvent)
+	{
+		if (Frozen) return;
 
-        if (keyEvent.Keycode != Key.C) return;
+		if (inputEvent is not InputEventKey keyEvent) return;
 
-        var mouseWorldPosition = GetViewport().GetCamera2D().GetGlobalMousePosition();
-        var mouseTilePosition = TileGrid.WorldToTilePosition(mouseWorldPosition);
+		if (!keyEvent.IsPressed()) return;
 
-        AddCityToEmpire(mouseTilePosition);
-    }
+		var mouseWorldPosition = GetViewport().GetCamera2D().GetGlobalMousePosition();
+		var mouseTilePosition = TileGrid.WorldToTilePosition(mouseWorldPosition);
 
-    private void UpdateCoinsLabel()
-    {
-        var balanceText = coins.ToString();
-        var deltaText = totalCoinsDelta.ToString();
-        coinsLabel.Text = $"{balanceText} (+{deltaText})";
-    }
+		if (keyEvent.Keycode == Key.C)
+		{
+			AddCityToEmpire(mouseTilePosition);
+		}
+		else if (keyEvent.Keycode == Key.U)
+		{
+			var rootNode = GetTree().Root;
+			var warrior = UnitSpawner.Instance.SpawnUnit<WarriorUnit>();
+			warrior.SetUnitPosition(mouseTilePosition);
+		}
+	}
 
-    private void UpdateTotalCoinDelta()
-    {
-        var total = 0;
+	private void UpdateCoinsLabel()
+	{
+		var balanceText = coins.ToString();
+		var deltaText = totalCoinsDelta.ToString();
+		coinsLabel.Text = $"{balanceText} (+{deltaText})";
+	}
 
-        foreach (var city in cities)
-        {
-            total += city.CoinsGenerated;
-        }
+	private void UpdateTotalCoinDelta()
+	{
+		var total = 0;
 
-        totalCoinsDelta = total;
-    }
+		foreach (var city in cities)
+		{
+			total += city.CoinsGenerated;
+		}
 
-    private void AddCityToEmpire(Vector2Int tilePosition)
-    {
-        var cityController = TileGrid.AddCity(tilePosition);
-        cityController.InitializeCity(tilePosition);
-        cities.Add(cityController);
-        totalCoinsDelta += cityController.CoinsGenerated;
-        UpdateTotalCoinDelta();
-        UpdateCoinsLabel();
-    }
+		totalCoinsDelta = total;
+	}
 
-    private void OnTurnStarted()
-    {
-        UpdateTotalCoinDelta();
-        coins += totalCoinsDelta;
-        UpdateCoinsLabel();
-    }
+	private void AddCityToEmpire(Vector2Int tilePosition)
+	{
+		var cityController = TileGrid.AddCity(tilePosition);
+		cityController.InitializeCity(tilePosition);
+		cities.Add(cityController);
+		totalCoinsDelta += cityController.CoinsGenerated;
+		UpdateTotalCoinDelta();
+		UpdateCoinsLabel();
+	}
+
+	private void OnTurnStarted()
+	{
+		UpdateTotalCoinDelta();
+		coins += totalCoinsDelta;
+		UpdateCoinsLabel();
+	}
 }

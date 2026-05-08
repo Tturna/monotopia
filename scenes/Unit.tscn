@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://d35hoavdljqc2"]
+
+[ext_resource type="Texture2D" uid="uid://drxfj8v5fhfbc" path="res://sprites/warrior.png" id="1_h85lg"]
+
+[node name="Sprite2D" type="Sprite2D" unique_id=1765061921]
+texture = ExtResource("1_h85lg")
+centered = false
