@@ -12,6 +12,8 @@
 [ext_resource type="Texture2D" uid="uid://dh42xxhofapix" path="res://sprites/coin_icon.png" id="6_vyht1"]
 [ext_resource type="Script" uid="uid://cg1myavcyc6vy" path="res://scripts/UnitSpawner.cs" id="8_6w1so"]
 [ext_resource type="PackedScene" uid="uid://d35hoavdljqc2" path="res://scenes/Unit.tscn" id="9_q7e4n"]
+[ext_resource type="Script" uid="uid://bngunyywpvjqm" path="res://scripts/UIController.cs" id="10_r7xkj"]
+[ext_resource type="PackedScene" uid="uid://1dota62uermp" path="res://scenes/OwnedCityView.tscn" id="13_6k1mm"]
 
 [node name="RootNode2D" type="Node2D" unique_id=1161755743]
 
@@ -31,6 +33,14 @@ script = ExtResource("6_huihk")
 [node name="UnitSpawner" type="Node2D" parent="." unique_id=1947486371]
 script = ExtResource("8_6w1so")
 UnitScene = ExtResource("9_q7e4n")
+
+[node name="UIController" type="Node2D" parent="." unique_id=170486342 node_paths=PackedStringArray("OwnedCityViewControl", "CoinsLabel", "TurnCountLabel", "TurnTimerLabel", "EndTurnButton")]
+script = ExtResource("10_r7xkj")
+OwnedCityViewControl = NodePath("../CanvasLayer/AspectRatioContainer/Owned City View")
+CoinsLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox/Coins Label")
+TurnCountLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Right HBox/VBoxContainer/Turn Count Label")
+TurnTimerLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/Turn Timer Label")
+EndTurnButton = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/CenterContainer/End Turn Button")
 
 [node name="Camera" type="Node2D" parent="." unique_id=676000897]
 script = ExtResource("3_vvh5c")
@@ -142,3 +152,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
 flat = true
+
+[node name="Owned City View" parent="CanvasLayer/AspectRatioContainer" unique_id=82809476 instance=ExtResource("13_6k1mm")]
+visible = false
+layout_mode = 2

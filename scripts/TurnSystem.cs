@@ -1,4 +1,3 @@
-using System;
 using Godot;
 
 public partial class TurnSystem : Node2D
@@ -7,10 +6,6 @@ public partial class TurnSystem : Node2D
     public event TurnStartedHandler TurnStarted;
 
     public static TurnSystem Instance;
-
-    private Label turnCountLabel => (Label)GetNode("%Turn Count Label");
-    private Label turnTimerLabel => (Label)GetNode("%Turn Timer Label");
-    private Button endTurnButton => (Button)GetNode("%End Turn Button");
 
     private int turnTimeSeconds = 5;
     private float turnTimer;
@@ -25,15 +20,14 @@ public partial class TurnSystem : Node2D
     {
         StartNextTurn();
 
-        endTurnButton.Pressed += () => StartNextTurn();
+        UIController.Instance.EndTurnButton.Pressed += () => StartNextTurn();
     }
 
     public override void _Process(double delta)
     {
         if (turnTimer <= 0) return;
 
-        var timeSpan = TimeSpan.FromSeconds(turnTimer);
-        turnTimerLabel.Text = timeSpan.ToString(@"mm\:ss");
+        UIController.Instance.SetTurnTimerText(turnTimer);
 
         turnTimer -= (float)delta;
 
@@ -47,7 +41,7 @@ public partial class TurnSystem : Node2D
     {
         turnTimer = turnTimeSeconds;
         turnCount++;
-        turnCountLabel.Text = $"Turn {turnCount}";
+        UIController.Instance.SetTurnCountText(turnCount);
         GD.Print($"Starting turn {turnCount}");
         TurnStarted?.Invoke();
     }

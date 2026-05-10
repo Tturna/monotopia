@@ -9,8 +9,6 @@ public partial class EmpireController : Node2D
 
 	public bool HasCursorSelection;
 
-	private Label coinsLabel => (Label)GetNode("%Coins Label");
-
 	private List<CityController> cities = new();
 	private int coins;
 	private int totalCoinsDelta;
@@ -67,10 +65,7 @@ public partial class EmpireController : Node2D
 	{
 		if (hasSelection && mouseButtonEvent.ButtonIndex == MouseButton.Right)
 		{
-			hasSelection = false;
-			selectedUnit = null;
-			selectedTile = null;
-			UpdateTileSelection(null);
+			Deselect();
 
 			return;
 		}
@@ -96,6 +91,7 @@ public partial class EmpireController : Node2D
 				selectedUnit = unit;
 				hasSelection = true;
 				UpdateTileSelection(mouseTilePosition);
+				UIController.Instance.ToggleOwnedCityView(false);
 
 				return;
 			}
@@ -120,7 +116,11 @@ public partial class EmpireController : Node2D
 
 			if (tileController is CityController cityController)
 			{
-                // Open city view
+				UIController.Instance.ToggleOwnedCityView(true);
+			}
+			else
+			{
+				UIController.Instance.ToggleOwnedCityView(false);
 			}
 
 			hasSelection = true;
@@ -136,6 +136,7 @@ public partial class EmpireController : Node2D
 		selectedTile = null;
 		hasSelection = false;
 		UpdateTileSelection(null);
+		UIController.Instance.ToggleOwnedCityView(false);
 	}
 
 	private void UpdateTileSelection(Vector2Int? tilePosition)
@@ -162,9 +163,7 @@ public partial class EmpireController : Node2D
 
 	private void UpdateCoinsLabel()
 	{
-		var balanceText = coins.ToString();
-		var deltaText = totalCoinsDelta.ToString();
-		coinsLabel.Text = $"{balanceText} (+{deltaText})";
+		UIController.Instance.SetCoinBalanceText(coins, totalCoinsDelta);
 	}
 
 	private void UpdateTotalCoinDelta()
