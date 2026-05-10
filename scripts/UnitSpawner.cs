@@ -12,9 +12,9 @@ public partial class UnitSpawner : Node2D
         Instance = this;
     }
 
-    public T SpawnUnit<T>() where T: BaseUnit, new()
+    public WarriorUnit SpawnWarrior(EmpireController ownerEmpire)
     {
-        var unit = new T();
+        var unit = new WarriorUnit(ownerEmpire);
         GetTree().Root.AddChild(unit);
 
         return unit;

@@ -1,10 +1,13 @@
 using System.Collections.Generic;
 using Godot;
 
+#nullable enable
 public partial class EmpireController : Node2D
 {
 	[Export]
 	public bool Frozen;
+
+	public BaseUnit? SelectedUnit;
 
 	private Label coinsLabel => (Label)GetNode("%Coins Label");
 
@@ -43,7 +46,7 @@ public partial class EmpireController : Node2D
 		else if (keyEvent.Keycode == Key.U)
 		{
 			var rootNode = GetTree().Root;
-			var warrior = UnitSpawner.Instance.SpawnUnit<WarriorUnit>();
+			var warrior = UnitSpawner.Instance.SpawnWarrior(ownerEmpire: this);
 			warrior.SetUnitTilePosition(mouseTilePosition);
 		}
 	}

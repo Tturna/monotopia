@@ -16,13 +16,15 @@ public abstract partial class BaseUnit : Sprite2D
     protected int Damage { get; init; } = 1;
     protected int Defense { get; init; } = 1;
 
+    protected EmpireController OwnerEmpire;
     protected bool IsSelected { get; private set; }
 
     private PackedScene tileSelectionScene => (PackedScene)GD.Load("res://scenes/TileSelection.tscn");
     private Sprite2D? tileSelectionNode;
 
-    public BaseUnit()
+    public BaseUnit(EmpireController unitOwner)
     {
+        OwnerEmpire = unitOwner;
         Texture = GetSprite();
         Centered = false;
     }
@@ -31,19 +33,58 @@ public abstract partial class BaseUnit : Sprite2D
     {
         if (inputEvent is not InputEventMouseButton mouseButtonEvent) return;
 
-        if (!mouseButtonEvent.IsPressed()) return;
-
-        var mouseWorldPosition = GetViewport().GetCamera2D().GetGlobalMousePosition();
-
-        if (!Collision.IsPointInArea(mouseWorldPosition, Position))
+        if (IsSelected && mouseButtonEvent.ButtonIndex == MouseButton.Right)
         {
             IsSelected = false;
+            OwnerEmpire.SelectedUnit = null;
             UpdateTileSelection();
+
             return;
         }
 
+        if (mouseButtonEvent.ButtonIndex != MouseButton.Left) return;
+
+        if (!mouseButtonEvent.IsPressed()) return;
+
+        var mouseWorldPosition = GetViewport().GetCamera2D().GetGlobalMousePosition();
+        var mouseTilePosition = TileGrid.WorldToTilePosition(mouseWorldPosition);
+
+        if (!TileGrid.IsTileInBounds(mouseTilePosition)) return;
+
+        if (mouseTilePosition != TilePosition)
+        {
+            if (IsSelected && TryMoveToTile(mouseTilePosition))
+            {
+                IsSelected = false;
+                OwnerEmpire.SelectedUnit = null;
+                UpdateTileSelection();
+            }
+
+            return;
+        }
+
+        if (OwnerEmpire.SelectedUnit is not null && OwnerEmpire.SelectedUnit != this) return;
+
         IsSelected = !IsSelected;
+        OwnerEmpire.SelectedUnit = IsSelected ? this : null;
         UpdateTileSelection();
+    }
+
+    private bool TryMoveToTile(Vector2Int tilePosition)
+    {
+        // TODO: Tile based path finding. How to get from current
+        // position to target position, how many tiles would the unit
+        // have to move through, would there be any obstacles in the way,
+        // and does the unit have enough movement for it?
+
+        var unitOwner = TileGrid.GetTileUnitOwner(tilePosition);
+
+        // TODO: Make it so you can swap friendly units?
+        if (unitOwner is not null) return false;
+
+        SetUnitTilePosition(tilePosition);
+
+        return true;
     }
 
     private void UpdateTileSelection()
@@ -68,8 +109,10 @@ public abstract partial class BaseUnit : Sprite2D
 
     public void SetUnitTilePosition(Vector2Int tilePosition)
     {
+        TileGrid.SetTileUnitOwner(TilePosition, null);
         this.TilePosition = tilePosition;
         Position = TileGrid.TileToWorldPosition(tilePosition);
+        TileGrid.SetTileUnitOwner(tilePosition, OwnerEmpire);
     }
 
     public void SetUnitWorldPosition(Vector2 worldPosition)

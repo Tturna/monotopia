@@ -28,7 +28,7 @@ public partial class TileGrid : Node2D
         new(TilesWidth - 1, TilesHeight - 1)
     ];
     private static int spawnPointsLeft;
-    private static Dictionary<Vector2Int, CityController?> tileOwners = new();
+    private static Dictionary<Vector2Int, TileData> tileDatas = new();
 
     public override void _EnterTree()
     {
@@ -46,7 +46,7 @@ public partial class TileGrid : Node2D
             {
                 var tilePos = new Vector2Int(x, y);
                 AddMapElement(tilePos, TileScene);
-                tileOwners.Add(tilePos, null);
+                tileDatas.Add(tilePos, new TileData());
             }
         }
 	}
@@ -140,42 +140,62 @@ public partial class TileGrid : Node2D
 
     public static bool IsTileInBounds(Vector2Int tilePosition)
     {
-        return tileOwners.ContainsKey(tilePosition);
+        return tileDatas.ContainsKey(tilePosition);
     }
 
     public static bool IsTileOwned(Vector2Int tilePosition)
     {
-        return IsTileInBounds(tilePosition) && tileOwners[tilePosition] is not null;
+        return IsTileInBounds(tilePosition) && tileDatas[tilePosition].TileOwner is not null;
     }
 
     public static void SetTileOwner(Vector2Int tilePosition, CityController owner)
     {
-        if (tileOwners.ContainsKey(tilePosition))
+        if (tileDatas.ContainsKey(tilePosition))
         {
-            tileOwners[tilePosition] = owner;
+            tileDatas[tilePosition] = tileDatas[tilePosition] with { TileOwner = owner };
         }
         else
         {
-            tileOwners.Add(tilePosition, owner);
+            tileDatas.Add(tilePosition, new TileData { TileOwner = owner });
         }
     }
 
-    public static bool TryGetTileOwner(Vector2Int tilePosition, out CityController? owner)
+    public static CityController? GetTileOwner(Vector2Int tilePosition)
     {
-        owner = null;
-
-        if (tileOwners.TryGetValue(tilePosition, out var ownerCity))
+        if (tileDatas.TryGetValue(tilePosition, out var tileData))
         {
-            if (ownerCity is null)
-            {
-                return false;
-            }
-
-            owner = ownerCity;
-
-            return true;
+            return tileData.TileOwner;
         }
 
-        return false;
+        throw new ArgumentOutOfRangeException(
+            paramName: nameof(tilePosition),
+            message: "Given tile position is out of bounds."
+        );
+    }
+
+    public static void SetTileUnitOwner(Vector2Int tilePosition, EmpireController? unitOwner)
+    {
+        if (!tileDatas.ContainsKey(tilePosition))
+        {
+            throw new ArgumentOutOfRangeException(
+                paramName: nameof(tilePosition),
+                message: "Given tile position is out of bounds."
+            );
+        }
+
+        tileDatas[tilePosition] = tileDatas[tilePosition] with { UnitOwner = unitOwner };
+    }
+
+    public static EmpireController? GetTileUnitOwner(Vector2Int tilePosition)
+    {
+        if (tileDatas.TryGetValue(tilePosition, out var tileData))
+        {
+            return tileData.UnitOwner;
+        }
+
+        throw new ArgumentOutOfRangeException(
+            paramName: nameof(tilePosition),
+            message: "Given tile position is out of bounds."
+        );
     }
 }

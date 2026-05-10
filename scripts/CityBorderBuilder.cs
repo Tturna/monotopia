@@ -249,13 +249,14 @@ public static class CityBorderBuilder
 
                     foreach (var dir in cardinalDirections)
                     {
-                        if (TileGrid.TryGetTileOwner(testTilePosition + dir, out var tileOwner))
+                        if (!TileGrid.IsTileInBounds(testTilePosition + dir)) continue;
+
+                        var tileOwner = TileGrid.GetTileOwner(testTilePosition + dir);
+
+                        if (tileOwner is not null && tileOwner == owner)
                         {
-                            if (tileOwner is not null && tileOwner == owner)
-                            {
-                                hasNeighbor = true;
-                                break;
-                            }
+                            hasNeighbor = true;
+                            break;
                         }
                     }
 
