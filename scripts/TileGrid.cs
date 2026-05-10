@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Godot;
 
 #nullable enable
@@ -28,7 +27,6 @@ public partial class TileGrid : Node2D
         new(TilesWidth - 1, TilesHeight - 1)
     ];
     private static int spawnPointsLeft;
-    private static Dictionary<Vector2Int, TileData> tileDatas = new();
 
     public override void _EnterTree()
     {
@@ -45,8 +43,8 @@ public partial class TileGrid : Node2D
             for (var x = 0; x < TilesHeight; x++)
             {
                 var tilePos = new Vector2Int(x, y);
-                AddMapElement(tilePos, TileScene);
-                tileDatas.Add(tilePos, new TileData());
+                var tileController = AddMapElement(tilePos, TileScene);
+                EntitySelector.AddTile(tilePos, tileController);
             }
         }
 	}
@@ -61,7 +59,7 @@ public partial class TileGrid : Node2D
         TilePixelSize = Vector2Int.FromVector2(tileTexture.GetSize());
     }
 
-    private Node2D InstantiateMapElement(PackedScene scene)
+    private TileController InstantiateMapElement(PackedScene scene)
     {
         var mapElementInstance = scene.Instantiate();
 
@@ -72,10 +70,10 @@ public partial class TileGrid : Node2D
 
         AddChild(mapElementInstance);
 
-        return (Node2D)mapElementInstance;
+        return (TileController)mapElementInstance;
     }
 
-    private Node2D AddMapElement(Vector2Int tilePosition, PackedScene scene)
+    private TileController AddMapElement(Vector2Int tilePosition, PackedScene scene)
     {
         var mapElementInstance = InstantiateMapElement(scene);
         mapElementInstance.Position = TileToWorldPosition(tilePosition);
@@ -102,7 +100,10 @@ public partial class TileGrid : Node2D
     public static CityController AddCity(Vector2Int tilePosition)
     {
         var cityNode = Instance.AddMapElement(tilePosition, Instance.CityScene);
-        return (CityController)cityNode;
+        var cityController = (CityController)cityNode;
+        EntitySelector.SetTile(tilePosition, cityController);
+
+        return cityController;
     }
 
     public static Vector2 TileToWorldPosition(Vector2Int tilePosition)
@@ -140,42 +141,26 @@ public partial class TileGrid : Node2D
 
     public static bool IsTileInBounds(Vector2Int tilePosition)
     {
-        return tileDatas.ContainsKey(tilePosition);
+        return EntitySelector.TryGetTile(tilePosition, out var _);
     }
 
     public static bool IsTileOwned(Vector2Int tilePosition)
     {
-        return IsTileInBounds(tilePosition) && tileDatas[tilePosition].TileOwner is not null;
+        if (!EntitySelector.TryGetTile(tilePosition, out var tileController)) return false;
+        if (tileController is null) return false;
+
+        return tileController.OwnerCity is not null;
     }
 
-    public static void SetTileOwner(Vector2Int tilePosition, CityController owner)
+    public static bool TrySetTileOwnerCity(Vector2Int tilePosition, CityController? owner)
     {
-        if (tileDatas.ContainsKey(tilePosition))
-        {
-            tileDatas[tilePosition] = tileDatas[tilePosition] with { TileOwner = owner };
-        }
-        else
-        {
-            tileDatas.Add(tilePosition, new TileData { TileOwner = owner });
-        }
+        return EntitySelector.TrySetTileOwner(tilePosition, owner);
     }
 
     public static CityController? GetTileOwner(Vector2Int tilePosition)
     {
-        if (tileDatas.TryGetValue(tilePosition, out var tileData))
-        {
-            return tileData.TileOwner;
-        }
-
-        throw new ArgumentOutOfRangeException(
-            paramName: nameof(tilePosition),
-            message: "Given tile position is out of bounds."
-        );
-    }
-
-    public static void SetTileUnitOwner(Vector2Int tilePosition, EmpireController? unitOwner)
-    {
-        if (!tileDatas.ContainsKey(tilePosition))
+        if (!EntitySelector.TryGetTile(tilePosition, out var tileController)
+            || tileController is null)
         {
             throw new ArgumentOutOfRangeException(
                 paramName: nameof(tilePosition),
@@ -183,19 +168,6 @@ public partial class TileGrid : Node2D
             );
         }
 
-        tileDatas[tilePosition] = tileDatas[tilePosition] with { UnitOwner = unitOwner };
-    }
-
-    public static EmpireController? GetTileUnitOwner(Vector2Int tilePosition)
-    {
-        if (tileDatas.TryGetValue(tilePosition, out var tileData))
-        {
-            return tileData.UnitOwner;
-        }
-
-        throw new ArgumentOutOfRangeException(
-            paramName: nameof(tilePosition),
-            message: "Given tile position is out of bounds."
-        );
+        return tileController.OwnerCity;
     }
 }

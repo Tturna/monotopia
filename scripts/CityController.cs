@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Godot;
 
 #nullable enable
-public partial class CityController : Node2D
+public partial class CityController : TileController
 {
     [Export]
     public bool Freeze;
@@ -40,7 +40,7 @@ public partial class CityController : Node2D
         if (TileGrid.IsTileOwned(tilePosition)) return;
 
         controlledTilePositions.Add(tilePosition);
-        TileGrid.SetTileOwner(tilePosition, this);
+        TileGrid.TrySetTileOwnerCity(tilePosition, this);
     }
 
     private void UpdateBorderPolygon()
@@ -55,7 +55,7 @@ public partial class CityController : Node2D
 
         cityTilePosition = tilePosition;
         controlledTilePositions.Add(cityTilePosition);
-        TileGrid.SetTileOwner(cityTilePosition, this);
+        TileGrid.TrySetTileOwnerCity(cityTilePosition, this);
 
         // Grow one tile outwards if possible, taking up a max of 3x3 tiles.
         for (var y = -1; y < 2; y++)
