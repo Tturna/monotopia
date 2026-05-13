@@ -1,27 +1,24 @@
 [gd_scene format=3 uid="uid://1dota62uermp"]
 
-[ext_resource type="Texture2D" uid="uid://drxfj8v5fhfbc" path="res://sprites/warrior.png" id="1_8uv1c"]
-[ext_resource type="Texture2D" uid="uid://dh42xxhofapix" path="res://sprites/coin_icon.png" id="2_1rtqh"]
-
 [node name="Owned City View" type="Control" unique_id=82809476]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = -932.0
+offset_right = -902.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=1873959765]
 layout_mode = 0
-offset_right = 220.0
+offset_right = 250.0
 offset_bottom = 648.0
 color = Color(0.34, 0.31302667, 0.2822, 1)
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=975254454]
 layout_mode = 0
-offset_right = 220.0
+offset_right = 250.0
 offset_bottom = 648.0
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
@@ -38,9 +35,9 @@ layout_mode = 2
 layout_mode = 2
 text = "City name here"
 
-[node name="CityNameLabel2" type="Label" parent="MarginContainer/City View Content VBox" unique_id=2003459632]
+[node name="CoinsGeneratedLabel" type="Label" parent="MarginContainer/City View Content VBox" unique_id=2003459632]
 layout_mode = 2
-text = "City name here"
+text = "Coins generated: 999999"
 
 [node name="CityNameLabel3" type="Label" parent="MarginContainer/City View Content VBox" unique_id=1438714515]
 layout_mode = 2
@@ -92,397 +89,9 @@ text = "Build"
 [node name="Build List Scroll Container" type="ScrollContainer" parent="MarginContainer/City View Content VBox/Build List VBox" unique_id=1920140059]
 layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
 
 [node name="Build List Scroll VBox" type="VBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container" unique_id=1607754824]
 layout_mode = 2
 size_flags_horizontal = 3
-
-[node name="Build Item Panel" type="PanelContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox" unique_id=1885011256]
-layout_mode = 2
-
-[node name="Build Item Margin" type="MarginContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel" unique_id=1241176876]
-layout_mode = 2
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_top = 5
-theme_override_constants/margin_right = 5
-theme_override_constants/margin_bottom = 5
-
-[node name="Build Item HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel/Build Item Margin" unique_id=1559764485]
-layout_mode = 2
-
-[node name="Built Item Info HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel/Build Item Margin/Build Item HBox" unique_id=214987369]
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Item Icon" type="TextureRect" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel/Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=305074754]
-layout_mode = 2
-texture = ExtResource("1_8uv1c")
-stretch_mode = 4
-
-[node name="Item Name" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel/Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=2004459593]
-layout_mode = 2
-text = "Unit"
-
-[node name="Build Item Cost HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel/Build Item Margin/Build Item HBox" unique_id=1848307458]
-layout_mode = 2
-size_flags_horizontal = 10
-
-[node name="Resource Icon" type="TextureRect" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel/Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=1045062050]
-layout_mode = 2
-texture = ExtResource("2_1rtqh")
-stretch_mode = 4
-
-[node name="Item Cost" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel/Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=2020188220]
-layout_mode = 2
-text = "9999"
-
-[node name="Build Item Panel2" type="PanelContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox" unique_id=521621353]
-layout_mode = 2
-
-[node name="Build Item Margin" type="MarginContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel2" unique_id=1858422115]
-layout_mode = 2
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_top = 5
-theme_override_constants/margin_right = 5
-theme_override_constants/margin_bottom = 5
-
-[node name="Build Item HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel2/Build Item Margin" unique_id=498295948]
-layout_mode = 2
-
-[node name="Built Item Info HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel2/Build Item Margin/Build Item HBox" unique_id=298719170]
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Item Icon" type="TextureRect" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel2/Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=41652040]
-layout_mode = 2
-texture = ExtResource("1_8uv1c")
-stretch_mode = 4
-
-[node name="Item Name" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel2/Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=1510713679]
-layout_mode = 2
-text = "Unit"
-
-[node name="Build Item Cost HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel2/Build Item Margin/Build Item HBox" unique_id=1518695745]
-layout_mode = 2
-size_flags_horizontal = 10
-
-[node name="Resource Icon" type="TextureRect" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel2/Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=1910827704]
-layout_mode = 2
-texture = ExtResource("2_1rtqh")
-stretch_mode = 4
-
-[node name="Item Cost" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel2/Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=49042706]
-layout_mode = 2
-text = "9999"
-
-[node name="Build Item Panel3" type="PanelContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox" unique_id=1672133194]
-layout_mode = 2
-
-[node name="Build Item Margin" type="MarginContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel3" unique_id=1597069579]
-layout_mode = 2
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_top = 5
-theme_override_constants/margin_right = 5
-theme_override_constants/margin_bottom = 5
-
-[node name="Build Item HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel3/Build Item Margin" unique_id=986849916]
-layout_mode = 2
-
-[node name="Built Item Info HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel3/Build Item Margin/Build Item HBox" unique_id=2012682088]
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Item Icon" type="TextureRect" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel3/Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=1439142005]
-layout_mode = 2
-texture = ExtResource("1_8uv1c")
-stretch_mode = 4
-
-[node name="Item Name" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel3/Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=1069460222]
-layout_mode = 2
-text = "Unit"
-
-[node name="Build Item Cost HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel3/Build Item Margin/Build Item HBox" unique_id=1501151847]
-layout_mode = 2
-size_flags_horizontal = 10
-
-[node name="Resource Icon" type="TextureRect" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel3/Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=162551148]
-layout_mode = 2
-texture = ExtResource("2_1rtqh")
-stretch_mode = 4
-
-[node name="Item Cost" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel3/Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=1776061908]
-layout_mode = 2
-text = "9999"
-
-[node name="Build Item Panel4" type="PanelContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox" unique_id=1656353486]
-layout_mode = 2
-
-[node name="Build Item Margin" type="MarginContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel4" unique_id=1932366693]
-layout_mode = 2
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_top = 5
-theme_override_constants/margin_right = 5
-theme_override_constants/margin_bottom = 5
-
-[node name="Build Item HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel4/Build Item Margin" unique_id=602134635]
-layout_mode = 2
-
-[node name="Built Item Info HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel4/Build Item Margin/Build Item HBox" unique_id=1880539104]
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Item Icon" type="TextureRect" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel4/Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=75352594]
-layout_mode = 2
-texture = ExtResource("1_8uv1c")
-stretch_mode = 4
-
-[node name="Item Name" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel4/Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=722306805]
-layout_mode = 2
-text = "Unit"
-
-[node name="Build Item Cost HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel4/Build Item Margin/Build Item HBox" unique_id=1678830474]
-layout_mode = 2
-size_flags_horizontal = 10
-
-[node name="Resource Icon" type="TextureRect" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel4/Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=1587178971]
-layout_mode = 2
-texture = ExtResource("2_1rtqh")
-stretch_mode = 4
-
-[node name="Item Cost" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel4/Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=1597375193]
-layout_mode = 2
-text = "9999"
-
-[node name="Build Item Panel5" type="PanelContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox" unique_id=510951309]
-layout_mode = 2
-
-[node name="Build Item Margin" type="MarginContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel5" unique_id=912611123]
-layout_mode = 2
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_top = 5
-theme_override_constants/margin_right = 5
-theme_override_constants/margin_bottom = 5
-
-[node name="Build Item HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel5/Build Item Margin" unique_id=1059382238]
-layout_mode = 2
-
-[node name="Built Item Info HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel5/Build Item Margin/Build Item HBox" unique_id=1723319184]
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Item Icon" type="TextureRect" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel5/Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=552955835]
-layout_mode = 2
-texture = ExtResource("1_8uv1c")
-stretch_mode = 4
-
-[node name="Item Name" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel5/Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=813170947]
-layout_mode = 2
-text = "Unit"
-
-[node name="Build Item Cost HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel5/Build Item Margin/Build Item HBox" unique_id=1807902701]
-layout_mode = 2
-size_flags_horizontal = 10
-
-[node name="Resource Icon" type="TextureRect" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel5/Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=1559630840]
-layout_mode = 2
-texture = ExtResource("2_1rtqh")
-stretch_mode = 4
-
-[node name="Item Cost" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel5/Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=2040751242]
-layout_mode = 2
-text = "9999"
-
-[node name="Build Item Panel6" type="PanelContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox" unique_id=531266211]
-layout_mode = 2
-
-[node name="Build Item Margin" type="MarginContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel6" unique_id=914686729]
-layout_mode = 2
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_top = 5
-theme_override_constants/margin_right = 5
-theme_override_constants/margin_bottom = 5
-
-[node name="Build Item HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel6/Build Item Margin" unique_id=1993704071]
-layout_mode = 2
-
-[node name="Built Item Info HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel6/Build Item Margin/Build Item HBox" unique_id=89178901]
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Item Icon" type="TextureRect" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel6/Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=2115291897]
-layout_mode = 2
-texture = ExtResource("1_8uv1c")
-stretch_mode = 4
-
-[node name="Item Name" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel6/Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=1609133361]
-layout_mode = 2
-text = "Unit"
-
-[node name="Build Item Cost HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel6/Build Item Margin/Build Item HBox" unique_id=2106393266]
-layout_mode = 2
-size_flags_horizontal = 10
-
-[node name="Resource Icon" type="TextureRect" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel6/Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=1386364532]
-layout_mode = 2
-texture = ExtResource("2_1rtqh")
-stretch_mode = 4
-
-[node name="Item Cost" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel6/Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=1526708739]
-layout_mode = 2
-text = "9999"
-
-[node name="Build Item Panel7" type="PanelContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox" unique_id=674946497]
-layout_mode = 2
-
-[node name="Build Item Margin" type="MarginContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel7" unique_id=306016341]
-layout_mode = 2
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_top = 5
-theme_override_constants/margin_right = 5
-theme_override_constants/margin_bottom = 5
-
-[node name="Build Item HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel7/Build Item Margin" unique_id=19450685]
-layout_mode = 2
-
-[node name="Built Item Info HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel7/Build Item Margin/Build Item HBox" unique_id=1976368347]
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Item Icon" type="TextureRect" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel7/Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=1773544989]
-layout_mode = 2
-texture = ExtResource("1_8uv1c")
-stretch_mode = 4
-
-[node name="Item Name" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel7/Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=7697909]
-layout_mode = 2
-text = "Unit"
-
-[node name="Build Item Cost HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel7/Build Item Margin/Build Item HBox" unique_id=366014481]
-layout_mode = 2
-size_flags_horizontal = 10
-
-[node name="Resource Icon" type="TextureRect" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel7/Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=1057817036]
-layout_mode = 2
-texture = ExtResource("2_1rtqh")
-stretch_mode = 4
-
-[node name="Item Cost" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel7/Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=647666479]
-layout_mode = 2
-text = "9999"
-
-[node name="Build Item Panel8" type="PanelContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox" unique_id=942626395]
-layout_mode = 2
-
-[node name="Build Item Margin" type="MarginContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel8" unique_id=1573296211]
-layout_mode = 2
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_top = 5
-theme_override_constants/margin_right = 5
-theme_override_constants/margin_bottom = 5
-
-[node name="Build Item HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel8/Build Item Margin" unique_id=1463440538]
-layout_mode = 2
-
-[node name="Built Item Info HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel8/Build Item Margin/Build Item HBox" unique_id=188558471]
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Item Icon" type="TextureRect" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel8/Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=217576702]
-layout_mode = 2
-texture = ExtResource("1_8uv1c")
-stretch_mode = 4
-
-[node name="Item Name" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel8/Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=1523174827]
-layout_mode = 2
-text = "Unit"
-
-[node name="Build Item Cost HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel8/Build Item Margin/Build Item HBox" unique_id=1371818517]
-layout_mode = 2
-size_flags_horizontal = 10
-
-[node name="Resource Icon" type="TextureRect" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel8/Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=1907969772]
-layout_mode = 2
-texture = ExtResource("2_1rtqh")
-stretch_mode = 4
-
-[node name="Item Cost" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel8/Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=396074883]
-layout_mode = 2
-text = "9999"
-
-[node name="Build Item Panel9" type="PanelContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox" unique_id=813538139]
-layout_mode = 2
-
-[node name="Build Item Margin" type="MarginContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel9" unique_id=1973904880]
-layout_mode = 2
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_top = 5
-theme_override_constants/margin_right = 5
-theme_override_constants/margin_bottom = 5
-
-[node name="Build Item HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel9/Build Item Margin" unique_id=477734490]
-layout_mode = 2
-
-[node name="Built Item Info HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel9/Build Item Margin/Build Item HBox" unique_id=764588373]
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Item Icon" type="TextureRect" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel9/Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=2062990983]
-layout_mode = 2
-texture = ExtResource("1_8uv1c")
-stretch_mode = 4
-
-[node name="Item Name" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel9/Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=1144643118]
-layout_mode = 2
-text = "Unit"
-
-[node name="Build Item Cost HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel9/Build Item Margin/Build Item HBox" unique_id=672456084]
-layout_mode = 2
-size_flags_horizontal = 10
-
-[node name="Resource Icon" type="TextureRect" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel9/Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=1921208325]
-layout_mode = 2
-texture = ExtResource("2_1rtqh")
-stretch_mode = 4
-
-[node name="Item Cost" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel9/Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=1251512510]
-layout_mode = 2
-text = "9999"
-
-[node name="Build Item Panel10" type="PanelContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox" unique_id=878929742]
-layout_mode = 2
-
-[node name="Build Item Margin" type="MarginContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel10" unique_id=1991107785]
-layout_mode = 2
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_top = 5
-theme_override_constants/margin_right = 5
-theme_override_constants/margin_bottom = 5
-
-[node name="Build Item HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel10/Build Item Margin" unique_id=1277873545]
-layout_mode = 2
-
-[node name="Built Item Info HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel10/Build Item Margin/Build Item HBox" unique_id=339928914]
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Item Icon" type="TextureRect" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel10/Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=1730162327]
-layout_mode = 2
-texture = ExtResource("1_8uv1c")
-stretch_mode = 4
-
-[node name="Item Name" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel10/Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=1482352542]
-layout_mode = 2
-text = "Unit"
-
-[node name="Build Item Cost HBox" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel10/Build Item Margin/Build Item HBox" unique_id=965727587]
-layout_mode = 2
-size_flags_horizontal = 10
-
-[node name="Resource Icon" type="TextureRect" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel10/Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=1100878011]
-layout_mode = 2
-texture = ExtResource("2_1rtqh")
-stretch_mode = 4
-
-[node name="Item Cost" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Scroll Container/Build List Scroll VBox/Build Item Panel10/Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=126698545]
-layout_mode = 2
-text = "9999"

@@ -1,36 +1,81 @@
 using System;
 using Godot;
 
+#nullable enable
 public partial class UIController : Node2D
 {
     [Export]
-    public Control OwnedCityViewControl;
+    public required Control OwnedCityViewControl;
     [Export]
-	public Label CoinsLabel;
+	public required Label CoinsLabel;
     [Export]
-    public Label TurnCountLabel;
+    public required Label TurnCountLabel;
     [Export]
-    public Label TurnTimerLabel;
+    public required Label TurnTimerLabel;
     [Export]
-    public Button EndTurnButton;
+    public required Button EndTurnButton;
+    [Export]
+    public required PackedScene BuildListItemPanel;
 
-    public static UIController Instance;
+    public static UIController Instance = null!;
 
     public override void _EnterTree()
     {
         Instance = this;
     }
 
-    public void ToggleOwnedCityView(bool visible)
+    public void ShowOwnedCityView(CityController city)
     {
-        if (visible)
+        if (city is null)
         {
-            OwnedCityViewControl.Show();
+            throw new ArgumentException("Can't show city info for null city", nameof(city));
         }
-        else
+
+        OwnedCityViewControl.Show();
+
+        var cityNameLabel = (Label)OwnedCityViewControl.FindChild("CityNameLabel");
+        cityNameLabel.Text = city!.CityName;
+
+        var coinsGeneratedLabel = (Label)OwnedCityViewControl.FindChild("CoinsGeneratedLabel");
+        var prefix = city.CoinsGenerated switch
         {
-            OwnedCityViewControl.Hide();
+            > 0 => "+",
+            < 0 => "-",
+            _ => ""
+        };
+        var coinsText = Math.Abs(city.CoinsGenerated).ToString();
+
+        coinsGeneratedLabel.Text = $"Coins generated: {prefix}{coinsText}";
+
+        var buildListScrollVBox = (VBoxContainer)OwnedCityViewControl.FindChild("Build List Scroll VBox");
+
+        while (buildListScrollVBox.GetChildCount() > 0)
+        {
+            var child = buildListScrollVBox.GetChild(0);
+            child.QueueFree();
+            buildListScrollVBox.RemoveChild(child);
         }
+
+        var buildables = city.TempGetBuildables();
+
+        foreach (var buildable in buildables)
+        {
+            var name = buildable.Item1;
+            var cost = buildable.Item2;
+
+            var buildListItemPanelInstance = BuildListItemPanel.Instantiate();
+            buildListScrollVBox.AddChild(buildListItemPanelInstance);
+
+            var itemNameLabel = (Label)buildListItemPanelInstance.FindChild("Item Name");
+            var itemCostLabel = (Label)buildListItemPanelInstance.FindChild("Item Cost");
+            itemNameLabel.Text = name;
+            itemCostLabel.Text = cost.ToString();
+        }
+    }
+
+    public void HideOwnedCityView()
+    {
+        OwnedCityViewControl.Hide();
     }
 
     public void SetCoinBalanceText(int coins, int delta)

@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://cg1myavcyc6vy" path="res://scripts/UnitSpawner.cs" id="8_6w1so"]
 [ext_resource type="PackedScene" uid="uid://d35hoavdljqc2" path="res://scenes/Unit.tscn" id="9_q7e4n"]
 [ext_resource type="Script" uid="uid://bngunyywpvjqm" path="res://scripts/UIController.cs" id="10_r7xkj"]
+[ext_resource type="PackedScene" uid="uid://bidsvn261x8ld" path="res://scenes/BuildItemPanel.tscn" id="11_eajee"]
 [ext_resource type="PackedScene" uid="uid://1dota62uermp" path="res://scenes/OwnedCityView.tscn" id="13_6k1mm"]
 
 [node name="RootNode2D" type="Node2D" unique_id=1161755743]
@@ -41,6 +42,7 @@ CoinsLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Top R
 TurnCountLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Right HBox/VBoxContainer/Turn Count Label")
 TurnTimerLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/Turn Timer Label")
 EndTurnButton = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/CenterContainer/End Turn Button")
+BuildListItemPanel = ExtResource("11_eajee")
 
 [node name="Camera" type="Node2D" parent="." unique_id=676000897]
 script = ExtResource("3_vvh5c")

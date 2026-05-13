@@ -1,0 +1,56 @@
+[gd_scene format=3 uid="uid://bidsvn261x8ld"]
+
+[ext_resource type="Texture2D" uid="uid://drxfj8v5fhfbc" path="res://sprites/warrior.png" id="1_yy1ro"]
+[ext_resource type="Texture2D" uid="uid://dh42xxhofapix" path="res://sprites/coin_icon.png" id="2_sodq7"]
+
+[node name="Build Item Panel" type="PanelContainer" unique_id=1912122995]
+custom_minimum_size = Vector2(220, 0)
+offset_right = 220.0
+offset_bottom = 42.0
+size_flags_horizontal = 4
+
+[node name="Build Item Margin" type="MarginContainer" parent="." unique_id=931306691]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="Build Item HBox" type="HBoxContainer" parent="Build Item Margin" unique_id=566214886]
+layout_mode = 2
+
+[node name="Built Item Info HBox" type="HBoxContainer" parent="Build Item Margin/Build Item HBox" unique_id=880502507]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Item Icon" type="TextureRect" parent="Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=573805453]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("1_yy1ro")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Item Name" type="Label" parent="Build Item Margin/Build Item HBox/Built Item Info HBox" unique_id=453999833]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+text = "Police headquarters"
+clip_text = true
+
+[node name="Build Item Cost HBox" type="HBoxContainer" parent="Build Item Margin/Build Item HBox" unique_id=1290202538]
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="Resource Icon" type="TextureRect" parent="Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=760434900]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("2_sodq7")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Item Cost" type="Label" parent="Build Item Margin/Build Item HBox/Build Item Cost HBox" unique_id=2006909266]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "9999"

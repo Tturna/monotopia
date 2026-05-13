@@ -91,7 +91,7 @@ public partial class EmpireController : Node2D
 				selectedUnit = unit;
 				hasSelection = true;
 				UpdateTileSelection(mouseTilePosition);
-				UIController.Instance.ToggleOwnedCityView(false);
+				UIController.Instance.HideOwnedCityView();
 
 				return;
 			}
@@ -116,11 +116,11 @@ public partial class EmpireController : Node2D
 
 			if (tileController is CityController cityController)
 			{
-				UIController.Instance.ToggleOwnedCityView(true);
+				UIController.Instance.ShowOwnedCityView(cityController);
 			}
 			else
 			{
-				UIController.Instance.ToggleOwnedCityView(false);
+				UIController.Instance.HideOwnedCityView();
 			}
 
 			hasSelection = true;
@@ -136,7 +136,7 @@ public partial class EmpireController : Node2D
 		selectedTile = null;
 		hasSelection = false;
 		UpdateTileSelection(null);
-		UIController.Instance.ToggleOwnedCityView(false);
+		UIController.Instance.HideOwnedCityView();
 	}
 
 	private void UpdateTileSelection(Vector2Int? tilePosition)

@@ -8,7 +8,8 @@ public partial class CityController : TileController
     [Export]
     public bool Freeze;
 
-    public int CoinsGenerated = 2;
+    public string CityName { get; private set; } = null!;
+    public int CoinsGenerated { get; private set; } = 2;
 
     private Vector2Int cityTilePosition = null!;
     private List<Vector2Int> controlledTilePositions = new();
@@ -51,6 +52,8 @@ public partial class CityController : TileController
 
     public void InitializeCity(Vector2Int tilePosition)
     {
+        CityName = $"City {tilePosition}";
+
         TurnSystem.Instance.TurnStarted += OnTurnStarted;
 
         cityTilePosition = tilePosition;
@@ -83,5 +86,18 @@ public partial class CityController : TileController
         var b = (float)Random.Shared.NextDouble();
         var a = 0.65f;
         borderPolygon.Color = new Color(r, g, b, a);
+    }
+
+    public (string, int)[] TempGetBuildables()
+    {
+        return
+        [
+            ("some unit", 10),
+            ("some building", 20),
+            ("special stuff", 30),
+            ("another unit", 50),
+            ("nuke", 1000),
+            ("police headquarters", 100)
+        ];
     }
 }
