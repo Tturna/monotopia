@@ -11,6 +11,7 @@ public partial class CityController : TileController
     public string CityName { get; private set; } = null!;
     public int CoinsGenerated { get; private set; } = 2;
     public Vector2Int CityTilePosition { get; private set; } = null!;
+    public EmpireController OwnerEmpire { get; private set; } = null!;
 
     private List<Vector2Int> controlledTilePositions = new();
     private Vector2Int? borderExpansionDirectionFocus = null;
@@ -50,9 +51,10 @@ public partial class CityController : TileController
         borderPolygon.Polygon = polygonVertices;
     }
 
-    public void InitializeCity(Vector2Int tilePosition)
+    public void InitializeCity(Vector2Int tilePosition, EmpireController ownerEmpire)
     {
         CityName = $"City {tilePosition}";
+        OwnerEmpire = ownerEmpire;
 
         TurnSystem.Instance.TurnStarted += OnTurnStarted;
 
@@ -86,5 +88,12 @@ public partial class CityController : TileController
         var b = (float)Random.Shared.NextDouble();
         var a = 0.65f;
         borderPolygon.Color = new Color(r, g, b, a);
+    }
+
+    public void SetOwnerEmpire(EmpireController newOwner)
+    {
+        OwnerEmpire = newOwner;
+
+        // TODO: update border colors and stuff
     }
 }

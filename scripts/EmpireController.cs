@@ -187,7 +187,7 @@ public partial class EmpireController : Node2D
 	private void AddCityToEmpire(Vector2Int tilePosition)
 	{
 		var cityController = TileGrid.AddCity(tilePosition);
-		cityController.InitializeCity(tilePosition);
+		cityController.InitializeCity(tilePosition, ownerEmpire: this);
 		cities.Add(cityController);
 		totalCoinsDelta += cityController.CoinsGenerated;
 		UpdateTotalCoinDelta();
@@ -241,6 +241,17 @@ public partial class EmpireController : Node2D
 		}
 
 		throw new NotImplementedException($"Empire should build a structure ({item.ItemName}) but it can only build units for now.");
+	}
+
+	public void AnnexCity(CityController targetCity)
+	{
+		cities.Add(targetCity);
+		targetCity.SetOwnerEmpire(this);
+	}
+
+	public void ReleaseCity(CityController targetCity)
+	{
+		cities.Remove(targetCity);
 	}
 
 	public static EmpireController GetPlayerEmpire(Node rootNode)

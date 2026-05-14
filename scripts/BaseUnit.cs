@@ -37,6 +37,15 @@ public abstract partial class BaseUnit : Sprite2D
 
         SetUnitTilePosition(tilePosition);
 
+        if (EntitySelector.TryGetTile(tilePosition, out var tile) && tile is CityController city)
+        {
+            if (city.OwnerEmpire != OwnerEmpire)
+            {
+                city.OwnerEmpire.ReleaseCity(city);
+                OwnerEmpire.AnnexCity(city);
+            }
+        }
+
         return true;
     }
 
