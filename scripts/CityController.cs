@@ -12,6 +12,7 @@ public partial class CityController : TileController
     public int CoinsGenerated { get; private set; } = 2;
     public Vector2Int CityTilePosition { get; private set; } = null!;
     public EmpireController OwnerEmpire { get; private set; } = null!;
+    public Color BorderColor { get; private set; }
 
     private List<Vector2Int> controlledTilePositions = new();
     private Vector2Int? borderExpansionDirectionFocus = null;
@@ -87,11 +88,14 @@ public partial class CityController : TileController
         var g = (float)Random.Shared.NextDouble();
         var b = (float)Random.Shared.NextDouble();
         var a = 0.65f;
-        borderPolygon.Color = new Color(r, g, b, a);
+        BorderColor = new Color(r, g, b, a);
+        borderPolygon.Color = BorderColor;
     }
 
-    public void SetOwnerEmpire(EmpireController newOwner)
+    public void SetOwnerEmpire(EmpireController newOwner, Color newBorderColor)
     {
+        BorderColor = newBorderColor;
+        borderPolygon.Color = BorderColor;
         OwnerEmpire = newOwner;
 
         // TODO: update border colors and stuff

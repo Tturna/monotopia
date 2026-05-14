@@ -246,7 +246,7 @@ public partial class EmpireController : Node2D
 	public void AnnexCity(CityController targetCity)
 	{
 		cities.Add(targetCity);
-		targetCity.SetOwnerEmpire(this);
+		targetCity.SetOwnerEmpire(this, cities[0].BorderColor);
 	}
 
 	public void ReleaseCity(CityController targetCity)
