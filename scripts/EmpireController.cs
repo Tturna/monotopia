@@ -247,11 +247,22 @@ public partial class EmpireController : Node2D
 	{
 		cities.Add(targetCity);
 		targetCity.SetOwnerEmpire(this, cities[0].BorderColor);
+
+		if (GetAliveEmpireCount(GetTree().Root) == 1)
+		{
+			UIController.Instance.ShowWinOverlay();
+			FreezeAllEmpires(GetTree().Root);
+		}
 	}
 
 	public void ReleaseCity(CityController targetCity)
 	{
 		cities.Remove(targetCity);
+	}
+
+	public bool HasCitiesRemaining()
+	{
+		return cities.Count > 0;
 	}
 
 	public static EmpireController GetPlayerEmpire(Node rootNode)
@@ -264,5 +275,31 @@ public partial class EmpireController : Node2D
 		}
 
 		throw new ArgumentException("No player empire found from given root node", nameof(rootNode));
+	}
+
+	public static int GetAliveEmpireCount(Node rootNode)
+	{
+		var empires = GodotUtilities.FindNodesOfType<EmpireController>(rootNode);
+		var aliveCount = 0;
+
+		foreach (EmpireController empire in empires)
+		{
+			if (empire.HasCitiesRemaining())
+			{
+				aliveCount++;
+			}
+		}
+
+		return aliveCount;
+	}
+
+	public static void FreezeAllEmpires(Node rootNode)
+	{
+		var empires = GodotUtilities.FindNodesOfType<EmpireController>(rootNode);
+
+		foreach (EmpireController empire in empires)
+		{
+			empire.Frozen = true;
+		}
 	}
 }

@@ -15,6 +15,7 @@
 [ext_resource type="Script" uid="uid://bngunyywpvjqm" path="res://scripts/UIController.cs" id="10_r7xkj"]
 [ext_resource type="PackedScene" uid="uid://bidsvn261x8ld" path="res://scenes/BuildItemPanel.tscn" id="11_eajee"]
 [ext_resource type="PackedScene" uid="uid://1dota62uermp" path="res://scenes/OwnedCityView.tscn" id="13_6k1mm"]
+[ext_resource type="PackedScene" uid="uid://cpc1ij2wjxypk" path="res://scenes/WinOverlay.tscn" id="15_d38gw"]
 
 [node name="RootNode2D" type="Node2D" unique_id=1161755743]
 
@@ -39,7 +40,7 @@ script = ExtResource("6_huihk")
 script = ExtResource("8_6w1so")
 UnitScene = ExtResource("9_q7e4n")
 
-[node name="UIController" type="Node2D" parent="." unique_id=170486342 node_paths=PackedStringArray("OwnedCityViewControl", "CoinsLabel", "TurnCountLabel", "TurnTimerLabel", "EndTurnButton")]
+[node name="UIController" type="Node2D" parent="." unique_id=170486342 node_paths=PackedStringArray("OwnedCityViewControl", "CoinsLabel", "TurnCountLabel", "TurnTimerLabel", "EndTurnButton", "WinOverlayControl")]
 script = ExtResource("10_r7xkj")
 OwnedCityViewControl = NodePath("../CanvasLayer/AspectRatioContainer/Owned City View")
 CoinsLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox/Coins Label")
@@ -47,6 +48,7 @@ TurnCountLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/T
 TurnTimerLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/Turn Timer Label")
 EndTurnButton = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/CenterContainer/End Turn Button")
 BuildListItemPanel = ExtResource("11_eajee")
+WinOverlayControl = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Win Overlay")
 
 [node name="Camera" type="Node2D" parent="." unique_id=676000897]
 script = ExtResource("3_vvh5c")
@@ -158,6 +160,12 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
 flat = true
+
+[node name="Win Overlay" parent="CanvasLayer/AspectRatioContainer/MarginContainer" unique_id=151656470 instance=ExtResource("15_d38gw")]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 
 [node name="Owned City View" parent="CanvasLayer/AspectRatioContainer" unique_id=82809476 instance=ExtResource("13_6k1mm")]
 visible = false

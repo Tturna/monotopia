@@ -17,6 +17,8 @@ public partial class UIController : Node2D
     public required Button EndTurnButton;
     [Export]
     public required PackedScene BuildListItemPanel;
+    [Export]
+    public required Control WinOverlayControl;
 
     public static UIController Instance = null!;
 
@@ -185,5 +187,10 @@ public partial class UIController : Node2D
     public void SetTurnCountText(int turn)
     {
         TurnCountLabel.Text = $"Turn {turn}";
+    }
+
+    public void ShowWinOverlay()
+    {
+        WinOverlayControl.Show();
     }
 }
