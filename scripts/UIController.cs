@@ -92,7 +92,6 @@ public partial class UIController : Node2D
     private void DeselectBuildableItem()
     {
         if (selectedBuildableItemPanel is null) return;
-        if (selectedBuildableItemPanel.IsQueuedForDeletion()) return;
 
         var highlightColorRect = (ColorRect)selectedBuildableItemPanel.FindChild("Highlight Color");
         highlightColorRect.Hide();
@@ -111,6 +110,10 @@ public partial class UIController : Node2D
         {
             throw new ArgumentException("Can't show city info for null city", nameof(city));
         }
+
+        // Reset all state so that switching directly between city views doesn't keep
+        // old view state.
+        HideOwnedCityView();
 
         selectedCity = city;
         OwnedCityViewControl.Show();
