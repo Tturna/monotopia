@@ -9,12 +9,24 @@ offset_right = 220.0
 offset_bottom = 42.0
 size_flags_horizontal = 4
 
+[node name="BG Color" type="ColorRect" parent="." unique_id=2046407417]
+layout_mode = 2
+color = Color(0.20511743, 0.20511743, 0.20511746, 1)
+
+[node name="Highlight Color" type="ColorRect" parent="." unique_id=32047115]
+visible = false
+layout_mode = 2
+
 [node name="Build Item Margin" type="MarginContainer" parent="." unique_id=931306691]
 layout_mode = 2
 theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
+
+[node name="Margin Area BG Color" type="ColorRect" parent="Build Item Margin" unique_id=2092730954]
+layout_mode = 2
+color = Color(0.20392157, 0.20392157, 0.20392157, 1)
 
 [node name="Build Item HBox" type="HBoxContainer" parent="Build Item Margin" unique_id=566214886]
 layout_mode = 2
@@ -54,3 +66,7 @@ stretch_mode = 4
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "9999"
+
+[node name="Select Button" type="Button" parent="." unique_id=1285001025]
+layout_mode = 2
+flat = true

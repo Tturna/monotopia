@@ -82,8 +82,18 @@ size_flags_vertical = 3
 [node name="Build List Label Panel" type="PanelContainer" parent="MarginContainer/City View Content VBox/Build List VBox" unique_id=860589678]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Label Panel" unique_id=1829174282]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Label Panel" unique_id=1317899274]
 layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Label Panel/HBoxContainer" unique_id=1829174282]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Buildables"
+
+[node name="Build Button" type="Button" parent="MarginContainer/City View Content VBox/Build List VBox/Build List Label Panel/HBoxContainer" unique_id=1575482629]
+layout_mode = 2
+size_flags_horizontal = 8
+disabled = true
 text = "Build"
 
 [node name="Build List Scroll Container" type="ScrollContainer" parent="MarginContainer/City View Content VBox/Build List VBox" unique_id=1920140059]

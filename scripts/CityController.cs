@@ -10,8 +10,8 @@ public partial class CityController : TileController
 
     public string CityName { get; private set; } = null!;
     public int CoinsGenerated { get; private set; } = 2;
+    public Vector2Int CityTilePosition { get; private set; } = null!;
 
-    private Vector2Int cityTilePosition = null!;
     private List<Vector2Int> controlledTilePositions = new();
     private Vector2Int? borderExpansionDirectionFocus = null;
     private Polygon2D borderPolygon = new();
@@ -22,7 +22,7 @@ public partial class CityController : TileController
 
         var nextTileAvailable = CityBorderBuilder.TryGetNextBorderExpansionTile(
             controlledTilePositions.ToArray(),
-            cityTilePosition,
+            CityTilePosition,
             owner: this,
             out var nextTilePosition,
             borderExpansionDirectionFocus);
@@ -36,7 +36,7 @@ public partial class CityController : TileController
 
     private void TakeControlOfTile(Vector2Int tilePosition)
     {
-        if (tilePosition == cityTilePosition) return;
+        if (tilePosition == CityTilePosition) return;
         if (!TileGrid.IsTileInBounds(tilePosition)) return;
         if (TileGrid.IsTileOwned(tilePosition)) return;
 
@@ -56,24 +56,24 @@ public partial class CityController : TileController
 
         TurnSystem.Instance.TurnStarted += OnTurnStarted;
 
-        cityTilePosition = tilePosition;
-        controlledTilePositions.Add(cityTilePosition);
-        TileGrid.TrySetTileOwnerCity(cityTilePosition, this);
+        CityTilePosition = tilePosition;
+        controlledTilePositions.Add(CityTilePosition);
+        TileGrid.TrySetTileOwnerCity(CityTilePosition, this);
 
         // Grow one tile outwards if possible, taking up a max of 3x3 tiles.
         for (var y = -1; y < 2; y++)
         {
             for (var x = -1; x < 2; x++)
             {
-                var controlledTilePosition = cityTilePosition + new Vector2Int(x, y);
+                var controlledTilePosition = CityTilePosition + new Vector2Int(x, y);
                 TakeControlOfTile(controlledTilePosition);
             }
         }
 
-        TakeControlOfTile(cityTilePosition + new Vector2Int(0, -2));
-        TakeControlOfTile(cityTilePosition + new Vector2Int(0, 2));
-        TakeControlOfTile(cityTilePosition + new Vector2Int(2, 0));
-        TakeControlOfTile(cityTilePosition + new Vector2Int(-2, 0));
+        TakeControlOfTile(CityTilePosition + new Vector2Int(0, -2));
+        TakeControlOfTile(CityTilePosition + new Vector2Int(0, 2));
+        TakeControlOfTile(CityTilePosition + new Vector2Int(2, 0));
+        TakeControlOfTile(CityTilePosition + new Vector2Int(-2, 0));
 
         UpdateBorderPolygon();
         AddChild(borderPolygon);
@@ -86,18 +86,5 @@ public partial class CityController : TileController
         var b = (float)Random.Shared.NextDouble();
         var a = 0.65f;
         borderPolygon.Color = new Color(r, g, b, a);
-    }
-
-    public (string, int)[] TempGetBuildables()
-    {
-        return
-        [
-            ("some unit", 10),
-            ("some building", 20),
-            ("special stuff", 30),
-            ("another unit", 50),
-            ("nuke", 1000),
-            ("police headquarters", 100)
-        ];
     }
 }

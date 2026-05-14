@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Generic;
 using Godot;
 
 #nullable enable
 public partial class EmpireController : Node2D
 {
+	[Export]
+	public bool IsPlayerEmpire;
 	[Export]
 	public bool Frozen;
 
@@ -34,6 +37,7 @@ public partial class EmpireController : Node2D
 
 	public override void _UnhandledInput(InputEvent inputEvent)
 	{
+		if (!IsPlayerEmpire) return;
 		if (Frozen) return;
 
 		if (inputEvent is InputEventMouseButton mouseButtonEvent)
@@ -55,7 +59,6 @@ public partial class EmpireController : Node2D
 		}
 		else if (keyEvent.Keycode == Key.U)
 		{
-			var rootNode = GetTree().Root;
 			var warrior = UnitSpawner.Instance.SpawnWarrior(ownerEmpire: this);
 			warrior.SetUnitTilePosition(mouseTilePosition);
 		}
@@ -114,9 +117,9 @@ public partial class EmpireController : Node2D
 				return;
 			}
 
-			if (tileController is CityController cityController)
+			if (tileController is CityController cityController && cities.Contains(cityController))
 			{
-				UIController.Instance.ShowOwnedCityView(cityController);
+				UIController.Instance.ShowOwnedCityView(cityController, GetBuildableItems(), BuildItem);
 			}
 			else
 			{
@@ -163,11 +166,14 @@ public partial class EmpireController : Node2D
 
 	private void UpdateCoinsLabel()
 	{
+		if (!IsPlayerEmpire) return;
 		UIController.Instance.SetCoinBalanceText(coins, totalCoinsDelta);
 	}
 
 	private void UpdateTotalCoinDelta()
 	{
+		if (!IsPlayerEmpire) return;
+
 		var total = 0;
 
 		foreach (var city in cities)
@@ -193,5 +199,59 @@ public partial class EmpireController : Node2D
 		UpdateTotalCoinDelta();
 		coins += totalCoinsDelta;
 		UpdateCoinsLabel();
+	}
+
+	public BuildableItem[] GetBuildableItems()
+	{
+		return
+		[
+			new BuildableItem {
+				ItemName = UnitSpawner.Units.Warrior.ToString(),
+				Cost = 2,
+				BuildableUnitType = UnitSpawner.Units.Warrior
+			}
+		];
+	}
+
+	public void BuildItem(BuildableItem item, CityController selectedCity)
+	{
+		// TODO: check if item is unlocked and actually available for building
+
+		if (item.Cost > coins)
+		{
+			throw new InvalidOperationException($"Item {item.ItemName} is too expensive to build in empire {Name}");
+		}
+
+		if (item.BuildableUnitType is not null)
+		{
+			if (EntitySelector.TryGetUnit(selectedCity.CityTilePosition, out var unit) && unit is not null)
+			{
+				throw new InvalidOperationException($"Can't build unit in an occupied city {selectedCity.Name}");
+			}
+
+			coins -= item.Cost;
+			UpdateCoinsLabel();
+
+			var spawnedUnit = UnitSpawner.Instance.SpawnUnit(
+				(UnitSpawner.Units)item.BuildableUnitType,
+				ownerEmpire: this);
+			spawnedUnit.SetUnitTilePosition(selectedCity.CityTilePosition);
+
+			return; 
+		}
+
+		throw new NotImplementedException($"Empire should build a structure ({item.ItemName}) but it can only build units for now.");
+	}
+
+	public static EmpireController GetPlayerEmpire(Node rootNode)
+	{
+		var empires = GodotUtilities.FindNodesOfType<EmpireController>(rootNode);
+
+		foreach (EmpireController empire in empires)
+		{
+			if (empire.IsPlayerEmpire) return empire;
+		}
+
+		throw new ArgumentException("No player empire found from given root node", nameof(rootNode));
 	}
 }
