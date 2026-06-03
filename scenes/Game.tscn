@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://d35hoavdljqc2" path="res://scenes/Unit.tscn" id="10_a85ww"]
 [ext_resource type="Script" uid="uid://bngunyywpvjqm" path="res://scripts/UIController.cs" id="11_jhsr3"]
 [ext_resource type="PackedScene" uid="uid://bidsvn261x8ld" path="res://scenes/BuildItemPanel.tscn" id="12_0bq3a"]
+[ext_resource type="Script" uid="uid://uvbndmdkkg8p" path="res://scripts/PauseMenuController.cs" id="12_vjgi4"]
 [ext_resource type="Script" uid="uid://uaer1wt5dso1" path="res://scripts/CameraController.cs" id="13_754j2"]
 [ext_resource type="Texture2D" uid="uid://dh42xxhofapix" path="res://sprites/coin_icon.png" id="14_i4jil"]
 [ext_resource type="LabelSettings" uid="uid://brmmuo7fvryem" path="res://UI_Base_Label_Settings.tres" id="15_jai3c"]
@@ -49,6 +50,13 @@ TurnTimerLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/B
 EndTurnButton = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/CenterContainer/End Turn Button")
 BuildListItemPanel = ExtResource("12_0bq3a")
 WinOverlayControl = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Win Overlay")
+
+[node name="PauseMenuController" type="Node2D" parent="." unique_id=1251333920 node_paths=PackedStringArray("pauseMenuControl", "continueButton", "settingsButton", "disconnectButton")]
+script = ExtResource("12_vjgi4")
+pauseMenuControl = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Pause Menu VBox")
+continueButton = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Pause Menu VBox/Continue Button")
+settingsButton = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Pause Menu VBox/Settings Button")
+disconnectButton = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Pause Menu VBox/Disconnect Button")
 
 [node name="Camera" type="Node2D" parent="." unique_id=676000897]
 script = ExtResource("13_754j2")
@@ -128,39 +136,6 @@ label_settings = ExtResource("15_jai3c")
 layout_mode = 2
 size_flags_vertical = 8
 
-[node name="Multiplayer VBox" type="VBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox" unique_id=234719343]
-layout_mode = 2
-
-[node name="Start Server Button" type="Button" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/Multiplayer VBox" unique_id=1077598894]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 6
-theme_override_font_sizes/font_size = 24
-text = "Start Server"
-
-[node name="Start Client Button" type="Button" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/Multiplayer VBox" unique_id=178393904]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 6
-theme_override_font_sizes/font_size = 24
-text = "Start Client"
-
-[node name="Disconnect Client Button" type="Button" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/Multiplayer VBox" unique_id=923392649]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-size_flags_vertical = 6
-theme_override_font_sizes/font_size = 24
-text = "Disconnect"
-
-[node name="Shutdown Server Button" type="Button" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/Multiplayer VBox" unique_id=726045916]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-size_flags_vertical = 6
-theme_override_font_sizes/font_size = 24
-text = "Shut down"
-
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox" unique_id=982840399]
 layout_mode = 2
 size_flags_horizontal = 10
@@ -199,6 +174,28 @@ visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+
+[node name="Pause Menu VBox" type="VBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer" unique_id=925813752]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Label" type="Label" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Pause Menu VBox" unique_id=1852092611]
+layout_mode = 2
+text = "\"Pause\" Menu"
+
+[node name="Continue Button" type="Button" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Pause Menu VBox" unique_id=1435858244]
+layout_mode = 2
+text = "Continue"
+
+[node name="Settings Button" type="Button" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Pause Menu VBox" unique_id=1952141120]
+layout_mode = 2
+text = "Settings"
+
+[node name="Disconnect Button" type="Button" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Pause Menu VBox" unique_id=561943499]
+layout_mode = 2
+text = "Disconnect"
 
 [node name="Owned City View" parent="CanvasLayer/AspectRatioContainer" unique_id=82809476 instance=ExtResource("17_426vi")]
 visible = false

@@ -64,6 +64,15 @@ public partial class LobbyController : Node
 
     private void OnStartGameButtonPressed()
     {
-        GD.Print("Start game!!!");
+        if (Multiplayer.IsServer())
+        {
+            Rpc(MethodName.LoadGameScene);
+        }
+    }
+
+    [Rpc(CallLocal = true)]
+    private void LoadGameScene()
+    {
+        GetTree().ChangeSceneToFile("res://scenes/Game.tscn");
     }
 }
