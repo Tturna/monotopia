@@ -11,8 +11,12 @@ config_version=5
 [application]
 
 config/name="monotopia"
-run/main_scene="uid://c2jn1b4uyjt8n"
+run/main_scene="uid://eawyb7asi28i"
 config/features=PackedStringArray("4.6", "C#", "Forward Plus")
+
+[autoload]
+
+MultiplayerController="*uid://kfcuaar860ok"
 
 [display]
 

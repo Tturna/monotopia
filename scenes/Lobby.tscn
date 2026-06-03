@@ -1,0 +1,87 @@
+[gd_scene format=3 uid="uid://dn6ieaf0k4qr8"]
+
+[ext_resource type="Script" uid="uid://j4rjxpjgopap" path="res://scripts/LobbyController.cs" id="1_6jt0u"]
+
+[node name="LobbyControl" type="Control" unique_id=775783726 node_paths=PackedStringArray("playerListControl", "backButton", "startGameButton", "clientInfoLabel")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_6jt0u")
+playerListControl = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Player List VBox/Inner Player List VBox")
+backButton = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Buttons HBox/Back Button")
+startGameButton = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Buttons HBox/Start Button")
+clientInfoLabel = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Buttons HBox/Client info label")
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="." unique_id=2111924765]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -576.0
+offset_right = 576.0
+offset_bottom = 648.0
+grow_horizontal = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+ratio = 1.7778
+
+[node name="MarginContainer" type="MarginContainer" parent="AspectRatioContainer" unique_id=244490695]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="Main VBox" type="VBoxContainer" parent="AspectRatioContainer/MarginContainer" unique_id=1175725510]
+layout_mode = 2
+
+[node name="Title HBox" type="HBoxContainer" parent="AspectRatioContainer/MarginContainer/Main VBox" unique_id=1623585915]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="AspectRatioContainer/MarginContainer/Main VBox/Title HBox" unique_id=624748019]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 64
+text = "Lobby Screen"
+
+[node name="Player List VBox" type="VBoxContainer" parent="AspectRatioContainer/MarginContainer/Main VBox" unique_id=1618373217]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PanelContainer" type="PanelContainer" parent="AspectRatioContainer/MarginContainer/Main VBox/Player List VBox" unique_id=1535014028]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="AspectRatioContainer/MarginContainer/Main VBox/Player List VBox/PanelContainer" unique_id=1884571069]
+layout_mode = 2
+text = "Players"
+
+[node name="Inner Player List VBox" type="VBoxContainer" parent="AspectRatioContainer/MarginContainer/Main VBox/Player List VBox" unique_id=49103539]
+layout_mode = 2
+
+[node name="Buttons HBox" type="HBoxContainer" parent="AspectRatioContainer/MarginContainer/Main VBox" unique_id=1018892430]
+layout_mode = 2
+
+[node name="Back Button" type="Button" parent="AspectRatioContainer/MarginContainer/Main VBox/Buttons HBox" unique_id=716749902]
+layout_mode = 2
+text = "Back"
+
+[node name="Start Button" type="Button" parent="AspectRatioContainer/MarginContainer/Main VBox/Buttons HBox" unique_id=2030069941]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Start Game"
+
+[node name="Client info label" type="Label" parent="AspectRatioContainer/MarginContainer/Main VBox/Buttons HBox" unique_id=373064471]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Wait for the host to start the game"
+
+[node name="Build Info HBox" type="HBoxContainer" parent="AspectRatioContainer/MarginContainer/Main VBox" unique_id=417800188]
+layout_mode = 2
+
+[node name="Build Info Label" type="Label" parent="AspectRatioContainer/MarginContainer/Main VBox/Build Info HBox" unique_id=1152193125]
+layout_mode = 2
+text = "Some build info idk"

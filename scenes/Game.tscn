@@ -1,57 +1,57 @@
 [gd_scene format=3 uid="uid://c2jn1b4uyjt8n"]
 
-[ext_resource type="Script" uid="uid://bynu3i6uj6t7r" path="res://scripts/TileGrid.cs" id="1_jnlp7"]
-[ext_resource type="PackedScene" uid="uid://bvkmb23pk35le" path="res://scenes/Tile.tscn" id="1_pyidc"]
-[ext_resource type="PackedScene" uid="uid://c4ae5yt0wa1il" path="res://scenes/City.tscn" id="3_85syf"]
-[ext_resource type="Texture2D" uid="uid://drabk7btini6x" path="res://sprites/villagetile.png" id="3_jnlp7"]
-[ext_resource type="Script" uid="uid://uaer1wt5dso1" path="res://scripts/CameraController.cs" id="3_vvh5c"]
-[ext_resource type="Texture2D" uid="uid://ceb6fnywpv652" path="res://sprites/towntile.png" id="4_l8v81"]
-[ext_resource type="Script" uid="uid://bisk33v27s82j" path="res://scripts/EmpireController.cs" id="5_bf3um"]
-[ext_resource type="Script" uid="uid://14p5a2axlcx1" path="res://scripts/TurnSystem.cs" id="6_huihk"]
-[ext_resource type="LabelSettings" uid="uid://brmmuo7fvryem" path="res://UI_Base_Label_Settings.tres" id="6_l8v81"]
-[ext_resource type="Texture2D" uid="uid://dh42xxhofapix" path="res://sprites/coin_icon.png" id="6_vyht1"]
-[ext_resource type="Script" uid="uid://cg1myavcyc6vy" path="res://scripts/UnitSpawner.cs" id="8_6w1so"]
-[ext_resource type="PackedScene" uid="uid://d35hoavdljqc2" path="res://scenes/Unit.tscn" id="9_q7e4n"]
-[ext_resource type="Script" uid="uid://bngunyywpvjqm" path="res://scripts/UIController.cs" id="10_r7xkj"]
-[ext_resource type="PackedScene" uid="uid://bidsvn261x8ld" path="res://scenes/BuildItemPanel.tscn" id="11_eajee"]
-[ext_resource type="PackedScene" uid="uid://1dota62uermp" path="res://scenes/OwnedCityView.tscn" id="13_6k1mm"]
-[ext_resource type="PackedScene" uid="uid://cpc1ij2wjxypk" path="res://scenes/WinOverlay.tscn" id="15_d38gw"]
+[ext_resource type="Script" uid="uid://bynu3i6uj6t7r" path="res://scripts/TileGrid.cs" id="1_vjgi4"]
+[ext_resource type="PackedScene" uid="uid://bvkmb23pk35le" path="res://scenes/Tile.tscn" id="2_kyk2p"]
+[ext_resource type="PackedScene" uid="uid://c4ae5yt0wa1il" path="res://scenes/City.tscn" id="3_45i86"]
+[ext_resource type="Texture2D" uid="uid://drabk7btini6x" path="res://sprites/villagetile.png" id="4_sv1m6"]
+[ext_resource type="Texture2D" uid="uid://ceb6fnywpv652" path="res://sprites/towntile.png" id="5_a8wo8"]
+[ext_resource type="Script" uid="uid://bisk33v27s82j" path="res://scripts/EmpireController.cs" id="6_attvq"]
+[ext_resource type="Script" uid="uid://14p5a2axlcx1" path="res://scripts/TurnSystem.cs" id="7_bneo8"]
+[ext_resource type="Script" uid="uid://cg1myavcyc6vy" path="res://scripts/UnitSpawner.cs" id="9_jbgew"]
+[ext_resource type="PackedScene" uid="uid://d35hoavdljqc2" path="res://scenes/Unit.tscn" id="10_a85ww"]
+[ext_resource type="Script" uid="uid://bngunyywpvjqm" path="res://scripts/UIController.cs" id="11_jhsr3"]
+[ext_resource type="PackedScene" uid="uid://bidsvn261x8ld" path="res://scenes/BuildItemPanel.tscn" id="12_0bq3a"]
+[ext_resource type="Script" uid="uid://uaer1wt5dso1" path="res://scripts/CameraController.cs" id="13_754j2"]
+[ext_resource type="Texture2D" uid="uid://dh42xxhofapix" path="res://sprites/coin_icon.png" id="14_i4jil"]
+[ext_resource type="LabelSettings" uid="uid://brmmuo7fvryem" path="res://UI_Base_Label_Settings.tres" id="15_jai3c"]
+[ext_resource type="PackedScene" uid="uid://cpc1ij2wjxypk" path="res://scenes/WinOverlay.tscn" id="16_1gdd5"]
+[ext_resource type="PackedScene" uid="uid://1dota62uermp" path="res://scenes/OwnedCityView.tscn" id="17_426vi"]
 
-[node name="RootNode2D" type="Node2D" unique_id=1161755743]
+[node name="GameRoot" type="Node2D" unique_id=1161755743]
 
 [node name="TileGrid" type="Node2D" parent="." unique_id=1726203210]
-script = ExtResource("1_jnlp7")
-TileScene = ExtResource("1_pyidc")
-CityScene = ExtResource("3_85syf")
-villageTileTexture = ExtResource("3_jnlp7")
-townTileTexture = ExtResource("4_l8v81")
+script = ExtResource("1_vjgi4")
+TileScene = ExtResource("2_kyk2p")
+CityScene = ExtResource("3_45i86")
+villageTileTexture = ExtResource("4_sv1m6")
+townTileTexture = ExtResource("5_a8wo8")
 
 [node name="EmpireController" type="Node2D" parent="." unique_id=1584417600]
-script = ExtResource("5_bf3um")
+script = ExtResource("6_attvq")
 IsPlayerEmpire = true
 
 [node name="EmpireController2" type="Node2D" parent="." unique_id=1436156181]
-script = ExtResource("5_bf3um")
+script = ExtResource("6_attvq")
 
 [node name="TurnSystem" type="Node2D" parent="." unique_id=1613588411]
-script = ExtResource("6_huihk")
+script = ExtResource("7_bneo8")
 
 [node name="UnitSpawner" type="Node2D" parent="." unique_id=1947486371]
-script = ExtResource("8_6w1so")
-UnitScene = ExtResource("9_q7e4n")
+script = ExtResource("9_jbgew")
+UnitScene = ExtResource("10_a85ww")
 
 [node name="UIController" type="Node2D" parent="." unique_id=170486342 node_paths=PackedStringArray("OwnedCityViewControl", "CoinsLabel", "TurnCountLabel", "TurnTimerLabel", "EndTurnButton", "WinOverlayControl")]
-script = ExtResource("10_r7xkj")
+script = ExtResource("11_jhsr3")
 OwnedCityViewControl = NodePath("../CanvasLayer/AspectRatioContainer/Owned City View")
 CoinsLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox/Coins Label")
 TurnCountLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Right HBox/VBoxContainer/Turn Count Label")
 TurnTimerLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/Turn Timer Label")
 EndTurnButton = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/CenterContainer/End Turn Button")
-BuildListItemPanel = ExtResource("11_eajee")
+BuildListItemPanel = ExtResource("12_0bq3a")
 WinOverlayControl = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Win Overlay")
 
 [node name="Camera" type="Node2D" parent="." unique_id=676000897]
-script = ExtResource("3_vvh5c")
+script = ExtResource("13_754j2")
 PanSpeed = 400.0
 
 [node name="Camera2D" type="Camera2D" parent="Camera" unique_id=429827703]
@@ -98,7 +98,7 @@ alignment = 1
 [node name="TextureRect" type="TextureRect" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox" unique_id=1366772080]
 layout_mode = 2
 size_flags_vertical = 4
-texture = ExtResource("6_vyht1")
+texture = ExtResource("14_i4jil")
 stretch_mode = 2
 
 [node name="Coins Label" type="Label" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox" unique_id=2049750665]
@@ -106,7 +106,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
 text = "999"
-label_settings = ExtResource("6_l8v81")
+label_settings = ExtResource("15_jai3c")
 
 [node name="Right HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox" unique_id=937397110]
 custom_minimum_size = Vector2(150, 0)
@@ -122,11 +122,44 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Turn 999"
-label_settings = ExtResource("6_l8v81")
+label_settings = ExtResource("15_jai3c")
 
 [node name="Bot Row HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer" unique_id=448409960]
 layout_mode = 2
 size_flags_vertical = 8
+
+[node name="Multiplayer VBox" type="VBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox" unique_id=234719343]
+layout_mode = 2
+
+[node name="Start Server Button" type="Button" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/Multiplayer VBox" unique_id=1077598894]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_font_sizes/font_size = 24
+text = "Start Server"
+
+[node name="Start Client Button" type="Button" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/Multiplayer VBox" unique_id=178393904]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_font_sizes/font_size = 24
+text = "Start Client"
+
+[node name="Disconnect Client Button" type="Button" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/Multiplayer VBox" unique_id=923392649]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_font_sizes/font_size = 24
+text = "Disconnect"
+
+[node name="Shutdown Server Button" type="Button" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/Multiplayer VBox" unique_id=726045916]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_font_sizes/font_size = 24
+text = "Shut down"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox" unique_id=982840399]
 layout_mode = 2
@@ -138,7 +171,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 8
 text = "66:66"
-label_settings = ExtResource("6_l8v81")
+label_settings = ExtResource("15_jai3c")
 
 [node name="CenterContainer" type="CenterContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer" unique_id=1197203940]
 custom_minimum_size = Vector2(150, 50)
@@ -153,7 +186,7 @@ color = Color(0.28482667, 0.44, 0.23759998, 1)
 [node name="End Turn Label" type="Label" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/CenterContainer" unique_id=1467600873]
 layout_mode = 2
 text = "End Turn"
-label_settings = ExtResource("6_l8v81")
+label_settings = ExtResource("15_jai3c")
 
 [node name="End Turn Button" type="Button" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/CenterContainer" unique_id=63129807]
 unique_name_in_owner = true
@@ -161,12 +194,12 @@ custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
 flat = true
 
-[node name="Win Overlay" parent="CanvasLayer/AspectRatioContainer/MarginContainer" unique_id=151656470 instance=ExtResource("15_d38gw")]
+[node name="Win Overlay" parent="CanvasLayer/AspectRatioContainer/MarginContainer" unique_id=151656470 instance=ExtResource("16_1gdd5")]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="Owned City View" parent="CanvasLayer/AspectRatioContainer" unique_id=82809476 instance=ExtResource("13_6k1mm")]
+[node name="Owned City View" parent="CanvasLayer/AspectRatioContainer" unique_id=82809476 instance=ExtResource("17_426vi")]
 visible = false
 layout_mode = 2

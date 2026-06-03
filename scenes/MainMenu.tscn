@@ -1,0 +1,151 @@
+[gd_scene format=3 uid="uid://eawyb7asi28i"]
+
+[ext_resource type="Script" uid="uid://bt6af0tfbcsa3" path="res://scripts/MainMenuController.cs" id="1_yqorp"]
+
+[node name="MainMenuControl" type="Control" unique_id=1244727104 node_paths=PackedStringArray("mainButtonControl", "startServerButton", "connectClientButton", "settingsButton", "quitButton", "startServerControl", "listenAddressLineEdit", "listenPortLineEdit", "confirmStartServerButton", "backStartServerButton", "connectClientControl", "connectAddressLineEdit", "connectPortLineEdit", "confirmConnectButton", "backConnectClientButton")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_yqorp")
+mainButtonControl = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Main Buttons VBox")
+startServerButton = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Main Buttons VBox/Start Server Button")
+connectClientButton = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Main Buttons VBox/Connect Button")
+settingsButton = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Main Buttons VBox/Settings Button")
+quitButton = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Main Buttons VBox/Exit Game Button")
+startServerControl = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Start Server VBox")
+listenAddressLineEdit = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Start Server VBox/Address LineEdit")
+listenPortLineEdit = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Start Server VBox/Port LineEdit")
+confirmStartServerButton = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Start Server VBox/Button")
+backStartServerButton = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Start Server VBox/Back Button")
+connectClientControl = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Connect Client VBox")
+connectAddressLineEdit = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Connect Client VBox/Address LineEdit")
+connectPortLineEdit = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Connect Client VBox/Port LineEdit")
+confirmConnectButton = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Connect Client VBox/Button")
+backConnectClientButton = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Connect Client VBox/Back Button")
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="." unique_id=231309563]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -576.0
+offset_right = 576.0
+offset_bottom = 648.0
+grow_horizontal = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+ratio = 1.7778
+
+[node name="MarginContainer" type="MarginContainer" parent="AspectRatioContainer" unique_id=1414378217]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="Main VBox" type="VBoxContainer" parent="AspectRatioContainer/MarginContainer" unique_id=1130451568]
+layout_mode = 2
+
+[node name="Title HBox" type="HBoxContainer" parent="AspectRatioContainer/MarginContainer/Main VBox" unique_id=187900243]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="AspectRatioContainer/MarginContainer/Main VBox/Title HBox" unique_id=764804889]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 64
+text = "Crazy Title Screen"
+
+[node name="Main Buttons VBox" type="VBoxContainer" parent="AspectRatioContainer/MarginContainer/Main VBox" unique_id=954826046]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 6
+
+[node name="Start Server Button" type="Button" parent="AspectRatioContainer/MarginContainer/Main VBox/Main Buttons VBox" unique_id=1712307695]
+layout_mode = 2
+text = "Start Server"
+
+[node name="Connect Button" type="Button" parent="AspectRatioContainer/MarginContainer/Main VBox/Main Buttons VBox" unique_id=1747630426]
+layout_mode = 2
+text = "Connect"
+
+[node name="Settings Button" type="Button" parent="AspectRatioContainer/MarginContainer/Main VBox/Main Buttons VBox" unique_id=1381715623]
+layout_mode = 2
+text = "Settings"
+
+[node name="Exit Game Button" type="Button" parent="AspectRatioContainer/MarginContainer/Main VBox/Main Buttons VBox" unique_id=985276720]
+layout_mode = 2
+text = "Exit Game"
+
+[node name="Start Server VBox" type="VBoxContainer" parent="AspectRatioContainer/MarginContainer/Main VBox" unique_id=1211875578]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 6
+
+[node name="Address Label" type="Label" parent="AspectRatioContainer/MarginContainer/Main VBox/Start Server VBox" unique_id=1970278855]
+layout_mode = 2
+text = "Server Listen Address"
+
+[node name="Address LineEdit" type="LineEdit" parent="AspectRatioContainer/MarginContainer/Main VBox/Start Server VBox" unique_id=258381147]
+layout_mode = 2
+placeholder_text = "192.168.0.100"
+
+[node name="Port Label" type="Label" parent="AspectRatioContainer/MarginContainer/Main VBox/Start Server VBox" unique_id=2118587471]
+layout_mode = 2
+text = "Server Listen Port"
+
+[node name="Port LineEdit" type="LineEdit" parent="AspectRatioContainer/MarginContainer/Main VBox/Start Server VBox" unique_id=288197929]
+layout_mode = 2
+placeholder_text = "12312"
+max_length = 5
+context_menu_enabled = false
+emoji_menu_enabled = false
+virtual_keyboard_type = 2
+
+[node name="Button" type="Button" parent="AspectRatioContainer/MarginContainer/Main VBox/Start Server VBox" unique_id=2076265364]
+layout_mode = 2
+text = "Start Server"
+
+[node name="Back Button" type="Button" parent="AspectRatioContainer/MarginContainer/Main VBox/Start Server VBox" unique_id=545972325]
+layout_mode = 2
+text = "Back"
+
+[node name="Connect Client VBox" type="VBoxContainer" parent="AspectRatioContainer/MarginContainer/Main VBox" unique_id=962545590]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 6
+
+[node name="Address Label" type="Label" parent="AspectRatioContainer/MarginContainer/Main VBox/Connect Client VBox" unique_id=1094796441]
+layout_mode = 2
+text = "Server Address"
+
+[node name="Address LineEdit" type="LineEdit" parent="AspectRatioContainer/MarginContainer/Main VBox/Connect Client VBox" unique_id=133634216]
+layout_mode = 2
+placeholder_text = "192.168.0.100"
+
+[node name="Port Label" type="Label" parent="AspectRatioContainer/MarginContainer/Main VBox/Connect Client VBox" unique_id=1469423945]
+layout_mode = 2
+text = "Server Port"
+
+[node name="Port LineEdit" type="LineEdit" parent="AspectRatioContainer/MarginContainer/Main VBox/Connect Client VBox" unique_id=1395676740]
+layout_mode = 2
+placeholder_text = "12312"
+
+[node name="Button" type="Button" parent="AspectRatioContainer/MarginContainer/Main VBox/Connect Client VBox" unique_id=1225034241]
+layout_mode = 2
+text = "Connect"
+
+[node name="Back Button" type="Button" parent="AspectRatioContainer/MarginContainer/Main VBox/Connect Client VBox" unique_id=265468722]
+layout_mode = 2
+text = "Back"
+
+[node name="Build Info HBox" type="HBoxContainer" parent="AspectRatioContainer/MarginContainer/Main VBox" unique_id=1341849560]
+layout_mode = 2
+
+[node name="Build Info Label" type="Label" parent="AspectRatioContainer/MarginContainer/Main VBox/Build Info HBox" unique_id=948108984]
+layout_mode = 2
+text = "Some build info idk"
