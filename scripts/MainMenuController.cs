@@ -35,6 +35,9 @@ public partial class MainMenuController : Node
 	[Export]
 	private Button backConnectClientButton;
 
+	[Export]
+	private Label buildInfoLabel;
+
 	public override void _Ready()
 	{
 		startServerButton.Pressed += OnStartServerPressed;
@@ -43,7 +46,7 @@ public partial class MainMenuController : Node
 		confirmConnectButton.Pressed += OnConfirmConnectClientPressed;
 		backStartServerButton.Pressed += OnBackStartServerPressed;
 		backConnectClientButton.Pressed += OnBackConnectClientPressed;
-		settingsButton.Pressed += () => GD.Print("Settings button pressed");
+		settingsButton.Pressed += () => DebugUtility.Print("Settings button pressed");
 		quitButton.Pressed += () => GetTree().Quit();
 
 		if (MultiplayerController.TryGetPreferredListenIPv4Address(out var address))
@@ -62,6 +65,8 @@ public partial class MainMenuController : Node
 
 		listenPortLineEdit.TextChanged += _ => EnsureValidPortText(listenPortLineEdit);
 		connectPortLineEdit.TextChanged += _ => EnsureValidPortText(connectPortLineEdit);
+
+		buildInfoLabel.Text = DebugUtility.GetBriefBuildInfoString();
 	}
 
 	private void EnsureValidPortText(LineEdit portLineEdit)
@@ -100,7 +105,7 @@ public partial class MainMenuController : Node
 
 		var address = listenAddressLineEdit.Text;
 
-		GD.Print($"Confirmed server start with address {address} and port {port}");
+		DebugUtility.Print($"Confirmed server start with address {address} and port {port}");
 		var startSucceeded = MultiplayerController.Instance.InitializeServer(address, port);
 
 		if (startSucceeded)
@@ -120,7 +125,7 @@ public partial class MainMenuController : Node
 		}
 
 		var address = connectAddressLineEdit.Text;
-		GD.Print($"Confirmed connect to address {address} and port {port}");
+		DebugUtility.Print($"Confirmed connect to address {address} and port {port}");
 		var connectSucceeded = MultiplayerController.Instance.InitializeClient(address, port);
 
 		if (connectSucceeded)

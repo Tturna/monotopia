@@ -42,7 +42,7 @@ public partial class TurnSystem : Node2D
         turnTimer = turnTimeSeconds;
         turnCount++;
         UIController.Instance.SetTurnCountText(turnCount);
-        GD.Print($"Starting turn {turnCount}");
+        DebugUtility.Print($"Starting turn {turnCount}");
         TurnStarted?.Invoke();
     }
 }

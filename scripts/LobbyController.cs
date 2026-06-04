@@ -12,6 +12,8 @@ public partial class LobbyController : Node
     private Button startGameButton;
     [Export]
     private Label clientInfoLabel;
+    [Export]
+    private Label buildInfoLabel;
 
     private Dictionary<long, Control> playerListEntries = new();
 
@@ -28,6 +30,8 @@ public partial class LobbyController : Node
             startGameButton.Hide();
             clientInfoLabel.Show();
         }
+
+        buildInfoLabel.Text = DebugUtility.GetBriefBuildInfoString();
 
         OnPlayerConnected(Multiplayer.GetUniqueId());
         SubscribeToMultiplayerEvents();

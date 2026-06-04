@@ -1,20 +1,34 @@
 using Godot;
 
+#nullable enable
 public static class DebugUtility
 {
-    public static void Print(string message)
+    private static string? debugInstancePrefix;
+
+    private static void FindDebugInstancePrefix()
     {
         var args = OS.GetCmdlineArgs();
-        var prefix = string.Empty;
 
         foreach (var arg in args)
         {
             if (!arg.Contains("instance")) continue;
 
-            prefix = arg;
+            debugInstancePrefix = arg;
             break;
         }
+    }
 
-        GD.Print($"{prefix} | {message}");
+    public static void Print(string message)
+    {
+        if (debugInstancePrefix is null) FindDebugInstancePrefix();
+
+        GD.Print($"{debugInstancePrefix} | {message}");
+    }
+
+    public static string GetBriefBuildInfoString()
+    {
+        if (debugInstancePrefix is null) FindDebugInstancePrefix();
+
+        return $"Debug instance: {debugInstancePrefix}";
     }
 }

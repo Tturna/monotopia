@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bt6af0tfbcsa3" path="res://scripts/MainMenuController.cs" id="1_yqorp"]
 
-[node name="MainMenuControl" type="Control" unique_id=1244727104 node_paths=PackedStringArray("mainButtonControl", "startServerButton", "connectClientButton", "settingsButton", "quitButton", "startServerControl", "listenAddressLineEdit", "listenPortLineEdit", "confirmStartServerButton", "backStartServerButton", "connectClientControl", "connectAddressLineEdit", "connectPortLineEdit", "confirmConnectButton", "backConnectClientButton")]
+[node name="MainMenuControl" type="Control" unique_id=1244727104 node_paths=PackedStringArray("mainButtonControl", "startServerButton", "connectClientButton", "settingsButton", "quitButton", "startServerControl", "listenAddressLineEdit", "listenPortLineEdit", "confirmStartServerButton", "backStartServerButton", "connectClientControl", "connectAddressLineEdit", "connectPortLineEdit", "confirmConnectButton", "backConnectClientButton", "buildInfoLabel")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -25,6 +25,7 @@ connectAddressLineEdit = NodePath("AspectRatioContainer/MarginContainer/Main VBo
 connectPortLineEdit = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Connect Client VBox/Port LineEdit")
 confirmConnectButton = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Connect Client VBox/Button")
 backConnectClientButton = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Connect Client VBox/Back Button")
+buildInfoLabel = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Build Info HBox/Build Info Label")
 
 [node name="AspectRatioContainer" type="AspectRatioContainer" parent="." unique_id=231309563]
 layout_mode = 1

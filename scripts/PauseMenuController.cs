@@ -62,7 +62,7 @@ public partial class PauseMenuController : Node
 
     private void OnSettingsPressed()
     {
-        GD.Print("Clicked on pause menu settings button");
+        DebugUtility.Print("Clicked on pause menu settings button");
     }
 
     private void OnDisconnectPressed()

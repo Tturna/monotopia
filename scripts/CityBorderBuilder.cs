@@ -151,7 +151,7 @@ public static class CityBorderBuilder
 
             if (failsafe <= 5)
             {
-                GD.Print($"""
+                DebugUtility.Print($"""
                     =====
                     Failsafe close to firing! Printing everything:
                     Current vertex: {currentVertex},
