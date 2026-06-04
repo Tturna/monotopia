@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Godot;
 
@@ -84,11 +83,10 @@ public partial class CityController : TileController
         // child node inherits the city position from the parent node.
         borderPolygon.GlobalPosition = Vector2.Zero;
 
-        var r = (float)Random.Shared.NextDouble();
-        var g = (float)Random.Shared.NextDouble();
-        var b = (float)Random.Shared.NextDouble();
         var a = 0.65f;
-        BorderColor = new Color(r, g, b, a);
+        var empirePrimaryColor = ownerEmpire.EmpirePrimaryColor;
+        empirePrimaryColor.A = a;
+        BorderColor = empirePrimaryColor;
         borderPolygon.Color = BorderColor;
     }
 

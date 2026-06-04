@@ -6,8 +6,8 @@ using Godot;
 public partial class EmpireController : Node2D
 {
 	public bool IsPlayerEmpire;
-
 	public bool HasCursorSelection;
+	public Color EmpirePrimaryColor;
 
 	private List<CityController> cities = new();
 	private int coins;

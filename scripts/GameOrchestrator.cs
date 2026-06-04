@@ -44,20 +44,37 @@ public partial class GameOrchestrator : Node2D
 			}
 			
 			var empire = (EmpireController)empireScene.Instantiate();
+			var r = (float)Random.Shared.NextDouble();
+			var g = (float)Random.Shared.NextDouble();
+			var b = (float)Random.Shared.NextDouble();
+			var empirePrimaryColor = new Color(r, g, b);
+
+			if (peerId == 1)
+			{
+				empire.IsPlayerEmpire = true;
+			}
+
+			empire.EmpirePrimaryColor = empirePrimaryColor;
 			empiresParent.AddChild(empire);
 			empire.AddNewCityToEmpire(capitalCityTilePosition);
 			playerEmpires.Add(peerId, empire);
-			Rpc(MethodName.SyncCreateEmpire, peerId, capitalCityTilePosition);
+
+			Rpc(MethodName.SyncCreateEmpire, peerId, capitalCityTilePosition, empirePrimaryColor);
 		}
 	}
 	
 	[Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false)]
-	private void SyncCreateEmpire(long empireOwnerPeerId, Vector2I capitalCityTilePosition)
+	private void SyncCreateEmpire(
+		long empireOwnerPeerId,
+		Vector2I capitalCityTilePosition,
+		Color empirePrimaryColor)
 	{
 		var peerId = Multiplayer.GetUniqueId();
-
 		DebugUtility.Print($"{peerId} says: Creating empire for {empireOwnerPeerId}");
+
 		var empire = (EmpireController)empireScene.Instantiate();
+
+		empire.EmpirePrimaryColor = empirePrimaryColor;
 		empiresParent.AddChild(empire);
 		empire.AddNewCityToEmpire(capitalCityTilePosition);
 
