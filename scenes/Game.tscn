@@ -5,12 +5,13 @@
 [ext_resource type="PackedScene" uid="uid://c4ae5yt0wa1il" path="res://scenes/City.tscn" id="3_45i86"]
 [ext_resource type="Texture2D" uid="uid://drabk7btini6x" path="res://sprites/villagetile.png" id="4_sv1m6"]
 [ext_resource type="Texture2D" uid="uid://ceb6fnywpv652" path="res://sprites/towntile.png" id="5_a8wo8"]
-[ext_resource type="Script" uid="uid://bisk33v27s82j" path="res://scripts/EmpireController.cs" id="6_attvq"]
 [ext_resource type="Script" uid="uid://14p5a2axlcx1" path="res://scripts/TurnSystem.cs" id="7_bneo8"]
 [ext_resource type="Script" uid="uid://cg1myavcyc6vy" path="res://scripts/UnitSpawner.cs" id="9_jbgew"]
 [ext_resource type="PackedScene" uid="uid://d35hoavdljqc2" path="res://scenes/Unit.tscn" id="10_a85ww"]
 [ext_resource type="Script" uid="uid://bngunyywpvjqm" path="res://scripts/UIController.cs" id="11_jhsr3"]
+[ext_resource type="Script" uid="uid://6bmj0uh8cnd2" path="res://scripts/GameOrchestrator.cs" id="11_vjgi4"]
 [ext_resource type="PackedScene" uid="uid://bidsvn261x8ld" path="res://scenes/BuildItemPanel.tscn" id="12_0bq3a"]
+[ext_resource type="PackedScene" uid="uid://d0v4k83kn45jp" path="res://scenes/Empire.tscn" id="12_kyk2p"]
 [ext_resource type="Script" uid="uid://uvbndmdkkg8p" path="res://scripts/PauseMenuController.cs" id="12_vjgi4"]
 [ext_resource type="Script" uid="uid://uaer1wt5dso1" path="res://scripts/CameraController.cs" id="13_754j2"]
 [ext_resource type="Texture2D" uid="uid://dh42xxhofapix" path="res://sprites/coin_icon.png" id="14_i4jil"]
@@ -26,13 +27,6 @@ TileScene = ExtResource("2_kyk2p")
 CityScene = ExtResource("3_45i86")
 villageTileTexture = ExtResource("4_sv1m6")
 townTileTexture = ExtResource("5_a8wo8")
-
-[node name="EmpireController" type="Node2D" parent="." unique_id=1584417600]
-script = ExtResource("6_attvq")
-IsPlayerEmpire = true
-
-[node name="EmpireController2" type="Node2D" parent="." unique_id=1436156181]
-script = ExtResource("6_attvq")
 
 [node name="TurnSystem" type="Node2D" parent="." unique_id=1613588411]
 script = ExtResource("7_bneo8")
@@ -51,6 +45,11 @@ EndTurnButton = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Bo
 BuildListItemPanel = ExtResource("12_0bq3a")
 WinOverlayControl = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Win Overlay")
 
+[node name="GameOrchestrator" type="Node2D" parent="." unique_id=228322953 node_paths=PackedStringArray("empiresParent")]
+script = ExtResource("11_vjgi4")
+empireScene = ExtResource("12_kyk2p")
+empiresParent = NodePath("../Empires Parent")
+
 [node name="PauseMenuController" type="Node2D" parent="." unique_id=1251333920 node_paths=PackedStringArray("pauseMenuControl", "continueButton", "settingsButton", "disconnectButton")]
 script = ExtResource("12_vjgi4")
 pauseMenuControl = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Pause Menu VBox")
@@ -64,6 +63,8 @@ PanSpeed = 400.0
 
 [node name="Camera2D" type="Camera2D" parent="Camera" unique_id=429827703]
 zoom = Vector2(2, 2)
+
+[node name="Empires Parent" type="Node2D" parent="." unique_id=1893305177]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1097156129]
 

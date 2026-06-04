@@ -10,12 +10,12 @@ public partial class CityController : TileController
 
     public string CityName { get; private set; } = null!;
     public int CoinsGenerated { get; private set; } = 2;
-    public Vector2Int CityTilePosition { get; private set; } = null!;
+    public Vector2I CityTilePosition { get; private set; }
     public EmpireController OwnerEmpire { get; private set; } = null!;
     public Color BorderColor { get; private set; }
 
-    private List<Vector2Int> controlledTilePositions = new();
-    private Vector2Int? borderExpansionDirectionFocus = null;
+    private List<Vector2I> controlledTilePositions = new();
+    private Vector2I? borderExpansionDirectionFocus = null;
     private Polygon2D borderPolygon = new();
 
     private void OnTurnStarted()
@@ -36,7 +36,7 @@ public partial class CityController : TileController
         }
     }
 
-    private void TakeControlOfTile(Vector2Int tilePosition)
+    private void TakeControlOfTile(Vector2I tilePosition)
     {
         if (tilePosition == CityTilePosition) return;
         if (!TileGrid.IsTileInBounds(tilePosition)) return;
@@ -52,7 +52,7 @@ public partial class CityController : TileController
         borderPolygon.Polygon = polygonVertices;
     }
 
-    public void InitializeCity(Vector2Int tilePosition, EmpireController ownerEmpire)
+    public void InitializeCity(Vector2I tilePosition, EmpireController ownerEmpire)
     {
         CityName = $"City {tilePosition}";
         OwnerEmpire = ownerEmpire;
@@ -68,15 +68,15 @@ public partial class CityController : TileController
         {
             for (var x = -1; x < 2; x++)
             {
-                var controlledTilePosition = CityTilePosition + new Vector2Int(x, y);
+                var controlledTilePosition = CityTilePosition + new Vector2I(x, y);
                 TakeControlOfTile(controlledTilePosition);
             }
         }
 
-        TakeControlOfTile(CityTilePosition + new Vector2Int(0, -2));
-        TakeControlOfTile(CityTilePosition + new Vector2Int(0, 2));
-        TakeControlOfTile(CityTilePosition + new Vector2Int(2, 0));
-        TakeControlOfTile(CityTilePosition + new Vector2Int(-2, 0));
+        TakeControlOfTile(CityTilePosition + new Vector2I(0, -2));
+        TakeControlOfTile(CityTilePosition + new Vector2I(0, 2));
+        TakeControlOfTile(CityTilePosition + new Vector2I(2, 0));
+        TakeControlOfTile(CityTilePosition + new Vector2I(-2, 0));
 
         UpdateBorderPolygon();
         AddChild(borderPolygon);

@@ -32,6 +32,15 @@ public partial class PauseMenuController : Node
         continueButton.Pressed += OnContinuePressed;
         settingsButton.Pressed += OnSettingsPressed;
         disconnectButton.Pressed += OnDisconnectPressed;
+
+        if (Multiplayer.IsServer())
+        {
+            disconnectButton.Text = "Shut down server";
+        }
+        else
+        {
+            disconnectButton.Text = "Disconnect";
+        }
     }
 
     private void TogglePauseMenu(bool visible)
@@ -58,6 +67,17 @@ public partial class PauseMenuController : Node
 
     private void OnDisconnectPressed()
     {
-        GD.Print("Clicked disconnect");
+        TogglePauseMenu(false);
+
+        if (Multiplayer.IsServer())
+        {
+            MultiplayerController.Instance.ShutdownServer();
+        }
+        else
+        {
+            MultiplayerController.Instance.DisconnectClient();
+        }
+
+        GetTree().ChangeSceneToFile("res://scenes/MainMenu.tscn");
     }
 }

@@ -9,7 +9,7 @@ public abstract partial class BaseUnit : Sprite2D
         get => base.Position;
         private set => base.Position = value;
     }
-    public Vector2Int TilePosition { get; private set; } = Vector2Int.Zero;
+    public Vector2I TilePosition { get; private set; } = Vector2I.Zero;
 
     protected int MovementRange { get; init; } = 1;
     protected int AttackRange { get; init; } = 1;
@@ -25,7 +25,7 @@ public abstract partial class BaseUnit : Sprite2D
         Centered = false;
     }
 
-    public bool TryMoveToTile(Vector2Int tilePosition)
+    public bool TryMoveToTile(Vector2I tilePosition)
     {
         // TODO: Tile based path finding. How to get from current
         // position to target position, how many tiles would the unit
@@ -49,7 +49,7 @@ public abstract partial class BaseUnit : Sprite2D
         return true;
     }
 
-    public void SetUnitTilePosition(Vector2Int tilePosition)
+    public void SetUnitTilePosition(Vector2I tilePosition)
     {
         EntitySelector.SetUnit(TilePosition, null);
         this.TilePosition = tilePosition;

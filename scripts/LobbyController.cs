@@ -30,8 +30,19 @@ public partial class LobbyController : Node
         }
 
         OnPlayerConnected(Multiplayer.GetUniqueId());
+        SubscribeToMultiplayerEvents();
+    }
+
+    private void SubscribeToMultiplayerEvents()
+    {
         MultiplayerController.Instance.PlayerConnected += OnPlayerConnected;
         MultiplayerController.Instance.PlayerDisconnected += OnPlayerDisconnected;
+    }
+
+    private void UnsubscribeFromMultiplayerEvents()
+    {
+        MultiplayerController.Instance.PlayerConnected -= OnPlayerConnected;
+        MultiplayerController.Instance.PlayerDisconnected -= OnPlayerDisconnected;
     }
 
     private void OnBackButtonPressed()
@@ -45,6 +56,7 @@ public partial class LobbyController : Node
             MultiplayerController.Instance.DisconnectClient();
         }
 
+        UnsubscribeFromMultiplayerEvents();
         GetTree().ChangeSceneToFile("res://scenes/MainMenu.tscn");
     }
 
@@ -73,6 +85,7 @@ public partial class LobbyController : Node
     [Rpc(CallLocal = true)]
     private void LoadGameScene()
     {
+        UnsubscribeFromMultiplayerEvents();
         GetTree().ChangeSceneToFile("res://scenes/Game.tscn");
     }
 }

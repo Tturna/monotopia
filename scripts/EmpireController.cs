@@ -5,10 +5,7 @@ using Godot;
 #nullable enable
 public partial class EmpireController : Node2D
 {
-	[Export]
 	public bool IsPlayerEmpire;
-	[Export]
-	public bool Frozen;
 
 	public bool HasCursorSelection;
 
@@ -21,24 +18,17 @@ public partial class EmpireController : Node2D
 	private BaseUnit? selectedUnit;
 	private TileController? selectedTile;
 	private bool hasSelection;
+	private bool isFrozen;
 
 	public override void _Ready()
 	{
 		TurnSystem.Instance.TurnStarted += OnTurnStarted;
-
-		if (!TileGrid.TryGetVillageTileSpawnPoint(out var spawnPoint))
-		{
-			GD.PrintErr("Couldn't get spawn point for empire!");
-			return;
-		}
-
-		AddCityToEmpire(spawnPoint);
 	}
 
 	public override void _UnhandledInput(InputEvent inputEvent)
 	{
 		if (!IsPlayerEmpire) return;
-		if (Frozen) return;
+		if (isFrozen) return;
 
 		if (inputEvent is InputEventMouseButton mouseButtonEvent)
 		{
@@ -52,16 +42,6 @@ public partial class EmpireController : Node2D
 
 		var mouseWorldPosition = GetViewport().GetCamera2D().GetGlobalMousePosition();
 		var mouseTilePosition = TileGrid.WorldToTilePosition(mouseWorldPosition);
-
-		if (keyEvent.Keycode == Key.C)
-		{
-			AddCityToEmpire(mouseTilePosition);
-		}
-		else if (keyEvent.Keycode == Key.U)
-		{
-			var warrior = UnitSpawner.Instance.SpawnWarrior(ownerEmpire: this);
-			warrior.SetUnitTilePosition(mouseTilePosition);
-		}
 	}
 
 	private void HandleMouseButtonEvent(InputEventMouseButton mouseButtonEvent)
@@ -142,7 +122,7 @@ public partial class EmpireController : Node2D
 		UIController.Instance.HideOwnedCityView();
 	}
 
-	private void UpdateTileSelection(Vector2Int? tilePosition)
+	private void UpdateTileSelection(Vector2I? tilePosition)
 	{
 		if (!hasSelection || tilePosition is null)
 		{
@@ -161,7 +141,7 @@ public partial class EmpireController : Node2D
 			AddChild(tileSelectionNode);
 		}
 
-		tileSelectionNode.Position = TileGrid.TileToWorldPosition(tilePosition);
+		tileSelectionNode.Position = TileGrid.TileToWorldPosition((Vector2I)tilePosition);
 	}
 
 	private void UpdateCoinsLabel()
@@ -182,16 +162,6 @@ public partial class EmpireController : Node2D
 		}
 
 		totalCoinsDelta = total;
-	}
-
-	private void AddCityToEmpire(Vector2Int tilePosition)
-	{
-		var cityController = TileGrid.AddCity(tilePosition);
-		cityController.InitializeCity(tilePosition, ownerEmpire: this);
-		cities.Add(cityController);
-		totalCoinsDelta += cityController.CoinsGenerated;
-		UpdateTotalCoinDelta();
-		UpdateCoinsLabel();
 	}
 
 	private void OnTurnStarted()
@@ -241,6 +211,16 @@ public partial class EmpireController : Node2D
 		}
 
 		throw new NotImplementedException($"Empire should build a structure ({item.ItemName}) but it can only build units for now.");
+	}
+
+	public void AddNewCityToEmpire(Vector2I tilePosition)
+	{
+		var cityController = TileGrid.AddCity(tilePosition);
+		cityController.InitializeCity(tilePosition, ownerEmpire: this);
+		cities.Add(cityController);
+		totalCoinsDelta += cityController.CoinsGenerated;
+		UpdateTotalCoinDelta();
+		UpdateCoinsLabel();
 	}
 
 	public void AnnexCity(CityController targetCity)
@@ -299,7 +279,7 @@ public partial class EmpireController : Node2D
 
 		foreach (EmpireController empire in empires)
 		{
-			empire.Frozen = true;
+			empire.isFrozen = true;
 		}
 	}
 }

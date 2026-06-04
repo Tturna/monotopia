@@ -38,7 +38,7 @@ public partial class MultiplayerController : Node2D
         if (errorStatus == Error.Ok)
         {
             Multiplayer.MultiplayerPeer = serverPeer;
-            GD.Print($"Server started. Listening on {listenAddress}:{listenPort}");
+            DebugUtility.Print($"Server started. Listening on {listenAddress}:{listenPort}");
             SubscribeToMultiplayerEvents();
             isMultiplayerPeerActive = true;
 
@@ -46,7 +46,7 @@ public partial class MultiplayerController : Node2D
         }
         else
         {
-            GD.Print($"Failed to start server. Status: {errorStatus.ToString()}");
+            DebugUtility.Print($"Failed to start server. Status: {errorStatus.ToString()}");
 
             return false;
         }
@@ -61,14 +61,14 @@ public partial class MultiplayerController : Node2D
         {
             Multiplayer.MultiplayerPeer = clientPeer;
             SubscribeToMultiplayerEvents();
-            GD.Print($"Client created. Target server: {address}:{port}. ID: {Multiplayer.GetUniqueId()}");
+            DebugUtility.Print($"Client created. Target server: {address}:{port}. ID: {Multiplayer.GetUniqueId()}");
             isMultiplayerPeerActive = true;
 
             return true;
         }
         else
         {
-            GD.Print($"Status when creating client: {errorStatus.ToString()}");
+            DebugUtility.Print($"Status when creating client: {errorStatus.ToString()}");
 
             return false;
         }
@@ -76,20 +76,20 @@ public partial class MultiplayerController : Node2D
 
     public void ShutdownServer()
     {
-        // TODO: Notify all clients that server is shutting down
-        Multiplayer.MultiplayerPeer = null;
-        isMultiplayerPeerActive = false;
-        GD.Print("Server shut down");
-        UnsubscribeFromMultiplayerEvents();
+        if (!IsConnectedToMultiplayer()) return;
+
+        DebugUtility.Print("Shutting down server");
+        Rpc(MethodName.NotifyServerShutdown);
+        DisconnectMultiplayer();
     }
 
     public void DisconnectClient()
     {
-        // TODO: Notify server that client disconnected
-        GD.Print($"Disconnecting client {Multiplayer.GetUniqueId()}");
-        Multiplayer.MultiplayerPeer = null;
-        isMultiplayerPeerActive = false;
-        UnsubscribeFromMultiplayerEvents();
+        if (!IsConnectedToMultiplayer()) return;
+
+        DebugUtility.Print($"Disconnecting client {Multiplayer.GetUniqueId()}");
+        Rpc(MethodName.NotifyPlayerDisconnect, Multiplayer.GetUniqueId());
+        DisconnectMultiplayer();
     }
 
     public static bool TryGetPreferredListenIPv4Address(out string address)
@@ -117,6 +117,31 @@ public partial class MultiplayerController : Node2D
         {
             return false;
         }
+    }
+
+    private void DisconnectMultiplayer()
+    {
+        if (!IsConnectedToMultiplayer()) return;
+
+        Multiplayer.MultiplayerPeer = null;
+        isMultiplayerPeerActive = false;
+        UnsubscribeFromMultiplayerEvents();
+    }
+
+    // Called on the server
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
+    private void NotifyPlayerDisconnect(long peerId)
+    {
+        DebugUtility.Print($"Peer {peerId} notified that it will disconnect");
+    }
+
+    // Called on clients
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false)]
+    private void NotifyServerShutdown()
+    {
+        DebugUtility.Print("Server notified that it is shutting down");
+        DisconnectClient();
+        GetTree().ChangeSceneToFile("res://scenes/MainMenu.tscn");
     }
 
     private void SubscribeToMultiplayerEvents()
@@ -147,32 +172,45 @@ public partial class MultiplayerController : Node2D
         }
     }
 
+    private bool IsConnectedToMultiplayer()
+    {
+        return isMultiplayerPeerActive && Multiplayer.MultiplayerPeer != null;
+    }
+
     private void OnPeerConnected(long id)
     {
-        GD.Print($"Peer {Multiplayer.GetUniqueId()} says: peer {id} connected.");
+        DebugUtility.Print($"Peer {Multiplayer.GetUniqueId()} says: peer {id} connected.");
         PlayerConnected?.Invoke(id);
     }
 
+    // Can be called really late
     private void OnPeerDisconnected(long id)
     {
-        GD.Print($"Peer {Multiplayer.GetUniqueId()} says: peer {id} disconnected.");
+        DebugUtility.Print($"Peer {Multiplayer.GetUniqueId()} says: peer {id} disconnected.");
         PlayerDisconnected?.Invoke(id);
     }
 
+    // Only called on clients
     private void OnConnectedToServer()
     {
-        GD.Print($"Peer {Multiplayer.GetUniqueId()} says: connected to server.");
+        DebugUtility.Print($"Peer {Multiplayer.GetUniqueId()} says: connected to server.");
     }
 
+    // Only called on clients
+    // I think this can be called really late too, but assuming the server shut down
+    // notification works and the client disconnects its multiplayer system, this
+    // would not be called at all. This would be called when the server shuts down
+    // unexpectedly for example.
     private void OnServerDisconnected()
     {
-        GD.Print("Disconnected from server. Multiplayer peer inactive.");
-        isMultiplayerPeerActive = false;
-        UnsubscribeFromMultiplayerEvents();
+        DebugUtility.Print("Disconnected from server.");
+        DisconnectMultiplayer();
+        GetTree().ChangeSceneToFile("res://scenes/MainMenu.tscn");
     }
 
+    // Only called on clients
     private void OnConnectionFailed()
     {
-        GD.Print($"Peer {Multiplayer.GetUniqueId()} says: failed to connect server.");
+        DebugUtility.Print($"Peer {Multiplayer.GetUniqueId()} says: failed to connect server.");
     }
 }

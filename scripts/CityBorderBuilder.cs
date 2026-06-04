@@ -51,7 +51,7 @@ public static class CityBorderBuilder
         }
     }
 
-    private static Edge[] TilePositionsToTileBorderEdges(Vector2Int[] tilePositions)
+    private static Edge[] TilePositionsToTileBorderEdges(Vector2I[] tilePositions)
     {
         // 1. Store each 4 edge of each tile
         // 2. Remove duplicate edges
@@ -112,7 +112,7 @@ public static class CityBorderBuilder
         return borderEdges.ToArray();
     }
 
-    private static Vector2Int[] BorderEdgesToPolygonTileVertices(Edge[] unorderedBorderEdges)
+    private static Vector2I[] BorderEdgesToPolygonTileVertices(Edge[] unorderedBorderEdges)
     {
         Dictionary<Vector2, List<Edge>> edgesTouchingVertices = new();
 
@@ -137,7 +137,7 @@ public static class CityBorderBuilder
             }
         }
 
-        List<Vector2Int> orderedBorderTileVertices = new();
+        List<Vector2I> orderedBorderTileVertices = new();
 
         var currentEdge = unorderedBorderEdges[0];
         var currentVertex = currentEdge.A;
@@ -166,7 +166,7 @@ public static class CityBorderBuilder
                 throw new Exception(message: "Failsafe!");
             }
 
-            orderedBorderTileVertices.Add(Vector2Int.FromVector2(currentVertex));
+            orderedBorderTileVertices.Add(new Vector2I((int)currentVertex.X, (int)currentVertex.Y));
 
             var nextVertex = goingToB ? currentEdge.B : currentEdge.A;
 
@@ -190,7 +190,7 @@ public static class CityBorderBuilder
         return orderedBorderTileVertices.ToArray();
     }
 
-    public static Vector2[] Polygon2DFromTilePositions(Vector2Int[] tilePositions)
+    public static Vector2[] Polygon2DFromTilePositions(Vector2I[] tilePositions)
     {
         var borderEdges = TilePositionsToTileBorderEdges(tilePositions);
         var polygonTileVertices = BorderEdgesToPolygonTileVertices(borderEdges);
@@ -206,14 +206,14 @@ public static class CityBorderBuilder
 
 #nullable enable
     public static bool TryGetNextBorderExpansionTile(
-        Vector2Int[] controlledTiles,
-        Vector2Int cityTilePosition,
+        Vector2I[] controlledTiles,
+        Vector2I cityTilePosition,
         CityController owner,
-        out Vector2Int tilePosition,
-        Vector2Int? expansionDirection = null)
+        out Vector2I tilePosition,
+        Vector2I? expansionDirection = null)
     {
-        tilePosition = Vector2Int.Zero;
-        HashSet<Vector2Int> availableNeighborTileSet = new();
+        tilePosition = Vector2I.Zero;
+        HashSet<Vector2I> availableNeighborTileSet = new();
 
         // Check tiles in expanding "rings" around the city center to find the first
         // layer with uncontrolled tiles. Later the results can be filtered based on
@@ -221,7 +221,7 @@ public static class CityBorderBuilder
         // and shouldn't form holes in its own borders naturally.
 
         var maxRingOffset = 5; // The city can't grow more than 5 tiles away.
-        Vector2Int[] cardinalDirections = [
+        Vector2I[] cardinalDirections = [
             new(1, 0), new(-1, 0), new(0, -1), new(0, 1)
         ];
 
@@ -237,7 +237,7 @@ public static class CityBorderBuilder
                         continue;
                     }
 
-                    var offset = new Vector2Int(x, y);
+                    var offset = new Vector2I(x, y);
                     var testTilePosition = cityTilePosition + offset;
 
                     if (!TileGrid.IsTileInBounds(testTilePosition)) continue;
@@ -271,7 +271,7 @@ public static class CityBorderBuilder
 
         if (availableNeighborTileSet.Count == 0) return false;
 
-        var availableNeighborTiles = new Vector2Int[availableNeighborTileSet.Count];
+        var availableNeighborTiles = new Vector2I[availableNeighborTileSet.Count];
         availableNeighborTileSet.CopyTo(availableNeighborTiles);
 
         if (expansionDirection is null)
@@ -282,7 +282,8 @@ public static class CityBorderBuilder
             return true;
         }
 
-        List<Vector2Int> availableTilePositionsInRightDirection = new();
+        var expDir = (Vector2I)expansionDirection;
+        List<Vector2I> availableTilePositionsInRightDirection = new();
 
         foreach (var availableTilePos in availableNeighborTiles)
         {
@@ -290,18 +291,18 @@ public static class CityBorderBuilder
             var dirFromCity = ((Vector2)diffFromCity).Normalized();
             var dot = dirFromCity.Dot(Vector2.Up);
 
-            if (dot >= 0.5f && expansionDirection == Vector2Int.Up)
+            if (dot >= 0.5f && expDir == Vector2I.Up)
             {
                 availableTilePositionsInRightDirection.Add(availableTilePos);
             }
-            else if (dot <= -0.5 && expansionDirection == Vector2Int.Down)
+            else if (dot <= -0.5 && expDir == Vector2I.Down)
             {
                 availableTilePositionsInRightDirection.Add(availableTilePos);
             }
-            else if (dot < 0.5f && dot > -0.5f && expansionDirection.Y == 0)
+            else if (dot < 0.5f && dot > -0.5f && expDir.Y == 0)
             {
-                if (dirFromCity.X > 0 && expansionDirection.X > 0 ||
-                    dirFromCity.X < 0 && expansionDirection.X < 0)
+                if (dirFromCity.X > 0 && expDir.X > 0 ||
+                    dirFromCity.X < 0 && expDir.X < 0)
                 {
                     availableTilePositionsInRightDirection.Add(availableTilePos);
                 }

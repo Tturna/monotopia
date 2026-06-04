@@ -14,12 +14,12 @@ public partial class TileGrid : Node2D
     public required Texture2D townTileTexture;
     public static int TilesWidth = 10;
     public static int TilesHeight = 10;
-    public static Vector2Int TilePixelSize { get; private set; } = Vector2Int.Zero;
+    public static Vector2I TilePixelSize { get; private set; } = Vector2I.Zero;
 
     public static TileGrid Instance = null!;
 
     private static int tileGap = 2;
-    private static Vector2Int[] villageTileSpawnPoints => [
+    private static Vector2I[] villageTileSpawnPoints => [
         new(0, 0),
         new(4, 3),
         new(6, 5),
@@ -42,7 +42,7 @@ public partial class TileGrid : Node2D
         {
             for (var x = 0; x < TilesHeight; x++)
             {
-                var tilePos = new Vector2Int(x, y);
+                var tilePos = new Vector2I(x, y);
                 var tileController = AddMapElement(tilePos, TileScene);
                 EntitySelector.AddTile(tilePos, tileController);
             }
@@ -56,7 +56,8 @@ public partial class TileGrid : Node2D
         var propertyIndex = 0; // First propery in the node (should be texture for Sprite2D)
         var tileTextureVariant = tileSceneState.GetNodePropertyValue(nodeIndex, propertyIndex);
         var tileTexture = (Texture2D)tileTextureVariant;
-        TilePixelSize = Vector2Int.FromVector2(tileTexture.GetSize());
+        var textureSize = tileTexture.GetSize();
+        TilePixelSize = new Vector2I((int)textureSize.X, (int)textureSize.Y);
     }
 
     private TileController InstantiateMapElement(PackedScene scene)
@@ -73,7 +74,7 @@ public partial class TileGrid : Node2D
         return (TileController)mapElementInstance;
     }
 
-    private TileController AddMapElement(Vector2Int tilePosition, PackedScene scene)
+    private TileController AddMapElement(Vector2I tilePosition, PackedScene scene)
     {
         var mapElementInstance = InstantiateMapElement(scene);
         mapElementInstance.Position = TileToWorldPosition(tilePosition);
@@ -81,9 +82,9 @@ public partial class TileGrid : Node2D
         return mapElementInstance;
     }
 
-    public static bool TryGetVillageTileSpawnPoint(out Vector2Int tileSpawnPoint)
+    public static bool TryGetVillageTileSpawnPoint(out Vector2I tileSpawnPoint)
     {
-        tileSpawnPoint = Vector2Int.Zero;
+        tileSpawnPoint = Vector2I.Zero;
 
         if (spawnPointsLeft == 0)
         {
@@ -97,7 +98,7 @@ public partial class TileGrid : Node2D
         return true;
     }
 
-    public static CityController AddCity(Vector2Int tilePosition)
+    public static CityController AddCity(Vector2I tilePosition)
     {
         var cityNode = Instance.AddMapElement(tilePosition, Instance.CityScene);
         var cityController = (CityController)cityNode;
@@ -106,7 +107,7 @@ public partial class TileGrid : Node2D
         return cityController;
     }
 
-    public static Vector2 TileToWorldPosition(Vector2Int tilePosition)
+    public static Vector2 TileToWorldPosition(Vector2I tilePosition)
     {
         var tileWidth = TilePixelSize.X;
         var tileHeight = TilePixelSize.Y;
@@ -118,7 +119,7 @@ public partial class TileGrid : Node2D
         return new Vector2(xPosition, yPosition);
     }
 
-    public static Vector2Int WorldToTilePosition(Vector2 worldPosition)
+    public static Vector2I WorldToTilePosition(Vector2 worldPosition)
     {
         var tileWidth = TilePixelSize.X;
         var tileHeight = TilePixelSize.Y;
@@ -136,15 +137,15 @@ public partial class TileGrid : Node2D
         var tilePosX = Mathf.FloorToInt(approxTilePosX);
         var tilePosY = Mathf.FloorToInt(approxTilePosY);
 
-        return new Vector2Int(tilePosX, tilePosY);
+        return new Vector2I(tilePosX, tilePosY);
     }
 
-    public static bool IsTileInBounds(Vector2Int tilePosition)
+    public static bool IsTileInBounds(Vector2I tilePosition)
     {
         return EntitySelector.TryGetTile(tilePosition, out var _);
     }
 
-    public static bool IsTileOwned(Vector2Int tilePosition)
+    public static bool IsTileOwned(Vector2I tilePosition)
     {
         if (!EntitySelector.TryGetTile(tilePosition, out var tileController)) return false;
         if (tileController is null) return false;
@@ -152,12 +153,12 @@ public partial class TileGrid : Node2D
         return tileController.OwnerCity is not null;
     }
 
-    public static bool TrySetTileOwnerCity(Vector2Int tilePosition, CityController? owner)
+    public static bool TrySetTileOwnerCity(Vector2I tilePosition, CityController? owner)
     {
         return EntitySelector.TrySetTileOwner(tilePosition, owner);
     }
 
-    public static CityController? GetTileOwner(Vector2Int tilePosition)
+    public static CityController? GetTileOwner(Vector2I tilePosition)
     {
         if (!EntitySelector.TryGetTile(tilePosition, out var tileController)
             || tileController is null)

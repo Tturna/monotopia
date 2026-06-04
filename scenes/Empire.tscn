@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://d0v4k83kn45jp"]
+
+[ext_resource type="Script" uid="uid://bisk33v27s82j" path="res://scripts/EmpireController.cs" id="1_yb8xm"]
+
+[node name="Empire" type="Node2D" unique_id=1222907897]
+script = ExtResource("1_yb8xm")
