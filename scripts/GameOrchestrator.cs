@@ -86,15 +86,15 @@ public partial class GameOrchestrator : Node2D
 
 		var empire = (EmpireController)empireScene.Instantiate();
 
-		empire.EmpireUid = empireUid;
-		empire.EmpirePrimaryColor = empirePrimaryColor;
-		empiresParent.AddChild(empire, forceReadableName: true);
-		empire.AddNewCityToEmpire(capitalCityTilePosition, capitalCityUid);
-
 		if (empireOwnerPeerId == peerId)
 		{
 			empire.IsPlayerEmpire = true;
 		}
+
+		empire.EmpireUid = empireUid;
+		empire.EmpirePrimaryColor = empirePrimaryColor;
+		empiresParent.AddChild(empire, forceReadableName: true);
+		empire.AddNewCityToEmpire(capitalCityTilePosition, capitalCityUid);
 	}
 
 	public EmpireController? GetEmpireForPeerId(long peerId)

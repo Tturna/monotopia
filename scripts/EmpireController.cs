@@ -271,10 +271,19 @@ public partial class EmpireController : Node2D
 		var cityController = TileGrid.AddCity(tilePosition);
 		cityController.InitializeCity(tilePosition, ownerEmpire: this, newCityUid);
 		cities.Add(cityController);
-		totalCoinsDelta += cityController.CoinsGenerated;
-		UpdateTotalCoinDelta();
-		UpdateCoinsLabel();
 		EntitySelector.SetCity(newCityUid, cityController);
+
+		if (IsPlayerEmpire || Multiplayer.IsServer())
+		{
+			totalCoinsDelta += cityController.CoinsGenerated;
+		}
+
+		if (IsPlayerEmpire)
+		{
+			UpdateTotalCoinDelta();
+			UpdateCoinsLabel();
+		}
+
 		DebugUtility.Print($"Empire {EmpireUid} now has {cities.Count} cities");
 	}
 
