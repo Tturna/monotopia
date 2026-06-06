@@ -19,11 +19,13 @@ public partial class UIController : Node2D
     public required PackedScene BuildListItemPanel;
     [Export]
     public required Control WinOverlayControl;
+    [Export]
+    public required Control LoseOverlayControl;
 
     public static UIController Instance = null!;
 
     private PanelContainer? selectedBuildableItemPanel;
-    private BuildableItem? selectedBuildable;
+    private BuildController.BuildableItemType? selectedBuildable;
     private CityController? selectedCity;
 
     public override void _EnterTree()
@@ -39,9 +41,9 @@ public partial class UIController : Node2D
             if (selectedBuildable is null) return;
             if (selectedCity is null) return;
 
-            var buildable = (BuildableItem)selectedBuildable;
+            var buildable = (BuildController.BuildableItemType)selectedBuildable;
             var playerEmpire = EmpireController.GetPlayerEmpire(GetTree().Root);
-            playerEmpire.BuildItem(buildable, selectedCity);
+            playerEmpire.RequestBuildItem((int)buildable, selectedCity.CityUid);
         };
     }
 
@@ -55,11 +57,11 @@ public partial class UIController : Node2D
         DeselectBuildableItem();
     }
 
-    private void SetSelectedBuildable(PanelContainer buildableItemPanel, BuildableItem item)
+    private void SetSelectedBuildable(PanelContainer buildableItemPanel, BuildController.BuildableItemType itemType)
     {
         if (selectedBuildable is null)
         {
-            selectedBuildable = item;
+            selectedBuildable = itemType;
             selectedBuildableItemPanel = buildableItemPanel;
             var highlightColorRect = (ColorRect)selectedBuildableItemPanel.FindChild("Highlight Color");
             highlightColorRect.Show();
@@ -67,14 +69,14 @@ public partial class UIController : Node2D
             var buildButton = (Button)OwnedCityViewControl.FindChild("Build Button");
             buildButton.Disabled = false;
         }
-        else if (selectedBuildable != item)
+        else if (selectedBuildable != itemType)
         {
             Debug.Assert(selectedBuildableItemPanel is not null);
 
             var highlightColorRect = (ColorRect)selectedBuildableItemPanel.FindChild("Highlight Color");
             highlightColorRect.Hide();
 
-            selectedBuildable = item;
+            selectedBuildable = itemType;
             selectedBuildableItemPanel = buildableItemPanel;
 
             highlightColorRect = (ColorRect)selectedBuildableItemPanel.FindChild("Highlight Color");
@@ -105,8 +107,8 @@ public partial class UIController : Node2D
 
     public void ShowOwnedCityView(
         CityController city,
-        BuildableItem[] buildables,
-        Action<BuildableItem, CityController> buildCallback)
+        BuildController.BuildableItemType[] buildableTypes,
+        Action<int, string> buildCallback)
     {
         if (city is null)
         {
@@ -143,10 +145,11 @@ public partial class UIController : Node2D
             buildListScrollVBox.RemoveChild(child);
         }
 
-        foreach (var buildable in buildables)
+        foreach (var buildableType in buildableTypes)
         {
-            var name = buildable.ItemName;
-            var cost = buildable.Cost;
+            var buildableItemInfo = BuildController.GetBuildableItemInfo(buildableType);
+            var name = buildableItemInfo.ItemName;
+            var cost = buildableItemInfo.Cost;
 
             var buildListItemPanelInstance = (PanelContainer)BuildListItemPanel.Instantiate();
             buildListScrollVBox.AddChild(buildListItemPanelInstance);
@@ -157,7 +160,7 @@ public partial class UIController : Node2D
             itemCostLabel.Text = cost.ToString();
 
             var selectButton = (Button)buildListItemPanelInstance.FindChild("Select Button");
-            selectButton.Pressed += () => SetSelectedBuildable(buildListItemPanelInstance, buildable);
+            selectButton.Pressed += () => SetSelectedBuildable(buildListItemPanelInstance, buildableType);
         }
     }
 
@@ -192,6 +195,11 @@ public partial class UIController : Node2D
     public void ShowWinOverlay()
     {
         WinOverlayControl.Show();
+    }
+
+    public void ShowLoseOverlay()
+    {
+        LoseOverlayControl.Show();
     }
 
     public void SetTurnEnded(bool state)

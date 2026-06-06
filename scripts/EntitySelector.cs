@@ -6,6 +6,7 @@ public static class EntitySelector
 {
     private static Dictionary<Vector2I, BaseUnit?> unitMap = new();
     private static Dictionary<Vector2I, TileController> tileMap = new();
+    private static Dictionary<string, CityController> cityIdMap = new();
 
     public static void AddTile(Vector2I tilePosition, TileController tileController)
     {
@@ -65,6 +66,28 @@ public static class EntitySelector
         if (!unitMap.ContainsKey(tilePosition)) return false;
 
         unit = unitMap[tilePosition];
+
+        return true;
+    }
+
+    public static void SetCity(string cityUid, CityController city)
+    {
+        if (!cityIdMap.ContainsKey(cityUid))
+        {
+            cityIdMap.Add(cityUid, city);
+            return;
+        }
+
+        cityIdMap[cityUid] = city;
+    }
+
+    public static bool TryGetCity(string cityUid, out CityController? city)
+    {
+        city = null;
+
+        if (!cityIdMap.ContainsKey(cityUid)) return false;
+
+        city = cityIdMap[cityUid];
 
         return true;
     }

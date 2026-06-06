@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://d2nlqqu8jsp7"]
+
+[node name="Lose Overlay" type="Control" unique_id=151656470]
+layout_mode = 3
+anchors_preset = 0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=683829738]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -338.5
+offset_top = -153.0
+offset_right = 338.5
+offset_bottom = 153.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="PanelContainer" unique_id=160530332]
+layout_mode = 2
+color = Color(0.18717614, 0.18717614, 0.18717614, 1)
+
+[node name="Label" type="Label" parent="PanelContainer" unique_id=528977738]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "You took an L"
+horizontal_alignment = 1

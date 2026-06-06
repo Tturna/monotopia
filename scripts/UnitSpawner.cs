@@ -7,21 +7,17 @@ public partial class UnitSpawner : Node2D
     public PackedScene UnitScene;
 
     public static UnitSpawner Instance;
-    public enum Units
-    {
-        Warrior
-    }
 
     public override void _EnterTree()
     {
         Instance = this;
     }
 
-    public BaseUnit SpawnUnit(Units unitType, EmpireController ownerEmpire)
+    public BaseUnit SpawnUnit(BuildController.BuildableItemType unitType, EmpireController ownerEmpire)
     {
         return unitType switch
         {
-            Units.Warrior => SpawnWarrior(ownerEmpire),
+            BuildController.BuildableItemType.Warrior => SpawnWarrior(ownerEmpire),
             _ => throw new ArgumentOutOfRangeException(nameof(unitType), "No spawner defined for given unit type")
         };
     }
@@ -29,7 +25,7 @@ public partial class UnitSpawner : Node2D
     public WarriorUnit SpawnWarrior(EmpireController ownerEmpire)
     {
         var unit = new WarriorUnit(ownerEmpire);
-        GetTree().Root.AddChild(unit);
+        GetTree().Root.AddChild(unit, forceReadableName: true);
 
         return unit;
     }

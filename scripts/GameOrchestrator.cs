@@ -54,33 +54,56 @@ public partial class GameOrchestrator : Node2D
 				empire.IsPlayerEmpire = true;
 			}
 
+			var empireUid = Guid.NewGuid().ToString();
+			var capitalUid = Guid.NewGuid().ToString();
+
+			empire.EmpireUid = empireUid;
 			empire.EmpirePrimaryColor = empirePrimaryColor;
-			empiresParent.AddChild(empire);
-			empire.AddNewCityToEmpire(capitalCityTilePosition);
+			empiresParent.AddChild(empire, forceReadableName: true);
+			empire.AddNewCityToEmpire(capitalCityTilePosition, capitalUid);
 			playerEmpires.Add(peerId, empire);
 
-			Rpc(MethodName.SyncCreateEmpire, peerId, capitalCityTilePosition, empirePrimaryColor);
+			Rpc(
+				MethodName.SyncCreateEmpire,
+				peerId,
+				empireUid,
+				capitalCityTilePosition,
+				empirePrimaryColor,
+				capitalUid);
 		}
 	}
 	
 	[Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false)]
 	private void SyncCreateEmpire(
 		long empireOwnerPeerId,
+		string empireUid,
 		Vector2I capitalCityTilePosition,
-		Color empirePrimaryColor)
+		Color empirePrimaryColor,
+		string capitalCityUid)
 	{
 		var peerId = Multiplayer.GetUniqueId();
-		DebugUtility.Print($"{peerId} says: Creating empire for {empireOwnerPeerId}");
+		DebugUtility.Print($"Peer {peerId} says: Sync creating empire for peer {empireOwnerPeerId}");
 
 		var empire = (EmpireController)empireScene.Instantiate();
 
+		empire.EmpireUid = empireUid;
 		empire.EmpirePrimaryColor = empirePrimaryColor;
-		empiresParent.AddChild(empire);
-		empire.AddNewCityToEmpire(capitalCityTilePosition);
+		empiresParent.AddChild(empire, forceReadableName: true);
+		empire.AddNewCityToEmpire(capitalCityTilePosition, capitalCityUid);
 
 		if (empireOwnerPeerId == peerId)
 		{
 			empire.IsPlayerEmpire = true;
 		}
+	}
+
+	public EmpireController? GetEmpireForPeerId(long peerId)
+	{
+		if (!playerEmpires.TryGetValue(peerId, out var empire))
+		{
+			return null;
+		}
+
+		return empire;
 	}
 }

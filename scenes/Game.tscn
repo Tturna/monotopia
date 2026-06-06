@@ -18,6 +18,7 @@
 [ext_resource type="LabelSettings" uid="uid://brmmuo7fvryem" path="res://UI_Base_Label_Settings.tres" id="15_jai3c"]
 [ext_resource type="PackedScene" uid="uid://cpc1ij2wjxypk" path="res://scenes/WinOverlay.tscn" id="16_1gdd5"]
 [ext_resource type="PackedScene" uid="uid://1dota62uermp" path="res://scenes/OwnedCityView.tscn" id="17_426vi"]
+[ext_resource type="PackedScene" uid="uid://d2nlqqu8jsp7" path="res://scenes/LoseOverlay.tscn" id="18_45i86"]
 
 [node name="GameRoot" type="Node2D" unique_id=1161755743]
 
@@ -35,7 +36,7 @@ script = ExtResource("7_bneo8")
 script = ExtResource("9_jbgew")
 UnitScene = ExtResource("10_a85ww")
 
-[node name="UIController" type="Node2D" parent="." unique_id=170486342 node_paths=PackedStringArray("OwnedCityViewControl", "CoinsLabel", "TurnCountLabel", "TurnTimerLabel", "EndTurnButton", "WinOverlayControl")]
+[node name="UIController" type="Node2D" parent="." unique_id=170486342 node_paths=PackedStringArray("OwnedCityViewControl", "CoinsLabel", "TurnCountLabel", "TurnTimerLabel", "EndTurnButton", "WinOverlayControl", "LoseOverlayControl")]
 script = ExtResource("11_jhsr3")
 OwnedCityViewControl = NodePath("../CanvasLayer/AspectRatioContainer/Owned City View")
 CoinsLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox/Coins Label")
@@ -44,6 +45,7 @@ TurnTimerLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/B
 EndTurnButton = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/CenterContainer/End Turn Button")
 BuildListItemPanel = ExtResource("12_0bq3a")
 WinOverlayControl = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Win Overlay")
+LoseOverlayControl = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Lose Overlay")
 
 [node name="GameOrchestrator" type="Node2D" parent="." unique_id=228322953 node_paths=PackedStringArray("empiresParent")]
 script = ExtResource("11_vjgi4")
@@ -170,6 +172,10 @@ visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+
+[node name="Lose Overlay" parent="CanvasLayer/AspectRatioContainer/MarginContainer" unique_id=246295177 instance=ExtResource("18_45i86")]
+visible = false
+layout_mode = 2
 
 [node name="Pause Menu VBox" type="VBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer" unique_id=925813752]
 visible = false

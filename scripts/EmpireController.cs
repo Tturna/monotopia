@@ -5,6 +5,7 @@ using Godot;
 #nullable enable
 public partial class EmpireController : Node2D
 {
+	public string EmpireUid = null!;
 	public bool IsPlayerEmpire;
 	public bool HasCursorSelection;
 	public Color EmpirePrimaryColor;
@@ -84,7 +85,7 @@ public partial class EmpireController : Node2D
 		{
 			if (selectedUnit is not null)
 			{
-				selectedUnit.TryMoveToTile(mouseTilePosition);
+				selectedUnit.RequestMoveToTile(mouseTilePosition);
 				Deselect();
 
 				return;
@@ -99,7 +100,7 @@ public partial class EmpireController : Node2D
 
 			if (tileController is CityController cityController && cities.Contains(cityController))
 			{
-				UIController.Instance.ShowOwnedCityView(cityController, GetBuildableItems(), BuildItem);
+				UIController.Instance.ShowOwnedCityView(cityController, GetBuildableItems(), RequestBuildItem);
 			}
 			else
 			{
@@ -171,73 +172,136 @@ public partial class EmpireController : Node2D
 		UpdateCoinsLabel();
 	}
 
-	public BuildableItem[] GetBuildableItems()
+	[Rpc(CallLocal = true)]
+	private void SyncUnitSpawn(int unitTypeEnum, string spawnCityUid)
+	{
+		var selectedCity = cities.Find(city => city.CityUid == spawnCityUid)!;
+		var spawnedUnit = UnitSpawner.Instance.SpawnUnit(
+			(BuildController.BuildableItemType)unitTypeEnum,
+			ownerEmpire: this);
+
+		if (Multiplayer.IsServer())
+		{
+			spawnedUnit.RequestMoveToTile(selectedCity.CityTilePosition);
+		}
+	}
+
+	[Rpc(CallLocal = true)]
+	private void SyncReleaseCity(string targetCityUid)
+	{
+		var targetCity = cities.Find(city => city.CityUid == targetCityUid)!;
+		cities.Remove(targetCity);
+		DebugUtility.Print($"Sync release city {targetCityUid} from empire {EmpireUid}. Empire {EmpireUid} now has {cities.Count} cities");
+	}
+
+	[Rpc(CallLocal = true)]
+	private void SyncAnnexCity(string targetCityUid)
+	{
+		if (!EntitySelector.TryGetCity(targetCityUid, out var targetCity) || targetCity is null)
+		{
+			throw new ArgumentException($"No city with given UID {targetCityUid} in empire {EmpireUid}. {EmpireUid} has {cities.Count} cities.");
+		}
+
+		cities.Add(targetCity);
+		targetCity.SetOwnerEmpire(this, cities[0].BorderColor);
+		DebugUtility.Print($"Sync annex city {targetCityUid} for empire {EmpireUid}. Empire {EmpireUid} now has {cities.Count} cities");
+
+		if (GetAliveEmpireCount(GetTree().Root) == 1)
+		{
+			FreezeAllEmpires(GetTree().Root);
+
+			if (IsPlayerEmpire)
+			{
+				UIController.Instance.ShowWinOverlay();
+			}
+			else
+			{
+				UIController.Instance.ShowLoseOverlay();
+			}
+		}
+	}
+
+	public BuildController.BuildableItemType[] GetBuildableItems()
 	{
 		return
 		[
-			new BuildableItem {
-				ItemName = UnitSpawner.Units.Warrior.ToString(),
-				Cost = 2,
-				BuildableUnitType = UnitSpawner.Units.Warrior
-			}
+			BuildController.BuildableItemType.Warrior
 		];
 	}
 
-	public void BuildItem(BuildableItem item, CityController selectedCity)
+	[Rpc(mode: MultiplayerApi.RpcMode.AnyPeer)]
+	public void RequestBuildItem(int itemTypeEnum, string cityUid)
 	{
-		// TODO: check if item is unlocked and actually available for building
-
-		if (item.Cost > coins)
+		if (!Multiplayer.IsServer())
 		{
-			throw new InvalidOperationException($"Item {item.ItemName} is too expensive to build in empire {Name}");
+			RpcId(1, nameof(RequestBuildItem), itemTypeEnum, cityUid);
+			return;
 		}
 
-		if (item.BuildableUnitType is not null)
+		// TODO: check if item is unlocked and actually available for building
+
+		var selectedCity = cities.Find(city => city.CityUid == cityUid)!;
+		var itemType = (BuildController.BuildableItemType)itemTypeEnum;
+		var itemInfo = BuildController.GetBuildableItemInfo(itemType);
+
+		if (itemInfo.Cost > coins)
+		{
+			throw new InvalidOperationException($"Item {itemInfo.ItemName} is too expensive to build in empire {Name}");
+		}
+
+		if (itemInfo.IsUnit)
 		{
 			if (EntitySelector.TryGetUnit(selectedCity.CityTilePosition, out var unit) && unit is not null)
 			{
 				throw new InvalidOperationException($"Can't build unit in an occupied city {selectedCity.Name}");
 			}
 
-			coins -= item.Cost;
+			coins -= itemInfo.Cost;
 			UpdateCoinsLabel();
-
-			var spawnedUnit = UnitSpawner.Instance.SpawnUnit(
-				(UnitSpawner.Units)item.BuildableUnitType,
-				ownerEmpire: this);
-			spawnedUnit.SetUnitTilePosition(selectedCity.CityTilePosition);
+			Rpc(MethodName.SyncUnitSpawn, (int)itemType, cityUid);
 
 			return; 
 		}
 
-		throw new NotImplementedException($"Empire should build a structure ({item.ItemName}) but it can only build units for now.");
+		throw new NotImplementedException($"Empire should build a structure ({itemInfo.ItemName}) but it can only build units for now.");
 	}
 
-	public void AddNewCityToEmpire(Vector2I tilePosition)
+	public void AddNewCityToEmpire(Vector2I tilePosition, string newCityUid)
 	{
 		var cityController = TileGrid.AddCity(tilePosition);
-		cityController.InitializeCity(tilePosition, ownerEmpire: this);
+		cityController.InitializeCity(tilePosition, ownerEmpire: this, newCityUid);
 		cities.Add(cityController);
 		totalCoinsDelta += cityController.CoinsGenerated;
 		UpdateTotalCoinDelta();
 		UpdateCoinsLabel();
+		EntitySelector.SetCity(newCityUid, cityController);
+		DebugUtility.Print($"Empire {EmpireUid} now has {cities.Count} cities");
 	}
 
-	public void AnnexCity(CityController targetCity)
+	[Rpc(mode: MultiplayerApi.RpcMode.AnyPeer)]
+	public void RequestAnnexCity(string targetCityUid)
 	{
-		cities.Add(targetCity);
-		targetCity.SetOwnerEmpire(this, cities[0].BorderColor);
-
-		if (GetAliveEmpireCount(GetTree().Root) == 1)
+		if (!Multiplayer.IsServer())
 		{
-			UIController.Instance.ShowWinOverlay();
-			FreezeAllEmpires(GetTree().Root);
+			RpcId(1, MethodName.RequestAnnexCity, targetCityUid);
+			return;
 		}
+
+		DebugUtility.Print($"Annexing city {targetCityUid} for empire {EmpireUid}");
+		Rpc(MethodName.SyncAnnexCity, targetCityUid);
 	}
 
-	public void ReleaseCity(CityController targetCity)
+	[Rpc(mode: MultiplayerApi.RpcMode.AnyPeer)]
+	public void RequestReleaseCity(string targetCityUid)
 	{
-		cities.Remove(targetCity);
+		if (!Multiplayer.IsServer())
+		{
+			RpcId(1, MethodName.RequestReleaseCity, targetCityUid);
+			return;
+		}
+
+		DebugUtility.Print($"Releasing city {targetCityUid} from empire {EmpireUid}");
+		Rpc(MethodName.SyncReleaseCity, targetCityUid);
 	}
 
 	public bool HasCitiesRemaining()
