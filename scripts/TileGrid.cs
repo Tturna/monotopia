@@ -40,7 +40,7 @@ public partial class TileGrid : Node2D
 
         for (var y = 0; y < TilesHeight; y++)
         {
-            for (var x = 0; x < TilesHeight; x++)
+            for (var x = 0; x < TilesWidth; x++)
             {
                 var tilePos = new Vector2I(x, y);
                 var tileController = AddMapElement(tilePos, TileScene);
