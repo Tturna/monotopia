@@ -143,7 +143,6 @@ size_flags_horizontal = 10
 size_flags_vertical = 8
 
 [node name="Turn Timer Label" type="Label" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer" unique_id=1178126591]
-unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 8
 text = "66:66"
@@ -159,15 +158,11 @@ custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
 color = Color(0.28482667, 0.44, 0.23759998, 1)
 
-[node name="End Turn Label" type="Label" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/CenterContainer" unique_id=1467600873]
-layout_mode = 2
-text = "End Turn"
-label_settings = ExtResource("15_jai3c")
-
 [node name="End Turn Button" type="Button" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/CenterContainer" unique_id=63129807]
-unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "End Turn"
 flat = true
 
 [node name="Win Overlay" parent="CanvasLayer/AspectRatioContainer/MarginContainer" unique_id=151656470 instance=ExtResource("16_1gdd5")]

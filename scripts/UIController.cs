@@ -193,4 +193,18 @@ public partial class UIController : Node2D
     {
         WinOverlayControl.Show();
     }
+
+    public void SetTurnEnded(bool state)
+    {
+        if (state)
+        {
+            EndTurnButton.Text = "Turn Ended";
+            EndTurnButton.Disabled = true;
+        }
+        else
+        {
+            EndTurnButton.Text = "End Turn";
+            EndTurnButton.Disabled = false;
+        }
+    }
 }
