@@ -30,6 +30,8 @@ public partial class GameOrchestrator : Node2D
 	{
 		if (!Multiplayer.IsServer()) return;
 
+		TurnSystem.Instance.TurnStarted += OnTurnStarted;
+
 		var allPeerIds = new List<int>(Multiplayer.GetPeers());
 		allPeerIds.Add(1);
 
@@ -89,12 +91,25 @@ public partial class GameOrchestrator : Node2D
 		if (empireOwnerPeerId == peerId)
 		{
 			empire.IsPlayerEmpire = true;
+			playerEmpires.Add(peerId, empire);
 		}
 
 		empire.EmpireUid = empireUid;
 		empire.EmpirePrimaryColor = empirePrimaryColor;
 		empiresParent.AddChild(empire, forceReadableName: true);
 		empire.AddNewCityToEmpire(capitalCityTilePosition, capitalCityUid);
+	}
+
+	private void OnTurnStarted()
+	{
+		SyncAllEmpireCoins(updateBalance: true);
+	}
+
+	[Rpc(CallLocal = true)]
+	private void SyncCoinsForOwnEmpire(int newBalance, int newIncome)
+	{
+		var empire = playerEmpires[Multiplayer.GetUniqueId()];
+		empire.SetCoinState(newBalance, newIncome);
 	}
 
 	public EmpireController? GetEmpireForPeerId(long peerId)
@@ -105,5 +120,22 @@ public partial class GameOrchestrator : Node2D
 		}
 
 		return empire;
+	}
+
+	public void SyncAllEmpireCoins(bool updateBalance = false)
+	{
+		foreach (var (peerId, empire) in playerEmpires)
+		{
+			var newBalance = empire.Coins;
+
+			if (updateBalance)
+			{
+				newBalance += empire.TotalCoinsDelta;
+			}
+
+			var newIncome = empire.TotalCoinsDelta;
+			empire.SetCoinState(newBalance, newIncome);
+			RpcId(peerId, MethodName.SyncCoinsForOwnEmpire, newBalance, newIncome);
+		}
 	}
 }

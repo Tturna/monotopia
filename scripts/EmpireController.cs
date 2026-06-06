@@ -9,10 +9,10 @@ public partial class EmpireController : Node2D
 	public bool IsPlayerEmpire;
 	public bool HasCursorSelection;
 	public Color EmpirePrimaryColor;
+	public int Coins { get; private set; }
+	public int TotalCoinsDelta { get; private set; }
 
 	private List<CityController> cities = new();
-	private int coins;
-	private int totalCoinsDelta;
 	
 	private PackedScene tileSelectionScene => (PackedScene)GD.Load("res://scenes/TileSelection.tscn");
 	private Sprite2D? tileSelectionNode;
@@ -20,11 +20,6 @@ public partial class EmpireController : Node2D
 	private TileController? selectedTile;
 	private bool hasSelection;
 	private bool isFrozen;
-
-	public override void _Ready()
-	{
-		TurnSystem.Instance.TurnStarted += OnTurnStarted;
-	}
 
 	public override void _UnhandledInput(InputEvent inputEvent)
 	{
@@ -148,28 +143,7 @@ public partial class EmpireController : Node2D
 	private void UpdateCoinsLabel()
 	{
 		if (!IsPlayerEmpire) return;
-		UIController.Instance.SetCoinBalanceText(coins, totalCoinsDelta);
-	}
-
-	private void UpdateTotalCoinDelta()
-	{
-		if (!IsPlayerEmpire) return;
-
-		var total = 0;
-
-		foreach (var city in cities)
-		{
-			total += city.CoinsGenerated;
-		}
-
-		totalCoinsDelta = total;
-	}
-
-	private void OnTurnStarted()
-	{
-		UpdateTotalCoinDelta();
-		coins += totalCoinsDelta;
-		UpdateCoinsLabel();
+		UIController.Instance.SetCoinBalanceText(Coins, TotalCoinsDelta);
 	}
 
 	[Rpc(CallLocal = true)]
@@ -192,6 +166,11 @@ public partial class EmpireController : Node2D
 		var targetCity = cities.Find(city => city.CityUid == targetCityUid)!;
 		cities.Remove(targetCity);
 		DebugUtility.Print($"Sync release city {targetCityUid} from empire {EmpireUid}. Empire {EmpireUid} now has {cities.Count} cities");
+
+		if (IsPlayerEmpire || Multiplayer.IsServer())
+		{
+			TotalCoinsDelta -= targetCity.CoinsGenerated;
+		}
 	}
 
 	[Rpc(CallLocal = true)]
@@ -206,6 +185,11 @@ public partial class EmpireController : Node2D
 		targetCity.SetOwnerEmpire(this, cities[0].BorderColor);
 		DebugUtility.Print($"Sync annex city {targetCityUid} for empire {EmpireUid}. Empire {EmpireUid} now has {cities.Count} cities");
 
+		if (IsPlayerEmpire || Multiplayer.IsServer())
+		{
+			TotalCoinsDelta += targetCity.CoinsGenerated;
+		}
+
 		if (GetAliveEmpireCount(GetTree().Root) == 1)
 		{
 			FreezeAllEmpires(GetTree().Root);
@@ -218,6 +202,22 @@ public partial class EmpireController : Node2D
 			{
 				UIController.Instance.ShowLoseOverlay();
 			}
+		}
+
+		if (Multiplayer.IsServer())
+		{
+			GameOrchestrator.Instance.SyncAllEmpireCoins();
+		}
+	}
+
+	public void SetCoinState(int newBalance, int newIncome)
+	{
+		Coins = newBalance;
+		TotalCoinsDelta = newIncome;
+
+		if (IsPlayerEmpire)
+		{
+			UpdateCoinsLabel();
 		}
 	}
 
@@ -244,10 +244,13 @@ public partial class EmpireController : Node2D
 		var itemType = (BuildController.BuildableItemType)itemTypeEnum;
 		var itemInfo = BuildController.GetBuildableItemInfo(itemType);
 
-		if (itemInfo.Cost > coins)
+		if (itemInfo.Cost > Coins)
 		{
 			throw new InvalidOperationException($"Item {itemInfo.ItemName} is too expensive to build in empire {Name}");
 		}
+
+		Coins -= itemInfo.Cost;
+		GameOrchestrator.Instance.SyncAllEmpireCoins();
 
 		if (itemInfo.IsUnit)
 		{
@@ -256,8 +259,6 @@ public partial class EmpireController : Node2D
 				throw new InvalidOperationException($"Can't build unit in an occupied city {selectedCity.Name}");
 			}
 
-			coins -= itemInfo.Cost;
-			UpdateCoinsLabel();
 			Rpc(MethodName.SyncUnitSpawn, (int)itemType, cityUid);
 
 			return; 
@@ -275,13 +276,7 @@ public partial class EmpireController : Node2D
 
 		if (IsPlayerEmpire || Multiplayer.IsServer())
 		{
-			totalCoinsDelta += cityController.CoinsGenerated;
-		}
-
-		if (IsPlayerEmpire)
-		{
-			UpdateTotalCoinDelta();
-			UpdateCoinsLabel();
+			TotalCoinsDelta += cityController.CoinsGenerated;
 		}
 
 		DebugUtility.Print($"Empire {EmpireUid} now has {cities.Count} cities");
