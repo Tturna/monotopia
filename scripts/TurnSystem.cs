@@ -74,10 +74,10 @@ public partial class TurnSystem : Node2D
     }
 
     [Rpc(mode: MultiplayerApi.RpcMode.Authority, CallLocal = true)]
-    private void StartNextTurn(int turnNumber, int nextTurnTimeSeconds)
+    private void StartNextTurn(int nextTurnNumber, int nextTurnTimeSeconds)
     {
         turnTimer = nextTurnTimeSeconds;
-        turnCount = turnNumber;
+        turnCount = nextTurnNumber;
         UIController.Instance.SetTurnCountText(turnCount);
         DebugUtility.Print($"Starting turn {turnCount}");
         TurnStarted?.Invoke();
