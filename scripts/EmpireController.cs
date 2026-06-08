@@ -171,6 +171,11 @@ public partial class EmpireController : Node2D
 		{
 			TotalCoinsDelta -= targetCity.CoinsGenerated;
 		}
+
+		if (IsPlayerEmpire && cities.Count == 0)
+		{
+			UIController.Instance.ShowLoseOverlay();
+		}
 	}
 
 	[Rpc(CallLocal = true)]
