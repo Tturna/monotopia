@@ -78,7 +78,7 @@ public partial class EmpireController : Node2D
 
 		if (EntitySelector.TryGetTile(mouseTilePosition, out var tileController) && tileController is not null)
 		{
-			if (selectedUnit is not null)
+			if (selectedUnit is not null && selectedUnit.GetOwnerEmpire().IsPlayerEmpire)
 			{
 				selectedUnit.RequestMoveToTile(mouseTilePosition);
 				Deselect();

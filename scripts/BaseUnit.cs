@@ -117,4 +117,9 @@ public abstract partial class BaseUnit : Sprite2D
     }
 
     public abstract Texture2D GetSprite();
+
+    public EmpireController GetOwnerEmpire()
+    {
+        return OwnerEmpire;
+    }
 }
