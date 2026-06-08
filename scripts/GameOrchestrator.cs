@@ -105,7 +105,7 @@ public partial class GameOrchestrator : Node2D
 		SyncAllEmpireCoins(updateBalance: true);
 	}
 
-	[Rpc(CallLocal = true)]
+	[Rpc()]
 	private void SyncCoinsForOwnEmpire(int newBalance, int newIncome)
 	{
 		var empire = playerEmpires[Multiplayer.GetUniqueId()];
@@ -135,7 +135,12 @@ public partial class GameOrchestrator : Node2D
 
 			var newIncome = empire.TotalCoinsDelta;
 			empire.SetCoinState(newBalance, newIncome);
-			RpcId(peerId, MethodName.SyncCoinsForOwnEmpire, newBalance, newIncome);
+
+			// Server doesn't need to sync itself
+			if (peerId != 1)
+			{
+				RpcId(peerId, MethodName.SyncCoinsForOwnEmpire, newBalance, newIncome);
+			}
 		}
 	}
 }
