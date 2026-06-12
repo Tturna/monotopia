@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://p68qne1qiojk"]
+
+[ext_resource type="Texture2D" uid="uid://02qx5wh51yov" path="res://sprites/tileselection.png" id="1_rom2y"]
+
+[node name="Sprite2D" type="Sprite2D" unique_id=1765061921]
+modulate = Color(0.42000002, 0.83566666, 1, 1)
+texture = ExtResource("1_rom2y")
+centered = false

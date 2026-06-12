@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 
 #nullable enable
@@ -170,5 +171,33 @@ public partial class TileGrid : Node2D
         }
 
         return tileController.OwnerCity;
+    }
+
+    public static Vector2I[] GetTileNeighbors(Vector2I tilePosition)
+    {
+        var neighbors = new List<Vector2I>();
+        var directions = new Vector2I[]
+        {
+            new(0, -1), // up
+            new(0, 1),  // down
+            new(-1, 0), // left
+            new(1, 0),  // right
+            new(-1, -1),// top left
+            new(1, -1), // top right
+            new(-1, 1), // bot left
+            new(1, 1)   // bot right
+        };
+
+        foreach (var dir in directions)
+        {
+            var neighborPos = tilePosition + dir;
+
+            if (IsTileInBounds(neighborPos))
+            {
+                neighbors.Add(neighborPos);
+            }
+        }
+
+        return neighbors.ToArray();
     }
 }

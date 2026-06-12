@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 
 #nullable enable
@@ -23,6 +24,58 @@ public abstract partial class BaseUnit : Sprite2D
         OwnerEmpire = unitOwner;
         Texture = GetSprite();
         Centered = false;
+    }
+
+    public Dictionary<Vector2I, int> GetReachableTilesWithCosts()
+    {
+        // 1. Take the whole tile grid or some large area of tiles that the unit
+        // could never get out of with its available movement range. Note that you can't
+        // limit the initial area just based on movement range if there can be tiles
+        // that increase range like roads, unless you make assumptions like roads can at most
+        // double movement speed, in which case you could limit the initial area to double
+        // of the unit's movement range.
+        // 
+        // 2. Run Dijkstra's on the tile area but don't let it continue once a path becomes too
+        // expensive. This prevents running it on an excessively large node graph.
+
+        // Dijkstra's
+        PriorityQueue<Vector2I, int> closestNodes = new();
+        HashSet<Vector2I> processedNodes = new();
+        Dictionary<Vector2I, int> distances = new();
+
+        // Add unit position as a 0 cost node to start from
+        closestNodes.Enqueue(TilePosition, 0);
+        distances.Add(TilePosition, 0);
+
+        while (closestNodes.Count > 0)
+        {
+            var currentNode = closestNodes.Dequeue();
+
+            if (processedNodes.Contains(currentNode)) continue;
+
+            processedNodes.Add(currentNode);
+
+            foreach (var neighbor in TileGrid.GetTileNeighbors(currentNode))
+            {
+                var neighborHasDistance = distances.ContainsKey(neighbor);
+                var currentDistanceToNeighbor = neighborHasDistance ? distances[neighbor] : int.MaxValue;
+                // For now, every tile has constant weight. Things like forest and hill tiles could
+                // have more weight later.
+                var weight = 1;
+                var newDistanceToNeighbor = distances[currentNode] + weight;
+
+                // Short circuit to prevent excessive processing
+                if (newDistanceToNeighbor > MovementRange) continue;
+
+                if (newDistanceToNeighbor < currentDistanceToNeighbor)
+                {
+                    distances[neighbor] = newDistanceToNeighbor;
+                    closestNodes.Enqueue(neighbor, newDistanceToNeighbor);
+                }
+            }
+        }
+
+        return distances;
     }
 
     [Rpc(mode: MultiplayerApi.RpcMode.AnyPeer)]

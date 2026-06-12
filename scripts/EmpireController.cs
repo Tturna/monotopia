@@ -15,11 +15,19 @@ public partial class EmpireController : Node2D
 	private List<CityController> cities = new();
 	
 	private PackedScene tileSelectionScene => (PackedScene)GD.Load("res://scenes/TileSelection.tscn");
-	private Sprite2D? tileSelectionNode;
+	private PackedScene reachableTileIndicatorScene => (PackedScene)GD.Load("res://scenes/ReachableTileIndicator.tscn");
+	private Sprite2D tileSelectionNode = null!;
+	private Dictionary<Vector2I, Sprite2D> reachableTileIndicators = new();
 	private BaseUnit? selectedUnit;
 	private TileController? selectedTile;
 	private bool hasSelection;
 	private bool isFrozen;
+
+	public override void _Ready()
+	{
+		tileSelectionNode = (Sprite2D)tileSelectionScene.Instantiate();
+		AddChild(tileSelectionNode);
+	}
 
 	public override void _UnhandledInput(InputEvent inputEvent)
 	{
@@ -72,6 +80,15 @@ public partial class EmpireController : Node2D
 				UpdateTileSelection(mouseTilePosition);
 				UIController.Instance.HideOwnedCityView();
 
+				var tileCosts = unit.GetReachableTilesWithCosts();
+
+				if (tileCosts.ContainsKey(unit.TilePosition))
+				{
+					tileCosts.Remove(unit.TilePosition);
+				}
+
+				ShowReachableTileIndicators(tileCosts.Keys);
+
 				return;
 			}
 		}
@@ -116,28 +133,46 @@ public partial class EmpireController : Node2D
 		hasSelection = false;
 		UpdateTileSelection(null);
 		UIController.Instance.HideOwnedCityView();
+		HideReachableTileIndicators();
 	}
 
 	private void UpdateTileSelection(Vector2I? tilePosition)
 	{
 		if (!hasSelection || tilePosition is null)
 		{
-			if (tileSelectionNode is not null)
-			{
-				tileSelectionNode.QueueFree();
-				tileSelectionNode = null;
-			}
-
+			tileSelectionNode.Hide();
 			return;
 		}
 
-		if (tileSelectionNode is null)
-		{
-			tileSelectionNode = (Sprite2D)tileSelectionScene.Instantiate();
-			AddChild(tileSelectionNode);
-		}
-
+		tileSelectionNode.Show();
 		tileSelectionNode.Position = TileGrid.TileToWorldPosition((Vector2I)tilePosition);
+	}
+
+	private void ShowReachableTileIndicators(IEnumerable<Vector2I> reachableTiles)
+	{
+		foreach (var tilePosition in reachableTiles)
+		{
+			if (reachableTileIndicators.ContainsKey(tilePosition))
+			{
+				reachableTileIndicators[tilePosition].Show();
+			}
+			else
+			{
+				var indicator = (Sprite2D)reachableTileIndicatorScene.Instantiate();
+				AddChild(indicator);
+				reachableTileIndicators.Add(tilePosition, indicator);
+			}
+
+			reachableTileIndicators[tilePosition].Position = TileGrid.TileToWorldPosition(tilePosition);
+		}
+	}
+
+	private void HideReachableTileIndicators()
+	{
+		foreach (var (_, indicator) in reachableTileIndicators)
+		{
+			indicator.Hide();
+		}
 	}
 
 	private void UpdateCoinsLabel()
