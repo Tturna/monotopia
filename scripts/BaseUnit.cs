@@ -117,6 +117,10 @@ public abstract partial class BaseUnit : Sprite2D
         // TODO: Make it so you can swap friendly units?
         if (EntitySelector.TryGetUnit(tilePosition, out var unit) && unit is not null) return false;
 
+        var tileCosts = GetReachableTilesWithCosts();
+
+        if (!tileCosts.ContainsKey(tilePosition)) return false;
+
         Rpc(MethodName.SetUnitTilePosition, tilePosition);
 
         if (EntitySelector.TryGetTile(tilePosition, out var tile) && tile is CityController city)
