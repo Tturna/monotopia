@@ -30,9 +30,10 @@ public abstract partial class BaseUnit : Sprite2D
 
     public override void _Ready()
     {
+        ResetAvailableMovement();
+
         if (Multiplayer.IsServer())
         {
-            ResetAvailableMovement();
             TurnSystem.Instance.TurnStarted += OnTurnStart;
         }
     }
@@ -137,7 +138,7 @@ public abstract partial class BaseUnit : Sprite2D
             throw new InvalidOperationException("Tried to force move a unit directly from a client");
         }
 
-        Rpc(MethodName.SetUnitTilePosition, tilePosition);
+        Rpc(MethodName.SetUnitTilePosition, tilePosition, MovementRangeLeft);
     }
 
     public bool TryMoveToTile(Vector2I tilePosition)
@@ -161,7 +162,7 @@ public abstract partial class BaseUnit : Sprite2D
 
         MovementRangeLeft -= tileCosts[tilePosition];
 
-        Rpc(MethodName.SetUnitTilePosition, tilePosition);
+        Rpc(MethodName.SetUnitTilePosition, tilePosition, MovementRangeLeft);
 
         if (EntitySelector.TryGetTile(tilePosition, out var tile) && tile is CityController city)
         {
@@ -176,7 +177,7 @@ public abstract partial class BaseUnit : Sprite2D
     }
 
     [Rpc(CallLocal = true)]
-    public void SetUnitTilePosition(Vector2I tilePosition)
+    private void SetUnitTilePosition(Vector2I tilePosition, int newAvailableMovementRange)
     {
         if (Multiplayer.GetRemoteSenderId() == 0)
         {
@@ -189,7 +190,8 @@ public abstract partial class BaseUnit : Sprite2D
         }
 
         EntitySelector.SetUnit(TilePosition, null);
-        this.TilePosition = tilePosition;
+        TilePosition = tilePosition;
+        MovementRangeLeft = newAvailableMovementRange;
         Position = TileGrid.TileToWorldPosition(tilePosition);
         EntitySelector.SetUnit(tilePosition, this);
     }
@@ -206,11 +208,6 @@ public abstract partial class BaseUnit : Sprite2D
 
     public void ResetAvailableMovement()
     {
-        if (!Multiplayer.IsServer())
-        {
-            throw new InvalidOperationException("Tried to reset unit movement directly from a client");
-        }
-
         MovementRangeLeft = MovementRange;
     }
 

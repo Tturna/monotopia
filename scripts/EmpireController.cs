@@ -82,9 +82,10 @@ public partial class EmpireController : Node2D
 
 		if (EntitySelector.TryGetUnit(mouseTilePosition, out var unit) && unit is not null)
 		{
+			Deselect();
+
 			if (unit == selectedUnit)
 			{
-				Deselect();
 			}
 			else
 			{
@@ -93,6 +94,9 @@ public partial class EmpireController : Node2D
 				hasSelection = true;
 				UpdateTileSelection(mouseTilePosition);
 				UIController.Instance.HideOwnedCityView();
+
+				if (!unit.GetOwnerEmpire().IsPlayerEmpire) return;
+
 				unitPathLine.Show();
 
 				var tileCosts = unit.GetReachableTilesWithCosts();
@@ -237,7 +241,7 @@ public partial class EmpireController : Node2D
 
 		if (Multiplayer.IsServer())
 		{
-            spawnedUnit.ForceMoveToTile(selectedCity.CityTilePosition);
+			spawnedUnit.ForceMoveToTile(selectedCity.CityTilePosition);
 		}
 	}
 
