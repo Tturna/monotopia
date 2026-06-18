@@ -78,6 +78,11 @@ public abstract partial class BaseUnit : Sprite2D
         return distances;
     }
 
+    public Vector2[] GetPathToTargetTile(Vector2I targetTilePosition)
+    {
+        return TileGrid.GetShortestPath(TilePosition, targetTilePosition);
+    }
+
     [Rpc(mode: MultiplayerApi.RpcMode.AnyPeer)]
     public void RequestMoveToTile(Vector2I tilePosition)
     {

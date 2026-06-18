@@ -20,13 +20,20 @@ public partial class EmpireController : Node2D
 	private Dictionary<Vector2I, Sprite2D> reachableTileIndicators = new();
 	private BaseUnit? selectedUnit;
 	private TileController? selectedTile;
+	private Vector2I? hoveredTile;
 	private bool hasSelection;
 	private bool isFrozen;
+	private Line2D unitPathLine = null!;
 
 	public override void _Ready()
 	{
 		tileSelectionNode = (Sprite2D)tileSelectionScene.Instantiate();
 		AddChild(tileSelectionNode);
+
+		unitPathLine = new Line2D();
+		unitPathLine.Width = 1;
+		AddChild(unitPathLine);
+		unitPathLine.Hide();
 	}
 
 	public override void _UnhandledInput(InputEvent inputEvent)
@@ -37,6 +44,12 @@ public partial class EmpireController : Node2D
 		if (inputEvent is InputEventMouseButton mouseButtonEvent)
 		{
 			HandleMouseButtonEvent(mouseButtonEvent);
+			return;
+		}
+
+		if (inputEvent is InputEventMouseMotion mouseMotionEvent)
+		{
+			HandleMouseMotionEvent(mouseMotionEvent);
 			return;
 		}
 
@@ -79,6 +92,7 @@ public partial class EmpireController : Node2D
 				hasSelection = true;
 				UpdateTileSelection(mouseTilePosition);
 				UIController.Instance.HideOwnedCityView();
+				unitPathLine.Show();
 
 				var tileCosts = unit.GetReachableTilesWithCosts();
 
@@ -126,6 +140,36 @@ public partial class EmpireController : Node2D
 		}
 	}
 
+	private void HandleMouseMotionEvent(InputEventMouseMotion motionEvent)
+	{
+		var mouseWorldPosition = GetViewport().GetCamera2D().GetGlobalMousePosition();
+		var mouseTilePosition = TileGrid.WorldToTilePosition(mouseWorldPosition);
+
+		if (TileGrid.IsTileInBounds(mouseTilePosition))
+		{
+			if (selectedUnit is not null && mouseTilePosition != hoveredTile)
+			{
+				var pathTiles = selectedUnit.GetPathToTargetTile(mouseTilePosition);
+				var pathIndicatorOffset = (Vector2)TileGrid.TilePixelSize / 2;
+
+				for (var i = 0; i < pathTiles.Length; i++)
+				{
+					var tilePos = (Vector2I)pathTiles[i];
+					var tileWorldPos = TileGrid.TileToWorldPosition(tilePos);
+					pathTiles[i] = tileWorldPos + pathIndicatorOffset;
+				}
+
+				unitPathLine.Points = pathTiles;
+			}
+
+			hoveredTile = mouseTilePosition;
+		}
+		else
+		{
+			hoveredTile = null;
+		}
+	}
+
 	private void Deselect()
 	{
 		selectedUnit = null;
@@ -134,6 +178,7 @@ public partial class EmpireController : Node2D
 		UpdateTileSelection(null);
 		UIController.Instance.HideOwnedCityView();
 		HideReachableTileIndicators();
+		unitPathLine.Hide();
 	}
 
 	private void UpdateTileSelection(Vector2I? tilePosition)

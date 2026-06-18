@@ -28,6 +28,7 @@ public partial class TileGrid : Node2D
         new(TilesWidth - 1, TilesHeight - 1)
     ];
     private static int spawnPointsLeft;
+    private static AStar2D astar = null!;
 
     public override void _EnterTree()
     {
@@ -38,6 +39,7 @@ public partial class TileGrid : Node2D
 	public override void _Ready()
 	{
         InitializeGeneralTileSize();
+        astar = new();
 
         for (var y = 0; y < TilesHeight; y++)
         {
@@ -46,6 +48,23 @@ public partial class TileGrid : Node2D
                 var tilePos = new Vector2I(x, y);
                 var tileController = AddMapElement(tilePos, TileScene);
                 EntitySelector.AddTile(tilePos, tileController);
+                astar.AddPoint(astar.GetPointCount(), tilePos);
+            }
+        }
+
+        for (var y = 0; y < TilesHeight; y++)
+        {
+            for (var x = 0; x < TilesWidth; x++)
+            {
+                var tilePos = new Vector2I(x, y);
+                var neighbors = GetTileNeighbors(tilePos);
+                var tileId = astar.GetClosestPoint(tilePos);
+
+                foreach (var neighbor in neighbors)
+                {
+                    var neighborId = astar.GetClosestPoint(neighbor);
+                    astar.ConnectPoints(tileId, neighborId);
+                }
             }
         }
 	}
@@ -199,5 +218,12 @@ public partial class TileGrid : Node2D
         }
 
         return neighbors.ToArray();
+    }
+
+    public static Vector2[] GetShortestPath(Vector2I fromTile, Vector2I toTile)
+    {
+        var fromId = astar.GetClosestPoint(fromTile);
+        var toId = astar.GetClosestPoint(toTile);
+        return astar.GetPointPath(fromId, toId);
     }
 }
