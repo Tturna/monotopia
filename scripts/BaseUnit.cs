@@ -19,11 +19,34 @@ public abstract partial class BaseUnit : Sprite2D
 
     protected EmpireController OwnerEmpire;
 
+    protected int MovementRangeLeft { get; set; }
+
     public BaseUnit(EmpireController unitOwner)
     {
         OwnerEmpire = unitOwner;
         Texture = GetSprite();
         Centered = false;
+    }
+
+    public override void _Ready()
+    {
+        if (Multiplayer.IsServer())
+        {
+            ResetAvailableMovement();
+            TurnSystem.Instance.TurnStarted += OnTurnStart;
+        }
+    }
+
+    public override void _ExitTree()
+    {
+        TurnSystem.Instance.TurnStarted -= OnTurnStart;
+    }
+
+    private void OnTurnStart()
+    {
+        if (!Multiplayer.IsServer()) return;
+
+        ResetAvailableMovement();
     }
 
     public Dictionary<Vector2I, int> GetReachableTilesWithCosts()
@@ -65,7 +88,7 @@ public abstract partial class BaseUnit : Sprite2D
                 var newDistanceToNeighbor = distances[currentNode] + weight;
 
                 // Short circuit to prevent excessive processing
-                if (newDistanceToNeighbor > MovementRange) continue;
+                if (newDistanceToNeighbor > MovementRangeLeft) continue;
 
                 if (newDistanceToNeighbor < currentDistanceToNeighbor)
                 {
@@ -126,6 +149,8 @@ public abstract partial class BaseUnit : Sprite2D
 
         if (!tileCosts.ContainsKey(tilePosition)) return false;
 
+        MovementRangeLeft -= tileCosts[tilePosition];
+
         Rpc(MethodName.SetUnitTilePosition, tilePosition);
 
         if (EntitySelector.TryGetTile(tilePosition, out var tile) && tile is CityController city)
@@ -167,6 +192,16 @@ public abstract partial class BaseUnit : Sprite2D
         }
 
         throw new InvalidOperationException("Don't use SetPosition() for units. Use SetUnitPosition instead.");
+    }
+
+    public void ResetAvailableMovement()
+    {
+        if (!Multiplayer.IsServer())
+        {
+            throw new InvalidOperationException("Tried to reset unit movement directly from a client");
+        }
+
+        MovementRangeLeft = MovementRange;
     }
 
     public abstract Texture2D GetSprite();
