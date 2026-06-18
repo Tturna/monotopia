@@ -19,7 +19,7 @@ public abstract partial class BaseUnit : Sprite2D
 
     protected EmpireController OwnerEmpire;
 
-    protected int MovementRangeLeft { get; set; }
+    protected int MovementRangeLeft { get; private set; }
 
     public BaseUnit(EmpireController unitOwner)
     {
@@ -128,6 +128,16 @@ public abstract partial class BaseUnit : Sprite2D
             // Ensure its their turn and stuff
             TryMoveToTile(tilePosition);
         }
+    }
+
+    public void ForceMoveToTile(Vector2I tilePosition)
+    {
+        if (!Multiplayer.IsServer())
+        {
+            throw new InvalidOperationException("Tried to force move a unit directly from a client");
+        }
+
+        Rpc(MethodName.SetUnitTilePosition, tilePosition);
     }
 
     public bool TryMoveToTile(Vector2I tilePosition)

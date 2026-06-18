@@ -29,6 +29,7 @@ public partial class EmpireController : Node2D
 	{
 		tileSelectionNode = (Sprite2D)tileSelectionScene.Instantiate();
 		AddChild(tileSelectionNode);
+		tileSelectionNode.Hide();
 
 		unitPathLine = new Line2D();
 		unitPathLine.Width = 1;
@@ -236,7 +237,7 @@ public partial class EmpireController : Node2D
 
 		if (Multiplayer.IsServer())
 		{
-			spawnedUnit.RequestMoveToTile(selectedCity.CityTilePosition);
+            spawnedUnit.ForceMoveToTile(selectedCity.CityTilePosition);
 		}
 	}
 
