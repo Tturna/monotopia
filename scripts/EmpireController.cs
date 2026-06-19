@@ -82,13 +82,25 @@ public partial class EmpireController : Node2D
 
 		if (EntitySelector.TryGetUnit(mouseTilePosition, out var unit) && unit is not null)
 		{
-			Deselect();
-
 			if (unit == selectedUnit)
 			{
+				Deselect();
+			}
+			else if (selectedUnit is not null && !unit.GetOwnerEmpire().IsPlayerEmpire)
+			{
+				// Try attacking clicked unit with selected unit
+
+				// If the unit dies, it immediately disappears from the world, so letting logic
+				// fall through to the tile check should move the attacking unit to the victim
+				// unit's position. If the unit doesn't die, the tile check fails below.
+				unit.RequestTakeDamage(10);
 			}
 			else
 			{
+				// No unit selected or selecting another own unit
+
+				Deselect();
+
 				selectedTile = null;
 				selectedUnit = unit;
 				hasSelection = true;

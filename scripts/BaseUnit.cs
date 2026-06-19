@@ -16,6 +16,8 @@ public abstract partial class BaseUnit : Sprite2D
     protected int AttackRange { get; init; } = 1;
     protected int Damage { get; init; } = 1;
     protected int Defense { get; init; } = 1;
+    protected int MaxHealth { get; private set; } = 100;
+    protected int Health { get; private set; }
 
     protected EmpireController OwnerEmpire;
 
@@ -31,6 +33,7 @@ public abstract partial class BaseUnit : Sprite2D
     public override void _Ready()
     {
         ResetAvailableMovement();
+        Health = MaxHealth;
 
         if (Multiplayer.IsServer())
         {
@@ -216,5 +219,59 @@ public abstract partial class BaseUnit : Sprite2D
     public EmpireController GetOwnerEmpire()
     {
         return OwnerEmpire;
+    }
+
+    [Rpc(mode: MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+    public void RequestTakeDamage(int amount)
+    {
+        if (!Multiplayer.IsServer())
+        {
+            RpcId(1, MethodName.RequestTakeDamage, amount);
+            return;
+        }
+
+        // TODO: Check that the unit is in range, unit has attacks left etc.
+
+        Rpc(MethodName.TakeDamage, amount);
+    }
+
+    /// <summary>
+    /// Damages the unit. If the unit's health falls to or below 0, the unit dies
+    /// and is immediately removed and QueueFree() is called. Returns true if the
+    /// unit's health is above 0 after taking damage, false otherwise.
+    /// </summary>
+    [Rpc(CallLocal = true)]
+    public bool TakeDamage(int amount)
+    {
+        if (Multiplayer.GetRemoteSenderId() == 0)
+        {
+            throw new InvalidOperationException("Tried to damage unit without RPC");
+        }
+
+        if (Multiplayer.GetRemoteSenderId() > 1)
+        {
+            throw new InvalidOperationException("Client tried to damage unit via direct RPC");
+        }
+
+        if (Health <= 0) return false;
+
+        Health -= amount;
+        DebugUtility.Print($"Unit took {amount} damage and now has {Health} health.");
+
+        if (Health <= 0)
+        {
+            Health = 0;
+            Death();
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public void Death()
+    {
+        EntitySelector.SetUnit(TilePosition, null);
+        QueueFree();
     }
 }
