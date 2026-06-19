@@ -22,6 +22,7 @@ public abstract partial class BaseUnit : Sprite2D
     protected EmpireController OwnerEmpire;
 
     protected int MovementRangeLeft { get; private set; }
+    protected bool HasAttackedThisTurn { get; private set; }
 
     public BaseUnit(EmpireController unitOwner)
     {
@@ -32,7 +33,7 @@ public abstract partial class BaseUnit : Sprite2D
 
     public override void _Ready()
     {
-        ResetAvailableMovement();
+        ResetTurnState();
         Health = MaxHealth;
 
         if (Multiplayer.IsServer())
@@ -54,8 +55,8 @@ public abstract partial class BaseUnit : Sprite2D
 
         if (GameOrchestrator.Instance.TryGetPeerIdForEmpire(ownerEmpire, out var peerId))
         {
-            ResetAvailableMovement();
-            RpcId(peerId, MethodName.ResetAvailableMovement);
+            ResetTurnState();
+            RpcId(peerId, MethodName.ResetTurnState);
         }
         else
         {
@@ -220,9 +221,10 @@ public abstract partial class BaseUnit : Sprite2D
     }
 
     [Rpc(CallLocal = true)]
-    public void ResetAvailableMovement()
+    public void ResetTurnState()
     {
         MovementRangeLeft = MovementRange;
+        HasAttackedThisTurn = false;
     }
 
     public abstract Texture2D GetSprite();
@@ -284,5 +286,13 @@ public abstract partial class BaseUnit : Sprite2D
     {
         EntitySelector.SetUnit(TilePosition, null);
         QueueFree();
+    }
+
+    public void TryAttackUnit(BaseUnit targetUnit)
+    {
+        if (HasAttackedThisTurn) return;
+
+        HasAttackedThisTurn = true;
+        targetUnit.RequestTakeDamage(Damage);
     }
 }

@@ -93,12 +93,17 @@ public partial class EmpireController : Node2D
 				// If the unit dies, it immediately disappears from the world, so letting logic
 				// fall through to the tile check should move the attacking unit to the victim
 				// unit's position. If the unit doesn't die, the tile check fails below.
-				unit.RequestTakeDamage(10);
+
+				var tileCosts = selectedUnit.GetReachableTilesWithCosts();
+
+				if (tileCosts.ContainsKey(unit.TilePosition))
+				{
+					selectedUnit.TryAttackUnit(unit);
+				}
 			}
 			else
 			{
 				// No unit selected or selecting another own unit
-
 				Deselect();
 
 				selectedTile = null;
