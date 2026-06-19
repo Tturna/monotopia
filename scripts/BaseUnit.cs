@@ -50,7 +50,17 @@ public abstract partial class BaseUnit : Sprite2D
     {
         if (!Multiplayer.IsServer()) return;
 
-        ResetAvailableMovement();
+        var ownerEmpire = GetOwnerEmpire();
+
+        if (GameOrchestrator.Instance.TryGetPeerIdForEmpire(ownerEmpire, out var peerId))
+        {
+            ResetAvailableMovement();
+            RpcId(peerId, MethodName.ResetAvailableMovement);
+        }
+        else
+        {
+            throw new ArgumentException("No peer ID found for empire");
+        }
     }
 
     public Dictionary<Vector2I, int> GetReachableTilesWithCosts()
@@ -209,6 +219,7 @@ public abstract partial class BaseUnit : Sprite2D
         throw new InvalidOperationException("Don't use SetPosition() for units. Use SetUnitPosition instead.");
     }
 
+    [Rpc(CallLocal = true)]
     public void ResetAvailableMovement()
     {
         MovementRangeLeft = MovementRange;

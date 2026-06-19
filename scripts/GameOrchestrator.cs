@@ -122,6 +122,21 @@ public partial class GameOrchestrator : Node2D
 		return empire;
 	}
 
+	public bool TryGetPeerIdForEmpire(EmpireController empire, out long id)
+	{
+		foreach (var (peerId, playerEmpire) in playerEmpires)
+		{
+			if (playerEmpire == empire)
+			{
+				id = peerId;
+				return true;
+			}
+		}
+
+		id = 0;
+		return false;
+	}
+
 	public void SyncAllEmpireCoins(bool updateBalance = false)
 	{
 		foreach (var (peerId, empire) in playerEmpires)
