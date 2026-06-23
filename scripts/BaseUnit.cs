@@ -18,11 +18,14 @@ public abstract partial class BaseUnit : Sprite2D
     protected int Defense { get; init; } = 1;
     protected int MaxHealth { get; private set; } = 10;
     protected int Health { get; private set; }
+    protected bool CanMoveAfterAttacking { get; private set; }
+    protected bool CanAttackAfterMoving { get; private set; }
 
     protected EmpireController OwnerEmpire;
 
     protected int MovementRangeLeft { get; private set; }
     protected bool HasAttackedThisTurn { get; private set; }
+    protected bool HasMovedThisTurn { get; private set; }
 
     public BaseUnit(EmpireController unitOwner)
     {
@@ -162,6 +165,8 @@ public abstract partial class BaseUnit : Sprite2D
             throw new InvalidOperationException("Tried to move a unit directly from a client");
         }
 
+        if (HasAttackedThisTurn && !CanMoveAfterAttacking) return false;
+
         // TODO: Tile based path finding. How to get from current
         // position to target position, how many tiles would the unit
         // have to move through, would there be any obstacles in the way,
@@ -175,6 +180,7 @@ public abstract partial class BaseUnit : Sprite2D
         if (!tileCosts.ContainsKey(tilePosition)) return false;
 
         MovementRangeLeft -= tileCosts[tilePosition];
+        HasMovedThisTurn = true;
 
         Rpc(MethodName.SetUnitTilePosition, tilePosition, MovementRangeLeft);
 
@@ -225,6 +231,7 @@ public abstract partial class BaseUnit : Sprite2D
     {
         MovementRangeLeft = MovementRange;
         HasAttackedThisTurn = false;
+        HasMovedThisTurn = false;
     }
 
     public abstract Texture2D GetSprite();
@@ -234,16 +241,12 @@ public abstract partial class BaseUnit : Sprite2D
         return OwnerEmpire;
     }
 
-    [Rpc(mode: MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-    public void RequestTakeDamage(int amount)
+    public void SyncTakeDamage(int amount)
     {
         if (!Multiplayer.IsServer())
         {
-            RpcId(1, MethodName.RequestTakeDamage, amount);
-            return;
+            throw new InvalidOperationException("Tried to make unit take damage directly from client");
         }
-
-        // TODO: Check that the unit is in range, unit has attacks left etc.
 
         Rpc(MethodName.TakeDamage, amount);
     }
@@ -287,9 +290,34 @@ public abstract partial class BaseUnit : Sprite2D
         QueueFree();
     }
 
-    public bool TryAttackUnit(BaseUnit targetUnit)
+    [Rpc(mode: MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+    public void RequestAttackUnit(Vector2I targetUnitTilePosition)
     {
+        if (!Multiplayer.IsServer())
+        {
+            RpcId(1, MethodName.RequestAttackUnit, targetUnitTilePosition);
+            return;
+        }
+
+        TryAttackUnit(targetUnitTilePosition);
+    }
+
+    public bool TryAttackUnit(Vector2I targetUnitTilePosition)
+    {
+        if (!Multiplayer.IsServer())
+        {
+            throw new InvalidOperationException("Tried to attack a unit directly from a client");
+        }
+
         if (HasAttackedThisTurn) return false;
+        if (HasMovedThisTurn && !CanAttackAfterMoving) return false;
+
+        if (!EntitySelector.TryGetUnit(targetUnitTilePosition, out var targetUnit)) return false;
+
+        if (targetUnit is null)
+        {
+            throw new ArgumentException("Given unit does not exist.");
+        }
 
         // Attack range uses Chebyshev distance (max(|dx|,|dy|)) because the
         // grid allows 8-directional movement and all tiles currently have equal
@@ -304,7 +332,7 @@ public abstract partial class BaseUnit : Sprite2D
         int dy = Mathf.Abs(TilePosition.Y - targetUnit.TilePosition.Y);
         if (Mathf.Max(dx, dy) > AttackRange) return false;
 
-        targetUnit.RequestTakeDamage(Damage);
+        targetUnit.SyncTakeDamage(Damage);
         HasAttackedThisTurn = true;
 
         return true;

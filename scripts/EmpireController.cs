@@ -94,7 +94,7 @@ public partial class EmpireController : Node2D
 				// fall through to the tile check should move the attacking unit to the victim
 				// unit's position. If the unit doesn't die, the tile check fails below.
 
-				selectedUnit.TryAttackUnit(unit);
+				selectedUnit.RequestAttackUnit(unit.TilePosition);
 			}
 			else
 			{
