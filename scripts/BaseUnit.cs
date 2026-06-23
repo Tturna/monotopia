@@ -16,7 +16,7 @@ public abstract partial class BaseUnit : Sprite2D
     protected int AttackRange { get; init; } = 1;
     protected int Damage { get; init; } = 1;
     protected int Defense { get; init; } = 1;
-    protected int MaxHealth { get; private set; } = 100;
+    protected int MaxHealth { get; private set; } = 10;
     protected int Health { get; private set; }
 
     protected EmpireController OwnerEmpire;
@@ -275,7 +275,6 @@ public abstract partial class BaseUnit : Sprite2D
         {
             Health = 0;
             Death();
-
             return false;
         }
 
@@ -288,11 +287,26 @@ public abstract partial class BaseUnit : Sprite2D
         QueueFree();
     }
 
-    public void TryAttackUnit(BaseUnit targetUnit)
+    public bool TryAttackUnit(BaseUnit targetUnit)
     {
-        if (HasAttackedThisTurn) return;
+        if (HasAttackedThisTurn) return false;
 
-        HasAttackedThisTurn = true;
+        // Attack range uses Chebyshev distance (max(|dx|,|dy|)) because the
+        // grid allows 8-directional movement and all tiles currently have equal
+        // cost with no obstacles. This is more efficient than running full A*
+        // just to only compare against the node count in the found path.
+        // If impassable terrain or line-of-sight blocking
+        // is added later, swap this for a bounded BFS: expand outward layer by
+        // layer up to AttackRange depth and return true if the target is found.
+        // A bounded BFS stops at the range boundary without exploring the whole
+        // grid, unlike full A*, and naturally routes around blocked tiles.
+        int dx = Mathf.Abs(TilePosition.X - targetUnit.TilePosition.X);
+        int dy = Mathf.Abs(TilePosition.Y - targetUnit.TilePosition.Y);
+        if (Mathf.Max(dx, dy) > AttackRange) return false;
+
         targetUnit.RequestTakeDamage(Damage);
+        HasAttackedThisTurn = true;
+
+        return true;
     }
 }

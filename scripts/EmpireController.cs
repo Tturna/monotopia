@@ -90,16 +90,11 @@ public partial class EmpireController : Node2D
 			{
 				// Try attacking clicked unit with selected unit
 
-				// If the unit dies, it immediately disappears from the world, so letting logic
+				// If the target unit dies, it immediately disappears from the world, so letting logic
 				// fall through to the tile check should move the attacking unit to the victim
 				// unit's position. If the unit doesn't die, the tile check fails below.
 
-				var tileCosts = selectedUnit.GetReachableTilesWithCosts();
-
-				if (tileCosts.ContainsKey(unit.TilePosition))
-				{
-					selectedUnit.TryAttackUnit(unit);
-				}
+				selectedUnit.TryAttackUnit(unit);
 			}
 			else
 			{
