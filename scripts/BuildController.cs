@@ -1,25 +1,25 @@
-using System.Collections.Generic;
+using System;
 
 public static class BuildController
 {
     public enum BuildableItemType
     {
-        Warrior
+        Warrior,
+        Archer
     }
 
-    private static Dictionary<BuildableItemType, BuildableItemInfo> buildableItemInfos = new() {
-        {
-            BuildableItemType.Warrior, new()
-            {
-                ItemName = "Warrior",
-                Cost = 2,
-                IsUnit = true
-            }
-        }
+    public static BuildableItemInfo GetBuildableItemInfo(BuildableItemType itemType) => itemType switch
+    {
+        BuildableItemType.Warrior => InfoFrom<WarriorUnit>(),
+        BuildableItemType.Archer  => InfoFrom<ArcherUnit>(),
+        _ => throw new ArgumentOutOfRangeException(nameof(itemType))
     };
 
-    public static BuildableItemInfo GetBuildableItemInfo(BuildableItemType itemType)
+    private static BuildableItemInfo InfoFrom<T>() where T : IBuildable => new()
     {
-        return buildableItemInfos[itemType];
-    }
+        ItemName = T.ItemName,
+        Cost     = T.Cost,
+        IsUnit   = T.IsUnit,
+        Icon     = T.Sprite
+    };
 }

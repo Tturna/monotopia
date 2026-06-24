@@ -7,7 +7,6 @@
 [ext_resource type="Texture2D" uid="uid://ceb6fnywpv652" path="res://sprites/towntile.png" id="5_a8wo8"]
 [ext_resource type="Script" uid="uid://14p5a2axlcx1" path="res://scripts/TurnSystem.cs" id="7_bneo8"]
 [ext_resource type="Script" uid="uid://cg1myavcyc6vy" path="res://scripts/UnitSpawner.cs" id="9_jbgew"]
-[ext_resource type="PackedScene" uid="uid://d35hoavdljqc2" path="res://scenes/Unit.tscn" id="10_a85ww"]
 [ext_resource type="Script" uid="uid://bngunyywpvjqm" path="res://scripts/UIController.cs" id="11_jhsr3"]
 [ext_resource type="Script" uid="uid://6bmj0uh8cnd2" path="res://scripts/GameOrchestrator.cs" id="11_vjgi4"]
 [ext_resource type="PackedScene" uid="uid://bidsvn261x8ld" path="res://scenes/BuildItemPanel.tscn" id="12_0bq3a"]
@@ -32,9 +31,9 @@ townTileTexture = ExtResource("5_a8wo8")
 [node name="TurnSystem" type="Node2D" parent="." unique_id=1613588411]
 script = ExtResource("7_bneo8")
 
-[node name="UnitSpawner" type="Node2D" parent="." unique_id=1947486371]
+[node name="UnitSpawner" type="Node2D" parent="." unique_id=1947486371 node_paths=PackedStringArray("UnitsContainer")]
 script = ExtResource("9_jbgew")
-UnitScene = ExtResource("10_a85ww")
+UnitsContainer = NodePath("../Units Parent")
 
 [node name="UIController" type="Node2D" parent="." unique_id=170486342 node_paths=PackedStringArray("OwnedCityViewControl", "CoinsLabel", "TurnCountLabel", "TurnTimerLabel", "EndTurnButton", "WinOverlayControl", "LoseOverlayControl")]
 script = ExtResource("11_jhsr3")
@@ -67,6 +66,8 @@ PanSpeed = 400.0
 zoom = Vector2(2, 2)
 
 [node name="Empires Parent" type="Node2D" parent="." unique_id=1893305177]
+
+[node name="Units Parent" type="Node2D" parent="." unique_id=676501087]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1097156129]
 

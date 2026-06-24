@@ -156,8 +156,10 @@ public partial class UIController : Node2D
 
             var itemNameLabel = (Label)buildListItemPanelInstance.FindChild("Item Name");
             var itemCostLabel = (Label)buildListItemPanelInstance.FindChild("Item Cost");
+            var itemIcon = (TextureRect)buildListItemPanelInstance.FindChild("Item Icon");
             itemNameLabel.Text = name;
             itemCostLabel.Text = cost.ToString();
+            itemIcon.Texture = buildableItemInfo.Icon;
 
             var selectButton = (Button)buildListItemPanelInstance.FindChild("Select Button");
             selectButton.Pressed += () => SetSelectedBuildable(buildListItemPanelInstance, buildableType);

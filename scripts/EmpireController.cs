@@ -327,7 +327,8 @@ public partial class EmpireController : Node2D
 	{
 		return
 		[
-			BuildController.BuildableItemType.Warrior
+			BuildController.BuildableItemType.Warrior,
+			BuildController.BuildableItemType.Archer
 		];
 	}
 

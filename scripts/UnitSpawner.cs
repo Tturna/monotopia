@@ -4,7 +4,7 @@ using Godot;
 public partial class UnitSpawner : Node2D
 {
     [Export]
-    public PackedScene UnitScene;
+    public Node2D UnitsContainer;
 
     public static UnitSpawner Instance;
 
@@ -15,18 +15,14 @@ public partial class UnitSpawner : Node2D
 
     public BaseUnit SpawnUnit(BuildController.BuildableItemType unitType, EmpireController ownerEmpire)
     {
-        return unitType switch
+        BaseUnit unit = unitType switch
         {
-            BuildController.BuildableItemType.Warrior => SpawnWarrior(ownerEmpire),
-            _ => throw new ArgumentOutOfRangeException(nameof(unitType), "No spawner defined for given unit type")
+            BuildController.BuildableItemType.Warrior => new WarriorUnit(ownerEmpire),
+            BuildController.BuildableItemType.Archer => new ArcherUnit(ownerEmpire),
+            _ => throw new ArgumentOutOfRangeException(nameof(unitType))
         };
-    }
 
-    public WarriorUnit SpawnWarrior(EmpireController ownerEmpire)
-    {
-        var unit = new WarriorUnit(ownerEmpire);
-        GetTree().Root.AddChild(unit, forceReadableName: true);
-
+        UnitsContainer.AddChild(unit, forceReadableName: true);
         return unit;
     }
 }
