@@ -6,7 +6,7 @@ public static class GodotUtilities
     /// <summary>
     /// Finds all nodes of type T from the given parent node's children.
     /// </summary>
-    public static T[] FindNodesOfType<T>(Node parentNode, bool recursive = true) where T : Node
+    public static T[] FindNodesOfType<T>(Node parentNode, bool recursive = true, int maxResults = int.MaxValue) where T : Node
 	{
 		List<T> nodes = new();
 
@@ -17,6 +17,8 @@ public static class GodotUtilities
 			if (childNode is T)
 			{
 				nodes.Add((T)childNode);
+
+                if (nodes.Count == maxResults) break;
 			}
 			else
 			{
@@ -30,4 +32,13 @@ public static class GodotUtilities
 		
 		return nodes.ToArray();
 	}
+
+    /// <summary>
+    /// Find the first node of type T from the given parent node's children.
+    /// </summary>
+    public static T FindNodeOfType<T>(Node parentNode, bool recursive = true) where T : Node
+    {
+        var results = FindNodesOfType<T>(parentNode, recursive, maxResults: 1);
+        return results[0];
+    }
 }

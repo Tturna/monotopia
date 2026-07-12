@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Godot;
 
@@ -18,12 +17,14 @@ public partial class CityController : TileController
     private List<Vector2I> controlledTilePositions = new();
     private Vector2I? borderExpansionDirectionFocus = null;
     private Polygon2D borderPolygon = new();
+    private TurnSystem turnSystem = null!;
 
-    public override void _EnterTree()
+    public override void _Ready()
     {
+        turnSystem = GodotUtilities.FindNodeOfType<TurnSystem>(GetTree().Root);
     }
 
-    private void OnTurnStarted()
+    private void OnTurnStarted(int turn)
     {
         if (Freeze) return;
 
@@ -63,7 +64,7 @@ public partial class CityController : TileController
         CityUid = newCityUid;
         OwnerEmpire = ownerEmpire;
 
-        TurnSystem.Instance.TurnStarted += OnTurnStarted;
+        turnSystem.TurnStarted += OnTurnStarted;
 
         CityTilePosition = tilePosition;
         controlledTilePositions.Add(CityTilePosition);

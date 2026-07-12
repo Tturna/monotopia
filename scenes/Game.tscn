@@ -12,6 +12,7 @@
 [ext_resource type="Script" uid="uid://bngunyywpvjqm" path="res://scripts/UIController.cs" id="11_jhsr3"]
 [ext_resource type="Script" uid="uid://6bmj0uh8cnd2" path="res://scripts/GameOrchestrator.cs" id="11_vjgi4"]
 [ext_resource type="PackedScene" uid="uid://bidsvn261x8ld" path="res://scenes/BuildItemPanel.tscn" id="12_0bq3a"]
+[ext_resource type="Script" uid="uid://p1jl1wkimbgp" path="res://scripts/PlayerInputController.cs" id="12_attvq"]
 [ext_resource type="Script" uid="uid://7hkt2jajq4pi" path="res://scripts/BuildController.cs" id="12_bneo8"]
 [ext_resource type="PackedScene" uid="uid://d0v4k83kn45jp" path="res://scenes/Empire.tscn" id="12_kyk2p"]
 [ext_resource type="Script" uid="uid://uvbndmdkkg8p" path="res://scripts/PauseMenuController.cs" id="12_vjgi4"]
@@ -50,6 +51,9 @@ winOverlayControl = NodePath("../CanvasLayer/AspectRatioContainer/MarginContaine
 loseOverlayControl = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Lose Overlay")
 tileSelectionScene = ExtResource("10_a8wo8")
 reachableTileIndicatorScene = ExtResource("11_attvq")
+
+[node name="PlayerInputController" type="Node2D" parent="." unique_id=55412351]
+script = ExtResource("12_attvq")
 
 [node name="BuildController" type="Node2D" parent="." unique_id=164214873]
 script = ExtResource("12_bneo8")

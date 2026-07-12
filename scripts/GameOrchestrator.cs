@@ -9,19 +9,19 @@ public partial class GameOrchestrator : Node2D
 	private PackedScene empireScene = null!;
 	[Export]
 	private Node2D empiresParent = null!;
-	
-	public static GameOrchestrator Instance = null!;
 
-	public override void _EnterTree()
-	{
-		Instance = this;
-	}
+	private UIController uiController = null!;
 	
 	public override void _Ready()
 	{
+		var rootNode = GetTree().Root;
+		uiController = GodotUtilities.FindNodeOfType<UIController>(rootNode);
+		var turnSystem = GodotUtilities.FindNodeOfType<TurnSystem>(rootNode);
+		ConnectTurnSystemToUI(turnSystem);
+
 		if (!Multiplayer.IsServer()) return;
 
-		TurnSystem.Instance.TurnStarted += OnTurnStarted;
+		turnSystem.TurnStarted += OnTurnStarted;
 
 		var allPeerIds = new List<int>(Multiplayer.GetPeers());
 		allPeerIds.Add(1);
@@ -43,10 +43,18 @@ public partial class GameOrchestrator : Node2D
 			var empireUid = Guid.NewGuid().ToString();
 			var capitalUid = Guid.NewGuid().ToString();
 
+			ConnectEmpireToUI(empire);
+			ConnectEmpireToOrchestrator(empire);
 			empire.InitializeEmpire(peerId, empireUid, empirePrimaryColor, isPlayerEmpire);
 			empiresParent.AddChild(empire, forceReadableName: true);
 			empire.AddNewCityToEmpire(capitalCityTilePosition, capitalUid);
 			EntitySelector.SetEmpire(empireUid, empire);
+
+			if (isPlayerEmpire)
+			{
+				var inputController = GodotUtilities.FindNodeOfType<PlayerInputController>(GetTree().Root);
+				inputController.SetTargetEmpire(empire);
+			}
 
 			Rpc(
 				MethodName.SyncCreateEmpire,
@@ -69,16 +77,48 @@ public partial class GameOrchestrator : Node2D
 		var peerId = Multiplayer.GetUniqueId();
 		var isPlayerEmpire = empireOwnerPeerId == peerId;
 		var empire = (EmpireController)empireScene.Instantiate();
-		EntitySelector.SetEmpire(empireUid, empire);
 
+		ConnectEmpireToUI(empire);
 		empire.InitializeEmpire(empireOwnerPeerId, empireUid, empirePrimaryColor, isPlayerEmpire);
 		empiresParent.AddChild(empire, forceReadableName: true);
 		empire.AddNewCityToEmpire(capitalCityTilePosition, capitalCityUid);
+		EntitySelector.SetEmpire(empireUid, empire);
+
+		if (isPlayerEmpire)
+		{
+			var inputController = GodotUtilities.FindNodeOfType<PlayerInputController>(GetTree().Root);
+			inputController.SetTargetEmpire(empire);
+		}
 	}
 
-	private void OnTurnStarted()
+	private void OnTurnStarted(int turn)
 	{
 		SyncAllEmpireCoins(updateBalance: true);
+	}
+
+	private void ConnectEmpireToOrchestrator(EmpireController empire)
+	{
+		if (!Multiplayer.IsServer())
+		{
+			throw new InvalidOperationException("Don't connect the game orchestrator to empires on clients. Server should do all the syncing.");
+		}
+
+		empire.CityAnnexed += () => SyncAllEmpireCoins();
+	}
+
+	private void ConnectEmpireToUI(EmpireController empire)
+	{
+		empire.SelectionChanged += uiController.OnEntitySelectionChanged;
+		empire.CoinsUpdated += uiController.SetCoinBalanceText;
+		empire.GameEnded += uiController.ShowGameEndedOverlay;
+		empire.UnitMovementPathUpdated += uiController.SetUnitMovementPathPoints;
+	}
+
+	private void ConnectTurnSystemToUI(TurnSystem turnSystem)
+	{
+		turnSystem.TurnStarted += uiController.OnTurnStarted;
+		turnSystem.TurnTimerUpdated += uiController.SetTurnTimerText;
+		uiController.EndTurnButtonPressed += turnSystem.OnEndTurnButtonPressed;
 	}
 
 	public void SyncAllEmpireCoins(bool updateBalance = false)

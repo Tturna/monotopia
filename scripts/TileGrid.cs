@@ -98,6 +98,7 @@ public partial class TileGrid : Node2D
     {
         var mapElementInstance = InstantiateMapElement(scene);
         mapElementInstance.Position = TileToWorldPosition(tilePosition);
+        mapElementInstance.TilePosition = tilePosition;
 
         return mapElementInstance;
     }

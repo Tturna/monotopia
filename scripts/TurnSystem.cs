@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
+#nullable enable
 public partial class TurnSystem : Node2D
 {
-    public delegate void TurnStartedHandler();
-    public event TurnStartedHandler TurnStarted;
-
-    public static TurnSystem Instance;
+    public delegate void TurnStartedHandler(int turn);
+    public delegate void TurnTimerUpdatedHandler(float turnTimer);
+    public event TurnStartedHandler? TurnStarted;
+    public event TurnTimerUpdatedHandler? TurnTimerUpdated;
 
     private int turnTimeSeconds = 15;
     private float turnTimer;
@@ -15,55 +16,19 @@ public partial class TurnSystem : Node2D
     private bool startingNewTurn;
     private List<long> playersThatEndedTurn = new();
 
-    public override void _EnterTree()
-    {
-        if (TurnSystem.Instance is not null)
-        {
-            QueueFree();
-            return;
-        }
-
-        Instance = this;
-    }
-
     public override void _Ready()
     {
         if (Multiplayer.IsServer())
         {
             Rpc(MethodName.StartNextTurn, turnCount + 1, turnTimeSeconds);
         }
-
-        UIController.Instance.RegisterEndTurnButtonCallback(() =>
-        {
-            UIController.Instance.SetTurnEnded(true);
-
-            if (Multiplayer.IsServer())
-            {
-                SetPlayerEndedTurn(1);
-            }
-            else
-            {
-                RpcId(1, MethodName.SetPlayerEndedTurn, Multiplayer.GetUniqueId());
-            }
-        });
-    }
-
-    public override void _Input(InputEvent inputEvent)
-    {
-        if (inputEvent is not InputEventKey keyEvent) return;
-        if (keyEvent.Keycode != Key.M) return;
-        if (!keyEvent.Pressed) return;
-
-        turnTimer = 1;
-        turnCount = Random.Shared.Next(100);
     }
 
     public override void _Process(double delta)
     {
         if (turnTimer <= 0) return;
 
-        UIController.Instance.SetTurnTimerText(turnTimer);
-
+        TurnTimerUpdated?.Invoke(turnTimer);
         turnTimer -= (float)delta;
 
         if (Multiplayer.IsServer() && turnTimer <= 0 && !startingNewTurn)
@@ -78,10 +43,8 @@ public partial class TurnSystem : Node2D
     {
         turnTimer = nextTurnTimeSeconds;
         turnCount = nextTurnNumber;
-        UIController.Instance.SetTurnCountText(turnCount);
         DebugUtility.Print($"Starting turn {turnCount}");
-        TurnStarted?.Invoke();
-        UIController.Instance.SetTurnEnded(false);
+        TurnStarted?.Invoke(turnCount);
 
         if (Multiplayer.IsServer())
         {
@@ -109,6 +72,20 @@ public partial class TurnSystem : Node2D
         if (playersThatEndedTurn.Count == totalPlayerCount)
         {
             Rpc(MethodName.StartNextTurn, turnCount + 1, turnTimeSeconds);
+        }
+    }
+
+    public void OnEndTurnButtonPressed(UIController uiController)
+    {
+        uiController.SetTurnEnded(true);
+
+        if (Multiplayer.IsServer())
+        {
+            SetPlayerEndedTurn(1);
+        }
+        else
+        {
+            RpcId(1, MethodName.SetPlayerEndedTurn, Multiplayer.GetUniqueId());
         }
     }
 }

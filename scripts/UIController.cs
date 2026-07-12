@@ -27,8 +27,6 @@ public partial class UIController : Node2D
     [Export]
 	private PackedScene reachableTileIndicatorScene = null!;
 
-    public static UIController Instance = null!;
-
     private Sprite2D tileSelectionNode = null!;
     private Dictionary<Vector2I, Sprite2D> reachableTileIndicators = new();
 	private Line2D unitPathLine = null!;
@@ -37,10 +35,8 @@ public partial class UIController : Node2D
     private BuildController.BuildableItemType? selectedBuildable;
     private CityController? selectedCity;
 
-    public override void _EnterTree()
-    {
-        Instance = this;
-    }
+    public delegate void EndTurnButtonPressedHandler(UIController uiController);
+    public event EndTurnButtonPressedHandler? EndTurnButtonPressed;
 
     public override void _Ready()
     {
@@ -62,6 +58,8 @@ public partial class UIController : Node2D
             var buildable = (BuildController.BuildableItemType)selectedBuildable;
             BuildController.Instance.RequestBuildItem((int)buildable, selectedCity.CityUid);
         };
+
+        endTurnButton.Pressed += () => EndTurnButtonPressed?.Invoke(this);
     }
 
     public override void _Input(InputEvent inputEvent)
@@ -122,9 +120,34 @@ public partial class UIController : Node2D
         buildButton.Disabled = true;
     }
 
-    public void RegisterEndTurnButtonCallback(Action callback)
+    public void OnEntitySelectionChanged(EmpireController empire)
     {
-        endTurnButton.Pressed += callback;
+        HideOwnedCityView();
+        HideReachableTileIndicators();
+        HideSelectedTileIndicator();
+        HideUnitMovementPathLine();
+
+        if (!empire.HasSelection) return;
+
+        if (empire.TryGetSelectedCity(out var city))
+        {
+            ShowSelectedTileIndicator(city!.TilePosition);
+
+            if (empire.IsOwnCitySelected)
+            {
+                ShowOwnedCityView(city!);
+            }
+        }
+        else if (empire.TryGetSelectedUnit(out var unit))
+        {
+            ShowSelectedTileIndicator(unit!.TilePosition);
+
+            if (empire.IsOwnUnitSelected && empire.TryGetReachableTileCostMap(out var costMap))
+            {
+                ShowUnitMovementPathLine();
+                ShowReachableTileIndicators(costMap.Keys);
+            }
+        }
     }
 
     public void ShowOwnedCityView(CityController city)
@@ -204,6 +227,12 @@ public partial class UIController : Node2D
 		coinsLabel.Text = $"{balanceText} (+{deltaText})";
     }
 
+    public void OnTurnStarted(int turn)
+    {
+        SetTurnEnded(false);
+        SetTurnCountText(turn);
+    }
+
     public void SetTurnTimerText(float secondsLeft)
     {
         var timeSpan = TimeSpan.FromSeconds(secondsLeft);
@@ -215,14 +244,16 @@ public partial class UIController : Node2D
         turnCountLabel.Text = $"Turn {turn}";
     }
 
-    public void ShowWinOverlay()
+    public void ShowGameEndedOverlay(bool didPlayerWin)
     {
-        winOverlayControl.Show();
-    }
-
-    public void ShowLoseOverlay()
-    {
-        loseOverlayControl.Show();
+        if (didPlayerWin)
+        {
+            winOverlayControl.Show();
+        }
+        else
+        {
+            loseOverlayControl.Show();
+        }
     }
 
     public void SetTurnEnded(bool state)

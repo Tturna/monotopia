@@ -10,193 +10,115 @@ public partial class EmpireController : Node2D
 	public Color EmpirePrimaryColor { get; private set; }
 	public int Coins { get; private set; }
 	public int TotalCoinIncome { get; private set; }
+	public bool IsFrozen { get; private set; }
+	public bool IsOwnCitySelected { get; private set; }
+	public bool IsOwnUnitSelected { get; private set; }
+	public TileController? SelectedTile { get; private set; }
+	public bool HasSelection { get; private set; }
 
 	private List<CityController> cities = new();
 	
 	private long? ownerPeerId = null;
-	private UIController uiController = null!;
 	private BaseUnit? selectedUnit;
-	private TileController? selectedTile;
-	private Vector2I? hoveredTile;
-	private bool hasSelection;
-	private bool isFrozen;
+	private Dictionary<Vector2I, int>? reachableTileCostMap;
 
-	public override void _Ready()
+	public delegate void SelectionChangedHandler(EmpireController empire);
+	public delegate void CityAnnexedHandler();
+	public delegate void CoinsUpdatedHandler(int balance, int income);
+	public delegate void GameEndedHandler(bool isWinner);
+	public delegate void UnitMovementPathUpdatedHandler(Vector2[] pathTiles);
+	public event SelectionChangedHandler? SelectionChanged;
+	public event CityAnnexedHandler? CityAnnexed;
+	public event CoinsUpdatedHandler? CoinsUpdated;
+	public event GameEndedHandler? GameEnded;
+	public event UnitMovementPathUpdatedHandler? UnitMovementPathUpdated;
+
+	public bool IsActivePlayerEmpire()
 	{
-		uiController = UIController.Instance;
+		return (IsPlayerEmpire || !IsFrozen);
 	}
 
-	public override void _UnhandledInput(InputEvent inputEvent)
+	public void HandleUnitSelection(BaseUnit unit)
 	{
-		if (!IsPlayerEmpire) return;
-		if (isFrozen) return;
-
-		if (inputEvent is InputEventMouseButton mouseButtonEvent)
+		if (selectedUnit is not null && !unit.GetOwnerEmpire().IsPlayerEmpire)
 		{
-			HandleMouseButtonEvent(mouseButtonEvent);
-			return;
+			// Try attacking clicked unit with selected unit
+			selectedUnit.RequestAttackUnit(unit.TilePosition);
 		}
-
-		if (inputEvent is InputEventMouseMotion mouseMotionEvent)
+		else
 		{
-			HandleMouseMotionEvent(mouseMotionEvent);
-			return;
+			// No unit selected or selecting another own unit
+			Deselect();
+			HandleOwnUnitSelection(unit);
 		}
-
-		if (inputEvent is not InputEventKey keyEvent) return;
-
-		if (!keyEvent.IsPressed()) return;
-
-		var mouseWorldPosition = GetViewport().GetCamera2D().GetGlobalMousePosition();
-		var mouseTilePosition = TileGrid.WorldToTilePosition(mouseWorldPosition);
 	}
 
-	private void HandleMouseButtonEvent(InputEventMouseButton mouseButtonEvent)
+	private void HandleOwnUnitSelection(BaseUnit unit)
 	{
-		if (hasSelection && mouseButtonEvent.ButtonIndex == MouseButton.Right)
+		IsOwnUnitSelected = true;
+		selectedUnit = unit;
+		HasSelection = true;
+
+		if (unit.GetOwnerEmpire().IsPlayerEmpire)
 		{
+			reachableTileCostMap = unit.GetReachableTilesWithCosts();
+
+			if (reachableTileCostMap.ContainsKey(unit.TilePosition))
+			{
+				reachableTileCostMap.Remove(unit.TilePosition);
+			}
+		}
+
+		SelectionChanged?.Invoke(this);
+	}
+
+	public void HandleTileSelection(TileController tile)
+	{
+		if (selectedUnit is not null && selectedUnit.GetOwnerEmpire().IsPlayerEmpire)
+		{
+			selectedUnit.RequestMoveToTile(tile.TilePosition);
 			Deselect();
 			return;
 		}
 
-		if (mouseButtonEvent.ButtonIndex != MouseButton.Left) return;
-
-		if (!mouseButtonEvent.IsPressed()) return;
-
-		var mouseWorldPosition = GetViewport().GetCamera2D().GetGlobalMousePosition();
-		var mouseTilePosition = TileGrid.WorldToTilePosition(mouseWorldPosition);
-
-		if (!TileGrid.IsTileInBounds(mouseTilePosition)) return;
-
-		if (EntitySelector.TryGetUnit(mouseTilePosition, out var unit) && unit is not null)
-		{
-			if (unit == selectedUnit)
-			{
-				Deselect();
-			}
-			else if (selectedUnit is not null && !unit.GetOwnerEmpire().IsPlayerEmpire)
-			{
-				// Try attacking clicked unit with selected unit
-
-				// If the target unit dies, it immediately disappears from the world, so letting logic
-				// fall through to the tile check should move the attacking unit to the victim
-				// unit's position. If the unit doesn't die, the tile check fails below.
-
-				selectedUnit.RequestAttackUnit(unit.TilePosition);
-			}
-			else
-			{
-				// No unit selected or selecting another own unit
-				HandleOwnUnitSelection(unit, mouseTilePosition);
-				return;
-			}
-		}
-
-		if (EntitySelector.TryGetTile(mouseTilePosition, out var tileController) && tileController is not null)
-		{
-			if (selectedUnit is not null && selectedUnit.GetOwnerEmpire().IsPlayerEmpire)
-			{
-				selectedUnit.RequestMoveToTile(mouseTilePosition);
-				Deselect();
-				return;
-			}
-
-			if (tileController == selectedTile)
-			{
-				Deselect();
-				return;
-			}
-
-			if (tileController is CityController cityController && cities.Contains(cityController))
-			{
-				uiController.ShowOwnedCityView(cityController);
-			}
-			else
-			{
-				uiController.HideOwnedCityView();
-			}
-
-			hasSelection = true;
-			selectedUnit = null;
-			selectedTile = tileController;
-			UpdateTileSelection(mouseTilePosition);
-		}
-	}
-
-	private void HandleMouseMotionEvent(InputEventMouseMotion motionEvent)
-	{
-		var mouseWorldPosition = GetViewport().GetCamera2D().GetGlobalMousePosition();
-		var mouseTilePosition = TileGrid.WorldToTilePosition(mouseWorldPosition);
-
-		if (TileGrid.IsTileInBounds(mouseTilePosition))
-		{
-			if (selectedUnit is not null && mouseTilePosition != hoveredTile)
-			{
-				var pathTiles = selectedUnit.GetPathToTargetTile(mouseTilePosition);
-				var pathIndicatorOffset = (Vector2)TileGrid.TilePixelSize / 2;
-
-				for (var i = 0; i < pathTiles.Length; i++)
-				{
-					var tilePos = (Vector2I)pathTiles[i];
-					var tileWorldPos = TileGrid.TileToWorldPosition(tilePos);
-					pathTiles[i] = tileWorldPos + pathIndicatorOffset;
-				}
-
-				uiController.SetUnitMovementPathPoints(pathTiles);
-			}
-
-			hoveredTile = mouseTilePosition;
-		}
-		else
-		{
-			hoveredTile = null;
-		}
-	}
-
-	private void HandleOwnUnitSelection(BaseUnit unit, Vector2I mouseTilePosition)
-	{
 		Deselect();
 
-		selectedTile = null;
-		selectedUnit = unit;
-		hasSelection = true;
-		UpdateTileSelection(mouseTilePosition);
-		uiController.HideOwnedCityView();
+		if (tile == SelectedTile) return;
 
-		if (!unit.GetOwnerEmpire().IsPlayerEmpire) return;
-
-		uiController.ShowUnitMovementPathLine();
-
-		var tileCosts = unit.GetReachableTilesWithCosts();
-
-		if (tileCosts.ContainsKey(unit.TilePosition))
-		{
-			tileCosts.Remove(unit.TilePosition);
-		}
-
-		uiController.ShowReachableTileIndicators(tileCosts.Keys);
+		IsOwnCitySelected = tile is CityController cityController && cities.Contains(cityController);
+		HasSelection = true;
+		SelectedTile = tile;
+		SelectionChanged?.Invoke(this);
 	}
 
-	private void Deselect()
+	public void UpdateSelectedOwnUnitPathLine(Vector2I mouseTilePosition)
 	{
+		if (selectedUnit is null) return;
+
+		var pathTiles = selectedUnit.GetPathToTargetTile(mouseTilePosition);
+		var pathIndicatorOffset = (Vector2)TileGrid.TilePixelSize / 2;
+
+		for (var i = 0; i < pathTiles.Length; i++)
+		{
+			var tilePos = (Vector2I)pathTiles[i];
+			var tileWorldPos = TileGrid.TileToWorldPosition(tilePos);
+			pathTiles[i] = tileWorldPos + pathIndicatorOffset;
+		}
+
+		UnitMovementPathUpdated?.Invoke(pathTiles);
+	}
+
+	public void Deselect()
+	{
+		if (!HasSelection) return;
+
+		IsOwnCitySelected = false;
+		IsOwnUnitSelected = false;
 		selectedUnit = null;
-		selectedTile = null;
-		hasSelection = false;
-		UpdateTileSelection(null);
-		uiController.HideOwnedCityView();
-		uiController.HideReachableTileIndicators();
-		uiController.HideUnitMovementPathLine();
-	}
-
-	private void UpdateTileSelection(Vector2I? tilePosition)
-	{
-		if (!hasSelection || tilePosition is null)
-		{
-			uiController.HideSelectedTileIndicator();
-			return;
-		}
-
-		uiController.ShowSelectedTileIndicator((Vector2I)tilePosition);
+		SelectedTile = null;
+		reachableTileCostMap = null;
+		HasSelection = false;
+		SelectionChanged?.Invoke(this);
 	}
 
 	[Rpc(CallLocal = true)]
@@ -213,7 +135,7 @@ public partial class EmpireController : Node2D
 
 		if (IsPlayerEmpire && cities.Count == 0)
 		{
-			uiController.ShowLoseOverlay();
+			GameEnded?.Invoke(isWinner: false);
 		}
 	}
 
@@ -240,17 +162,17 @@ public partial class EmpireController : Node2D
 
 			if (IsPlayerEmpire)
 			{
-				uiController.ShowWinOverlay();
+				GameEnded?.Invoke(isWinner: true);
 			}
 			else
 			{
-				uiController.ShowLoseOverlay();
+				GameEnded?.Invoke(isWinner: false);
 			}
 		}
 
 		if (Multiplayer.IsServer())
 		{
-			GameOrchestrator.Instance.SyncAllEmpireCoins();
+			CityAnnexed?.Invoke();
 		}
 	}
 
@@ -262,17 +184,15 @@ public partial class EmpireController : Node2D
 
 		if (IsPlayerEmpire)
 		{
-			UpdateCoinsLabel();
+			CoinsUpdated?.Invoke(Coins, TotalCoinIncome);
 		}
 	}
 
-	private void UpdateCoinsLabel()
-	{
-		if (!IsPlayerEmpire) return;
-		uiController.SetCoinBalanceText(Coins, TotalCoinIncome);
-	}
-
-	public void InitializeEmpire(long ownerPeerId, string empireUid, Color empireColor, bool isPlayerEmpire = false)
+	public void InitializeEmpire(
+		long ownerPeerId,
+		string empireUid,
+		Color empireColor,
+		bool isPlayerEmpire = false)
 	{
 		this.ownerPeerId = ownerPeerId;
 		EmpireUid = empireUid;
@@ -351,6 +271,44 @@ public partial class EmpireController : Node2D
 		RpcId(GetOwnerPeerId(), MethodName.SyncSetCoinState, newCoinBalance, newCoinIncome);
 	}
 
+	public bool TryGetSelectedCity(out CityController? city)
+	{
+		city = null;
+
+		if (SelectedTile is not null && SelectedTile is CityController cityController)
+		{
+			city = cityController;
+			return true;
+		}
+
+		return false;
+	}
+
+	public bool TryGetSelectedUnit(out BaseUnit? unit)
+	{
+		unit = null;
+
+		if (selectedUnit is not null)
+		{
+			unit = selectedUnit;
+			return true;
+		}
+
+		return false;
+	}
+
+	public bool TryGetReachableTileCostMap(out Dictionary<Vector2I, int> costMap)
+	{
+		if (IsOwnUnitSelected && reachableTileCostMap is not null && reachableTileCostMap.Count > 0)
+		{
+			costMap = reachableTileCostMap;
+			return true;
+		}
+
+		costMap = new();
+		return false;
+	}
+
 	public bool HasCitiesRemaining()
 	{
 		return cities.Count > 0;
@@ -378,7 +336,7 @@ public partial class EmpireController : Node2D
 
 		foreach (EmpireController empire in empires)
 		{
-			empire.isFrozen = true;
+			empire.IsFrozen = true;
 		}
 	}
 }

@@ -22,6 +22,7 @@ public abstract partial class BaseUnit : Sprite2D
     protected bool CanAttackAfterMoving { get; private set; }
 
     protected EmpireController OwnerEmpire;
+    protected TurnSystem TurnSystem = null!;
 
     protected int MovementRangeLeft { get; private set; }
     protected bool HasAttackedThisTurn { get; private set; }
@@ -38,19 +39,20 @@ public abstract partial class BaseUnit : Sprite2D
     {
         ResetTurnState();
         Health = MaxHealth;
+        TurnSystem = GodotUtilities.FindNodeOfType<TurnSystem>(GetTree().Root);
 
         if (Multiplayer.IsServer())
         {
-            TurnSystem.Instance.TurnStarted += OnTurnStart;
+            TurnSystem.TurnStarted += OnTurnStart;
         }
     }
 
     public override void _ExitTree()
     {
-        TurnSystem.Instance.TurnStarted -= OnTurnStart;
+        TurnSystem.TurnStarted -= OnTurnStart;
     }
 
-    private void OnTurnStart()
+    private void OnTurnStart(int turn)
     {
         if (!Multiplayer.IsServer()) return;
 
