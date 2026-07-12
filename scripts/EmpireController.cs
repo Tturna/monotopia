@@ -5,15 +5,15 @@ using Godot;
 #nullable enable
 public partial class EmpireController : Node2D
 {
-	public string EmpireUid = null!;
-	public bool IsPlayerEmpire;
-	public bool HasCursorSelection;
-	public Color EmpirePrimaryColor;
+	public string EmpireUid { get; private set; } = null!;
+	public bool IsPlayerEmpire { get; private set; }
+	public Color EmpirePrimaryColor { get; private set; }
 	public int Coins { get; private set; }
 	public int TotalCoinIncome { get; private set; }
 
 	private List<CityController> cities = new();
 	
+	private long? ownerPeerId = null;
 	private UIController uiController = null!;
 	private BaseUnit? selectedUnit;
 	private TileController? selectedTile;
@@ -272,6 +272,24 @@ public partial class EmpireController : Node2D
 		uiController.SetCoinBalanceText(Coins, TotalCoinIncome);
 	}
 
+	public void InitializeEmpire(long ownerPeerId, string empireUid, Color empireColor, bool isPlayerEmpire = false)
+	{
+		this.ownerPeerId = ownerPeerId;
+		EmpireUid = empireUid;
+		EmpirePrimaryColor = empireColor;
+		IsPlayerEmpire = isPlayerEmpire;
+	}
+
+	public long GetOwnerPeerId()
+	{
+		if (ownerPeerId is null)
+		{
+			throw new InvalidOperationException("Owner peer ID is null");
+		}
+
+		return (long)ownerPeerId;
+	}
+
 	public void AddNewCityToEmpire(Vector2I tilePosition, string newCityUid)
 	{
 		var cityController = TileGrid.AddCity(tilePosition);
@@ -328,31 +346,14 @@ public partial class EmpireController : Node2D
 		}
 
 		// Coin data should only be updated for each player's own empire
-		if (!GameOrchestrator.Instance.TryGetPeerIdForEmpire(this, out var peerId))
-		{
-			throw new InvalidOperationException($"Empire {EmpireUid} not registered in GameOrchestrator");
-		}
-
 		Coins = newCoinBalance;
 		TotalCoinIncome = newCoinIncome;
-		RpcId(peerId, MethodName.SyncSetCoinState, newCoinBalance, newCoinIncome);
+		RpcId(GetOwnerPeerId(), MethodName.SyncSetCoinState, newCoinBalance, newCoinIncome);
 	}
 
 	public bool HasCitiesRemaining()
 	{
 		return cities.Count > 0;
-	}
-
-	public static EmpireController GetPlayerEmpire(Node rootNode)
-	{
-		var empires = GodotUtilities.FindNodesOfType<EmpireController>(rootNode);
-
-		foreach (EmpireController empire in empires)
-		{
-			if (empire.IsPlayerEmpire) return empire;
-		}
-
-		throw new ArgumentException("No player empire found from given root node", nameof(rootNode));
 	}
 
 	public static int GetAliveEmpireCount(Node rootNode)

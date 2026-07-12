@@ -60,7 +60,6 @@ public partial class UIController : Node2D
             if (selectedCity is null) return;
 
             var buildable = (BuildController.BuildableItemType)selectedBuildable;
-            var playerEmpire = EmpireController.GetPlayerEmpire(GetTree().Root);
             BuildController.Instance.RequestBuildItem((int)buildable, selectedCity.CityUid);
         };
     }

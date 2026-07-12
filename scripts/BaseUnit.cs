@@ -56,15 +56,8 @@ public abstract partial class BaseUnit : Sprite2D
 
         var ownerEmpire = GetOwnerEmpire();
 
-        if (GameOrchestrator.Instance.TryGetPeerIdForEmpire(ownerEmpire, out var peerId))
-        {
-            ResetTurnState();
-            RpcId(peerId, MethodName.ResetTurnState);
-        }
-        else
-        {
-            throw new ArgumentException("No peer ID found for empire");
-        }
+        ResetTurnState();
+        RpcId(ownerEmpire.GetOwnerPeerId(), MethodName.ResetTurnState);
     }
 
     public Dictionary<Vector2I, int> GetReachableTilesWithCosts()

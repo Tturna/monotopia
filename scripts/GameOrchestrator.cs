@@ -12,17 +12,8 @@ public partial class GameOrchestrator : Node2D
 	
 	public static GameOrchestrator Instance = null!;
 
-	private Dictionary<long, EmpireController> playerEmpires = new();
-
 	public override void _EnterTree()
 	{
-		if (GameOrchestrator.Instance is not null)
-		{
-			QueueFree();
-
-			return;
-		}
-
 		Instance = this;
 	}
 	
@@ -37,9 +28,6 @@ public partial class GameOrchestrator : Node2D
 
 		foreach (var peerId in allPeerIds)
 		{
-			bool isLocalPlayer = (peerId == Multiplayer.GetUniqueId());
-			DebugUtility.Print($"Adding empire for peer {peerId}");
-			
 			if (!TileGrid.TryGetVillageTileSpawnPoint(out var capitalCityTilePosition))
 			{
 				throw new InvalidOperationException("No capital city spawn points left");
@@ -51,19 +39,13 @@ public partial class GameOrchestrator : Node2D
 			var b = (float)Random.Shared.NextDouble();
 			var empirePrimaryColor = new Color(r, g, b);
 
-			if (peerId == 1)
-			{
-				empire.IsPlayerEmpire = true;
-			}
-
+			var isPlayerEmpire = peerId == 1;
 			var empireUid = Guid.NewGuid().ToString();
 			var capitalUid = Guid.NewGuid().ToString();
 
-			empire.EmpireUid = empireUid;
-			empire.EmpirePrimaryColor = empirePrimaryColor;
+			empire.InitializeEmpire(peerId, empireUid, empirePrimaryColor, isPlayerEmpire);
 			empiresParent.AddChild(empire, forceReadableName: true);
 			empire.AddNewCityToEmpire(capitalCityTilePosition, capitalUid);
-			playerEmpires.Add(peerId, empire);
 			EntitySelector.SetEmpire(empireUid, empire);
 
 			Rpc(
@@ -85,19 +67,11 @@ public partial class GameOrchestrator : Node2D
 		string capitalCityUid)
 	{
 		var peerId = Multiplayer.GetUniqueId();
-		DebugUtility.Print($"Peer {peerId} says: Sync creating empire for peer {empireOwnerPeerId}");
-
+		var isPlayerEmpire = empireOwnerPeerId == peerId;
 		var empire = (EmpireController)empireScene.Instantiate();
 		EntitySelector.SetEmpire(empireUid, empire);
 
-		if (empireOwnerPeerId == peerId)
-		{
-			empire.IsPlayerEmpire = true;
-			playerEmpires.Add(peerId, empire);
-		}
-
-		empire.EmpireUid = empireUid;
-		empire.EmpirePrimaryColor = empirePrimaryColor;
+		empire.InitializeEmpire(empireOwnerPeerId, empireUid, empirePrimaryColor, isPlayerEmpire);
 		empiresParent.AddChild(empire, forceReadableName: true);
 		empire.AddNewCityToEmpire(capitalCityTilePosition, capitalCityUid);
 	}
@@ -107,34 +81,9 @@ public partial class GameOrchestrator : Node2D
 		SyncAllEmpireCoins(updateBalance: true);
 	}
 
-	public EmpireController? GetEmpireForPeerId(long peerId)
-	{
-		if (!playerEmpires.TryGetValue(peerId, out var empire))
-		{
-			return null;
-		}
-
-		return empire;
-	}
-
-	public bool TryGetPeerIdForEmpire(EmpireController empire, out long id)
-	{
-		foreach (var (peerId, playerEmpire) in playerEmpires)
-		{
-			if (playerEmpire == empire)
-			{
-				id = peerId;
-				return true;
-			}
-		}
-
-		id = 0;
-		return false;
-	}
-
 	public void SyncAllEmpireCoins(bool updateBalance = false)
 	{
-		foreach (var (peerId, empire) in playerEmpires)
+		foreach (var (_, empire) in EntitySelector.GetEmpiresDict())
 		{
 			var newBalance = empire.Coins;
 

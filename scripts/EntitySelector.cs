@@ -114,4 +114,6 @@ public static class EntitySelector
 
         return true;
     }
+
+    public static Dictionary<string, EmpireController> GetEmpiresDict() => empireIdMap;
 }
