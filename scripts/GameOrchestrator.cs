@@ -64,6 +64,7 @@ public partial class GameOrchestrator : Node2D
 			empiresParent.AddChild(empire, forceReadableName: true);
 			empire.AddNewCityToEmpire(capitalCityTilePosition, capitalUid);
 			playerEmpires.Add(peerId, empire);
+			EntitySelector.SetEmpire(empireUid, empire);
 
 			Rpc(
 				MethodName.SyncCreateEmpire,
@@ -87,6 +88,7 @@ public partial class GameOrchestrator : Node2D
 		DebugUtility.Print($"Peer {peerId} says: Sync creating empire for peer {empireOwnerPeerId}");
 
 		var empire = (EmpireController)empireScene.Instantiate();
+		EntitySelector.SetEmpire(empireUid, empire);
 
 		if (empireOwnerPeerId == peerId)
 		{
@@ -103,13 +105,6 @@ public partial class GameOrchestrator : Node2D
 	private void OnTurnStarted()
 	{
 		SyncAllEmpireCoins(updateBalance: true);
-	}
-
-	[Rpc()]
-	private void SyncCoinsForOwnEmpire(int newBalance, int newIncome)
-	{
-		var empire = playerEmpires[Multiplayer.GetUniqueId()];
-		empire.SetCoinState(newBalance, newIncome);
 	}
 
 	public EmpireController? GetEmpireForPeerId(long peerId)
@@ -145,17 +140,11 @@ public partial class GameOrchestrator : Node2D
 
 			if (updateBalance)
 			{
-				newBalance += empire.TotalCoinsDelta;
+				newBalance += empire.TotalCoinIncome;
 			}
 
-			var newIncome = empire.TotalCoinsDelta;
-			empire.SetCoinState(newBalance, newIncome);
-
-			// Server doesn't need to sync itself
-			if (peerId != 1)
-			{
-				RpcId(peerId, MethodName.SyncCoinsForOwnEmpire, newBalance, newIncome);
-			}
+			var newIncome = empire.TotalCoinIncome;
+			empire.RequestSetCoinState(newBalance, newIncome);
 		}
 	}
 }

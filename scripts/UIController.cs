@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Godot;
 
@@ -6,23 +7,31 @@ using Godot;
 public partial class UIController : Node2D
 {
     [Export]
-    public required Control OwnedCityViewControl;
+    private Control ownedCityViewControl = null!;
     [Export]
-	public required Label CoinsLabel;
+	private Label coinsLabel = null!;
     [Export]
-    public required Label TurnCountLabel;
+    private Label turnCountLabel = null!;
     [Export]
-    public required Label TurnTimerLabel;
+    private Label turnTimerLabel = null!;
     [Export]
-    public required Button EndTurnButton;
+    private Button endTurnButton = null!;
     [Export]
-    public required PackedScene BuildListItemPanel;
+    private PackedScene buildListItemPanel = null!;
     [Export]
-    public required Control WinOverlayControl;
+    private Control winOverlayControl = null!;
     [Export]
-    public required Control LoseOverlayControl;
+    private Control loseOverlayControl = null!;
+    [Export]
+	private PackedScene tileSelectionScene = null!;
+    [Export]
+	private PackedScene reachableTileIndicatorScene = null!;
 
     public static UIController Instance = null!;
+
+    private Sprite2D tileSelectionNode = null!;
+    private Dictionary<Vector2I, Sprite2D> reachableTileIndicators = new();
+	private Line2D unitPathLine = null!;
 
     private PanelContainer? selectedBuildableItemPanel;
     private BuildController.BuildableItemType? selectedBuildable;
@@ -35,7 +44,16 @@ public partial class UIController : Node2D
 
     public override void _Ready()
     {
-        var buildButton = (Button)OwnedCityViewControl.FindChild("Build Button");
+		tileSelectionNode = (Sprite2D)tileSelectionScene.Instantiate();
+		AddChild(tileSelectionNode);
+		tileSelectionNode.Hide();
+
+		unitPathLine = new Line2D();
+		unitPathLine.Width = 1;
+		AddChild(unitPathLine);
+		unitPathLine.Hide();
+
+        var buildButton = (Button)ownedCityViewControl.FindChild("Build Button");
         buildButton.Pressed += () =>
         {
             if (selectedBuildable is null) return;
@@ -43,7 +61,7 @@ public partial class UIController : Node2D
 
             var buildable = (BuildController.BuildableItemType)selectedBuildable;
             var playerEmpire = EmpireController.GetPlayerEmpire(GetTree().Root);
-            playerEmpire.RequestBuildItem((int)buildable, selectedCity.CityUid);
+            BuildController.Instance.RequestBuildItem((int)buildable, selectedCity.CityUid);
         };
     }
 
@@ -66,7 +84,7 @@ public partial class UIController : Node2D
             var highlightColorRect = (ColorRect)selectedBuildableItemPanel.FindChild("Highlight Color");
             highlightColorRect.Show();
 
-            var buildButton = (Button)OwnedCityViewControl.FindChild("Build Button");
+            var buildButton = (Button)ownedCityViewControl.FindChild("Build Button");
             buildButton.Disabled = false;
         }
         else if (selectedBuildable != itemType)
@@ -82,7 +100,7 @@ public partial class UIController : Node2D
             highlightColorRect = (ColorRect)selectedBuildableItemPanel.FindChild("Highlight Color");
             highlightColorRect.Show();
 
-            var buildButton = (Button)OwnedCityViewControl.FindChild("Build Button");
+            var buildButton = (Button)ownedCityViewControl.FindChild("Build Button");
             buildButton.Disabled = false;
         }
         else // clicked on already selected buildable
@@ -101,14 +119,16 @@ public partial class UIController : Node2D
         highlightColorRect.Hide();
         selectedBuildable = null;
         selectedBuildableItemPanel = null;
-        var buildButton = (Button)OwnedCityViewControl.FindChild("Build Button");
+        var buildButton = (Button)ownedCityViewControl.FindChild("Build Button");
         buildButton.Disabled = true;
     }
 
-    public void ShowOwnedCityView(
-        CityController city,
-        BuildController.BuildableItemType[] buildableTypes,
-        Action<int, string> buildCallback)
+    public void RegisterEndTurnButtonCallback(Action callback)
+    {
+        endTurnButton.Pressed += callback;
+    }
+
+    public void ShowOwnedCityView(CityController city)
     {
         if (city is null)
         {
@@ -120,12 +140,12 @@ public partial class UIController : Node2D
         HideOwnedCityView();
 
         selectedCity = city;
-        OwnedCityViewControl.Show();
+        ownedCityViewControl.Show();
 
-        var cityNameLabel = (Label)OwnedCityViewControl.FindChild("CityNameLabel");
+        var cityNameLabel = (Label)ownedCityViewControl.FindChild("CityNameLabel");
         cityNameLabel.Text = city!.CityName;
 
-        var coinsGeneratedLabel = (Label)OwnedCityViewControl.FindChild("CoinsGeneratedLabel");
+        var coinsGeneratedLabel = (Label)ownedCityViewControl.FindChild("CoinsGeneratedLabel");
         var prefix = city.CoinsGenerated switch
         {
             > 0 => "+",
@@ -136,7 +156,7 @@ public partial class UIController : Node2D
 
         coinsGeneratedLabel.Text = $"Coins generated: {prefix}{coinsText}";
 
-        var buildListScrollVBox = (VBoxContainer)OwnedCityViewControl.FindChild("Build List Scroll VBox");
+        var buildListScrollVBox = (VBoxContainer)ownedCityViewControl.FindChild("Build List Scroll VBox");
 
         while (buildListScrollVBox.GetChildCount() > 0)
         {
@@ -145,13 +165,15 @@ public partial class UIController : Node2D
             buildListScrollVBox.RemoveChild(child);
         }
 
+        var buildableTypes = BuildController.GetBuildableItems();
+
         foreach (var buildableType in buildableTypes)
         {
             var buildableItemInfo = BuildController.GetBuildableItemInfo(buildableType);
             var name = buildableItemInfo.ItemName;
             var cost = buildableItemInfo.Cost;
 
-            var buildListItemPanelInstance = (PanelContainer)BuildListItemPanel.Instantiate();
+            var buildListItemPanelInstance = (PanelContainer)buildListItemPanel.Instantiate();
             buildListScrollVBox.AddChild(buildListItemPanelInstance);
 
             var itemNameLabel = (Label)buildListItemPanelInstance.FindChild("Item Name");
@@ -171,50 +193,95 @@ public partial class UIController : Node2D
         selectedCity = null;
         selectedBuildable = null;
         selectedBuildableItemPanel = null;
-        var buildButton = (Button)OwnedCityViewControl.FindChild("Build Button");
+        var buildButton = (Button)ownedCityViewControl.FindChild("Build Button");
         buildButton.Disabled = true;
-        OwnedCityViewControl.Hide();
+        ownedCityViewControl.Hide();
     }
 
     public void SetCoinBalanceText(int coins, int delta)
     {
 		var balanceText = coins.ToString();
 		var deltaText = delta.ToString();
-		CoinsLabel.Text = $"{balanceText} (+{deltaText})";
+		coinsLabel.Text = $"{balanceText} (+{deltaText})";
     }
 
     public void SetTurnTimerText(float secondsLeft)
     {
         var timeSpan = TimeSpan.FromSeconds(secondsLeft);
-        TurnTimerLabel.Text = timeSpan.ToString(@"mm\:ss");
+        turnTimerLabel.Text = timeSpan.ToString(@"mm\:ss");
     }
 
     public void SetTurnCountText(int turn)
     {
-        TurnCountLabel.Text = $"Turn {turn}";
+        turnCountLabel.Text = $"Turn {turn}";
     }
 
     public void ShowWinOverlay()
     {
-        WinOverlayControl.Show();
+        winOverlayControl.Show();
     }
 
     public void ShowLoseOverlay()
     {
-        LoseOverlayControl.Show();
+        loseOverlayControl.Show();
     }
 
     public void SetTurnEnded(bool state)
     {
         if (state)
         {
-            EndTurnButton.Text = "Turn Ended";
-            EndTurnButton.Disabled = true;
+            endTurnButton.Text = "Turn Ended";
+            endTurnButton.Disabled = true;
         }
         else
         {
-            EndTurnButton.Text = "End Turn";
-            EndTurnButton.Disabled = false;
+            endTurnButton.Text = "End Turn";
+            endTurnButton.Disabled = false;
         }
+    }
+
+    public void ShowSelectedTileIndicator(Vector2I tilePosition)
+    {
+		tileSelectionNode.Show();
+		tileSelectionNode.Position = TileGrid.TileToWorldPosition(tilePosition);
+    }
+
+    public void HideSelectedTileIndicator()
+    {
+        tileSelectionNode.Hide();
+    }
+
+	public void ShowReachableTileIndicators(IEnumerable<Vector2I> reachableTiles)
+	{
+		foreach (var tilePosition in reachableTiles)
+		{
+			if (reachableTileIndicators.ContainsKey(tilePosition))
+			{
+				reachableTileIndicators[tilePosition].Show();
+			}
+			else
+			{
+				var indicator = (Sprite2D)reachableTileIndicatorScene.Instantiate();
+				AddChild(indicator);
+				reachableTileIndicators.Add(tilePosition, indicator);
+			}
+
+			reachableTileIndicators[tilePosition].Position = TileGrid.TileToWorldPosition(tilePosition);
+		}
+	}
+
+	public void HideReachableTileIndicators()
+	{
+		foreach (var (_, indicator) in reachableTileIndicators)
+		{
+			indicator.Hide();
+		}
+	}
+
+    public void ShowUnitMovementPathLine() => unitPathLine.Show();
+    public void HideUnitMovementPathLine() => unitPathLine.Hide();
+    public void SetUnitMovementPathPoints(Vector2[] points)
+    {
+        unitPathLine.Points = points;
     }
 }

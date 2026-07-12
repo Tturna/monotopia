@@ -223,7 +223,7 @@ public abstract partial class BaseUnit : Sprite2D
             throw new InvalidOperationException("Tried to move a unit directly from a client");
         }
 
-        throw new InvalidOperationException("Don't use SetPosition() for units. Use SetUnitPosition instead.");
+        throw new InvalidOperationException($"Don't use SetPosition() for units. Use {MethodName.SetUnitTilePosition} instead.");
     }
 
     [Rpc(CallLocal = true)]

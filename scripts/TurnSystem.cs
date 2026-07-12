@@ -33,7 +33,7 @@ public partial class TurnSystem : Node2D
             Rpc(MethodName.StartNextTurn, turnCount + 1, turnTimeSeconds);
         }
 
-        UIController.Instance.EndTurnButton.Pressed += () =>
+        UIController.Instance.RegisterEndTurnButtonCallback(() =>
         {
             UIController.Instance.SetTurnEnded(true);
 
@@ -45,7 +45,7 @@ public partial class TurnSystem : Node2D
             {
                 RpcId(1, MethodName.SetPlayerEndedTurn, Multiplayer.GetUniqueId());
             }
-        };
+        });
     }
 
     public override void _Input(InputEvent inputEvent)

@@ -13,8 +13,31 @@ public partial class UnitSpawner : Node2D
         Instance = this;
     }
 
-    public BaseUnit SpawnUnit(BuildController.BuildableItemType unitType, EmpireController ownerEmpire)
+    public void SpawnAndSyncUnit(BuildController.BuildableItemType unitType, Vector2I tilePosition, EmpireController ownerEmpire)
     {
+        if (!Multiplayer.IsServer())
+        {
+            throw new InvalidOperationException("Tried to spawn unit from client");
+        }
+
+        Rpc(MethodName.SyncUnitSpawn, (int)unitType, tilePosition, ownerEmpire.EmpireUid);
+    }
+
+	[Rpc(CallLocal = true)]
+	private void SyncUnitSpawn(int unitTypeEnum, Vector2I tilePosition, string ownerEmpireUid)
+	{
+        if (Multiplayer.GetRemoteSenderId() == 0)
+        {
+            throw new InvalidOperationException("Tried to sync unit spawn without RPC");
+        }
+
+        var unitType = (BuildController.BuildableItemType)unitTypeEnum;
+
+        if (!EntitySelector.TryGetEmpire(ownerEmpireUid, out var ownerEmpire))
+        {
+            throw new InvalidOperationException($"Can't find empire with UID: {ownerEmpireUid}");
+        }
+
         BaseUnit unit = unitType switch
         {
             BuildController.BuildableItemType.Warrior => new WarriorUnit(ownerEmpire),
@@ -23,6 +46,10 @@ public partial class UnitSpawner : Node2D
         };
 
         UnitsContainer.AddChild(unit, forceReadableName: true);
-        return unit;
-    }
+
+        if (Multiplayer.IsServer())
+        {
+            unit.ForceMoveToTile(tilePosition);
+        }
+	}
 }

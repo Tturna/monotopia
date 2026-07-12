@@ -10,31 +10,20 @@ public partial class EmpireController : Node2D
 	public bool HasCursorSelection;
 	public Color EmpirePrimaryColor;
 	public int Coins { get; private set; }
-	public int TotalCoinsDelta { get; private set; }
+	public int TotalCoinIncome { get; private set; }
 
 	private List<CityController> cities = new();
 	
-	private PackedScene tileSelectionScene => (PackedScene)GD.Load("res://scenes/TileSelection.tscn");
-	private PackedScene reachableTileIndicatorScene => (PackedScene)GD.Load("res://scenes/ReachableTileIndicator.tscn");
-	private Sprite2D tileSelectionNode = null!;
-	private Dictionary<Vector2I, Sprite2D> reachableTileIndicators = new();
+	private UIController uiController = null!;
 	private BaseUnit? selectedUnit;
 	private TileController? selectedTile;
 	private Vector2I? hoveredTile;
 	private bool hasSelection;
 	private bool isFrozen;
-	private Line2D unitPathLine = null!;
 
 	public override void _Ready()
 	{
-		tileSelectionNode = (Sprite2D)tileSelectionScene.Instantiate();
-		AddChild(tileSelectionNode);
-		tileSelectionNode.Hide();
-
-		unitPathLine = new Line2D();
-		unitPathLine.Width = 1;
-		AddChild(unitPathLine);
-		unitPathLine.Hide();
+		uiController = UIController.Instance;
 	}
 
 	public override void _UnhandledInput(InputEvent inputEvent)
@@ -67,7 +56,6 @@ public partial class EmpireController : Node2D
 		if (hasSelection && mouseButtonEvent.ButtonIndex == MouseButton.Right)
 		{
 			Deselect();
-
 			return;
 		}
 
@@ -99,27 +87,7 @@ public partial class EmpireController : Node2D
 			else
 			{
 				// No unit selected or selecting another own unit
-				Deselect();
-
-				selectedTile = null;
-				selectedUnit = unit;
-				hasSelection = true;
-				UpdateTileSelection(mouseTilePosition);
-				UIController.Instance.HideOwnedCityView();
-
-				if (!unit.GetOwnerEmpire().IsPlayerEmpire) return;
-
-				unitPathLine.Show();
-
-				var tileCosts = unit.GetReachableTilesWithCosts();
-
-				if (tileCosts.ContainsKey(unit.TilePosition))
-				{
-					tileCosts.Remove(unit.TilePosition);
-				}
-
-				ShowReachableTileIndicators(tileCosts.Keys);
-
+				HandleOwnUnitSelection(unit, mouseTilePosition);
 				return;
 			}
 		}
@@ -130,24 +98,22 @@ public partial class EmpireController : Node2D
 			{
 				selectedUnit.RequestMoveToTile(mouseTilePosition);
 				Deselect();
-
 				return;
 			}
 
 			if (tileController == selectedTile)
 			{
 				Deselect();
-
 				return;
 			}
 
 			if (tileController is CityController cityController && cities.Contains(cityController))
 			{
-				UIController.Instance.ShowOwnedCityView(cityController, GetBuildableItems(), RequestBuildItem);
+				uiController.ShowOwnedCityView(cityController);
 			}
 			else
 			{
-				UIController.Instance.HideOwnedCityView();
+				uiController.HideOwnedCityView();
 			}
 
 			hasSelection = true;
@@ -176,7 +142,7 @@ public partial class EmpireController : Node2D
 					pathTiles[i] = tileWorldPos + pathIndicatorOffset;
 				}
 
-				unitPathLine.Points = pathTiles;
+				uiController.SetUnitMovementPathPoints(pathTiles);
 			}
 
 			hoveredTile = mouseTilePosition;
@@ -187,74 +153,50 @@ public partial class EmpireController : Node2D
 		}
 	}
 
+	private void HandleOwnUnitSelection(BaseUnit unit, Vector2I mouseTilePosition)
+	{
+		Deselect();
+
+		selectedTile = null;
+		selectedUnit = unit;
+		hasSelection = true;
+		UpdateTileSelection(mouseTilePosition);
+		uiController.HideOwnedCityView();
+
+		if (!unit.GetOwnerEmpire().IsPlayerEmpire) return;
+
+		uiController.ShowUnitMovementPathLine();
+
+		var tileCosts = unit.GetReachableTilesWithCosts();
+
+		if (tileCosts.ContainsKey(unit.TilePosition))
+		{
+			tileCosts.Remove(unit.TilePosition);
+		}
+
+		uiController.ShowReachableTileIndicators(tileCosts.Keys);
+	}
+
 	private void Deselect()
 	{
 		selectedUnit = null;
 		selectedTile = null;
 		hasSelection = false;
 		UpdateTileSelection(null);
-		UIController.Instance.HideOwnedCityView();
-		HideReachableTileIndicators();
-		unitPathLine.Hide();
+		uiController.HideOwnedCityView();
+		uiController.HideReachableTileIndicators();
+		uiController.HideUnitMovementPathLine();
 	}
 
 	private void UpdateTileSelection(Vector2I? tilePosition)
 	{
 		if (!hasSelection || tilePosition is null)
 		{
-			tileSelectionNode.Hide();
+			uiController.HideSelectedTileIndicator();
 			return;
 		}
 
-		tileSelectionNode.Show();
-		tileSelectionNode.Position = TileGrid.TileToWorldPosition((Vector2I)tilePosition);
-	}
-
-	private void ShowReachableTileIndicators(IEnumerable<Vector2I> reachableTiles)
-	{
-		foreach (var tilePosition in reachableTiles)
-		{
-			if (reachableTileIndicators.ContainsKey(tilePosition))
-			{
-				reachableTileIndicators[tilePosition].Show();
-			}
-			else
-			{
-				var indicator = (Sprite2D)reachableTileIndicatorScene.Instantiate();
-				AddChild(indicator);
-				reachableTileIndicators.Add(tilePosition, indicator);
-			}
-
-			reachableTileIndicators[tilePosition].Position = TileGrid.TileToWorldPosition(tilePosition);
-		}
-	}
-
-	private void HideReachableTileIndicators()
-	{
-		foreach (var (_, indicator) in reachableTileIndicators)
-		{
-			indicator.Hide();
-		}
-	}
-
-	private void UpdateCoinsLabel()
-	{
-		if (!IsPlayerEmpire) return;
-		UIController.Instance.SetCoinBalanceText(Coins, TotalCoinsDelta);
-	}
-
-	[Rpc(CallLocal = true)]
-	private void SyncUnitSpawn(int unitTypeEnum, string spawnCityUid)
-	{
-		var selectedCity = cities.Find(city => city.CityUid == spawnCityUid)!;
-		var spawnedUnit = UnitSpawner.Instance.SpawnUnit(
-			(BuildController.BuildableItemType)unitTypeEnum,
-			ownerEmpire: this);
-
-		if (Multiplayer.IsServer())
-		{
-			spawnedUnit.ForceMoveToTile(selectedCity.CityTilePosition);
-		}
+		uiController.ShowSelectedTileIndicator((Vector2I)tilePosition);
 	}
 
 	[Rpc(CallLocal = true)]
@@ -266,12 +208,12 @@ public partial class EmpireController : Node2D
 
 		if (IsPlayerEmpire || Multiplayer.IsServer())
 		{
-			TotalCoinsDelta -= targetCity.CoinsGenerated;
+			TotalCoinIncome -= targetCity.CoinsGenerated;
 		}
 
 		if (IsPlayerEmpire && cities.Count == 0)
 		{
-			UIController.Instance.ShowLoseOverlay();
+			uiController.ShowLoseOverlay();
 		}
 	}
 
@@ -289,7 +231,7 @@ public partial class EmpireController : Node2D
 
 		if (IsPlayerEmpire || Multiplayer.IsServer())
 		{
-			TotalCoinsDelta += targetCity.CoinsGenerated;
+			TotalCoinIncome += targetCity.CoinsGenerated;
 		}
 
 		if (GetAliveEmpireCount(GetTree().Root) == 1)
@@ -298,11 +240,11 @@ public partial class EmpireController : Node2D
 
 			if (IsPlayerEmpire)
 			{
-				UIController.Instance.ShowWinOverlay();
+				uiController.ShowWinOverlay();
 			}
 			else
 			{
-				UIController.Instance.ShowLoseOverlay();
+				uiController.ShowLoseOverlay();
 			}
 		}
 
@@ -312,10 +254,11 @@ public partial class EmpireController : Node2D
 		}
 	}
 
-	public void SetCoinState(int newBalance, int newIncome)
+	[Rpc(CallLocal = true)]
+	private void SyncSetCoinState(int newCoinBalance, int newCoinIncome)
 	{
-		Coins = newBalance;
-		TotalCoinsDelta = newIncome;
+		Coins = newCoinBalance;
+		TotalCoinIncome = newCoinIncome;
 
 		if (IsPlayerEmpire)
 		{
@@ -323,51 +266,10 @@ public partial class EmpireController : Node2D
 		}
 	}
 
-	public BuildController.BuildableItemType[] GetBuildableItems()
+	private void UpdateCoinsLabel()
 	{
-		return
-		[
-			BuildController.BuildableItemType.Warrior,
-			BuildController.BuildableItemType.Archer
-		];
-	}
-
-	[Rpc(mode: MultiplayerApi.RpcMode.AnyPeer)]
-	public void RequestBuildItem(int itemTypeEnum, string cityUid)
-	{
-		if (!Multiplayer.IsServer())
-		{
-			RpcId(1, nameof(RequestBuildItem), itemTypeEnum, cityUid);
-			return;
-		}
-
-		// TODO: check if item is unlocked and actually available for building
-
-		var selectedCity = cities.Find(city => city.CityUid == cityUid)!;
-		var itemType = (BuildController.BuildableItemType)itemTypeEnum;
-		var itemInfo = BuildController.GetBuildableItemInfo(itemType);
-
-		if (itemInfo.Cost > Coins)
-		{
-			throw new InvalidOperationException($"Item {itemInfo.ItemName} is too expensive to build in empire {Name}");
-		}
-
-		Coins -= itemInfo.Cost;
-		GameOrchestrator.Instance.SyncAllEmpireCoins();
-
-		if (itemInfo.IsUnit)
-		{
-			if (EntitySelector.TryGetUnit(selectedCity.CityTilePosition, out var unit) && unit is not null)
-			{
-				throw new InvalidOperationException($"Can't build unit in an occupied city {selectedCity.Name}");
-			}
-
-			Rpc(MethodName.SyncUnitSpawn, (int)itemType, cityUid);
-
-			return; 
-		}
-
-		throw new NotImplementedException($"Empire should build a structure ({itemInfo.ItemName}) but it can only build units for now.");
+		if (!IsPlayerEmpire) return;
+		uiController.SetCoinBalanceText(Coins, TotalCoinIncome);
 	}
 
 	public void AddNewCityToEmpire(Vector2I tilePosition, string newCityUid)
@@ -379,7 +281,7 @@ public partial class EmpireController : Node2D
 
 		if (IsPlayerEmpire || Multiplayer.IsServer())
 		{
-			TotalCoinsDelta += cityController.CoinsGenerated;
+			TotalCoinIncome += cityController.CoinsGenerated;
 		}
 
 		DebugUtility.Print($"Empire {EmpireUid} now has {cities.Count} cities");
@@ -409,6 +311,31 @@ public partial class EmpireController : Node2D
 
 		DebugUtility.Print($"Releasing city {targetCityUid} from empire {EmpireUid}");
 		Rpc(MethodName.SyncReleaseCity, targetCityUid);
+	}
+
+	public void RequestUpdateCoins(int change)
+	{
+		RequestSetCoinState(Coins + change, TotalCoinIncome);
+	}
+
+	[Rpc(mode: MultiplayerApi.RpcMode.AnyPeer)]
+	public void RequestSetCoinState(int newCoinBalance, int newCoinIncome)
+	{
+		if (!Multiplayer.IsServer())
+		{
+			RpcId(1, MethodName.RequestSetCoinState, newCoinBalance, newCoinIncome);
+			return;
+		}
+
+		// Coin data should only be updated for each player's own empire
+		if (!GameOrchestrator.Instance.TryGetPeerIdForEmpire(this, out var peerId))
+		{
+			throw new InvalidOperationException($"Empire {EmpireUid} not registered in GameOrchestrator");
+		}
+
+		Coins = newCoinBalance;
+		TotalCoinIncome = newCoinIncome;
+		RpcId(peerId, MethodName.SyncSetCoinState, newCoinBalance, newCoinIncome);
 	}
 
 	public bool HasCitiesRemaining()

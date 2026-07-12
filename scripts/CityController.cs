@@ -21,7 +21,6 @@ public partial class CityController : TileController
 
     public override void _EnterTree()
     {
-        CityUid = Guid.NewGuid().ToString();
     }
 
     private void OnTurnStarted()

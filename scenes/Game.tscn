@@ -7,9 +7,12 @@
 [ext_resource type="Texture2D" uid="uid://ceb6fnywpv652" path="res://sprites/towntile.png" id="5_a8wo8"]
 [ext_resource type="Script" uid="uid://14p5a2axlcx1" path="res://scripts/TurnSystem.cs" id="7_bneo8"]
 [ext_resource type="Script" uid="uid://cg1myavcyc6vy" path="res://scripts/UnitSpawner.cs" id="9_jbgew"]
+[ext_resource type="PackedScene" uid="uid://cmjujoq33e31k" path="res://scenes/TileSelection.tscn" id="10_a8wo8"]
+[ext_resource type="PackedScene" uid="uid://p68qne1qiojk" path="res://scenes/ReachableTileIndicator.tscn" id="11_attvq"]
 [ext_resource type="Script" uid="uid://bngunyywpvjqm" path="res://scripts/UIController.cs" id="11_jhsr3"]
 [ext_resource type="Script" uid="uid://6bmj0uh8cnd2" path="res://scripts/GameOrchestrator.cs" id="11_vjgi4"]
 [ext_resource type="PackedScene" uid="uid://bidsvn261x8ld" path="res://scenes/BuildItemPanel.tscn" id="12_0bq3a"]
+[ext_resource type="Script" uid="uid://7hkt2jajq4pi" path="res://scripts/BuildController.cs" id="12_bneo8"]
 [ext_resource type="PackedScene" uid="uid://d0v4k83kn45jp" path="res://scenes/Empire.tscn" id="12_kyk2p"]
 [ext_resource type="Script" uid="uid://uvbndmdkkg8p" path="res://scripts/PauseMenuController.cs" id="12_vjgi4"]
 [ext_resource type="Script" uid="uid://uaer1wt5dso1" path="res://scripts/CameraController.cs" id="13_754j2"]
@@ -35,16 +38,21 @@ script = ExtResource("7_bneo8")
 script = ExtResource("9_jbgew")
 UnitsContainer = NodePath("../Units Parent")
 
-[node name="UIController" type="Node2D" parent="." unique_id=170486342 node_paths=PackedStringArray("OwnedCityViewControl", "CoinsLabel", "TurnCountLabel", "TurnTimerLabel", "EndTurnButton", "WinOverlayControl", "LoseOverlayControl")]
+[node name="UIController" type="Node2D" parent="." unique_id=170486342 node_paths=PackedStringArray("ownedCityViewControl", "coinsLabel", "turnCountLabel", "turnTimerLabel", "endTurnButton", "winOverlayControl", "loseOverlayControl")]
 script = ExtResource("11_jhsr3")
-OwnedCityViewControl = NodePath("../CanvasLayer/AspectRatioContainer/Owned City View")
-CoinsLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox/Coins Label")
-TurnCountLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Right HBox/VBoxContainer/Turn Count Label")
-TurnTimerLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/Turn Timer Label")
-EndTurnButton = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/CenterContainer/End Turn Button")
-BuildListItemPanel = ExtResource("12_0bq3a")
-WinOverlayControl = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Win Overlay")
-LoseOverlayControl = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Lose Overlay")
+ownedCityViewControl = NodePath("../CanvasLayer/AspectRatioContainer/Owned City View")
+coinsLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox/Coins Label")
+turnCountLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Right HBox/VBoxContainer/Turn Count Label")
+turnTimerLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/Turn Timer Label")
+endTurnButton = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/CenterContainer/End Turn Button")
+buildListItemPanel = ExtResource("12_0bq3a")
+winOverlayControl = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Win Overlay")
+loseOverlayControl = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Lose Overlay")
+tileSelectionScene = ExtResource("10_a8wo8")
+reachableTileIndicatorScene = ExtResource("11_attvq")
+
+[node name="BuildController" type="Node2D" parent="." unique_id=164214873]
+script = ExtResource("12_bneo8")
 
 [node name="GameOrchestrator" type="Node2D" parent="." unique_id=228322953 node_paths=PackedStringArray("empiresParent")]
 script = ExtResource("11_vjgi4")
