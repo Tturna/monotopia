@@ -14,4 +14,5 @@ public partial class FounderUnit : BaseUnit, IBuildable
     }
 
     public override Texture2D GetSprite() => Sprite;
+    public override string GetUnitName() => ItemName;
 }

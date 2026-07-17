@@ -49,6 +49,9 @@ public abstract partial class BaseUnit : Sprite2D
         TurnSystem.TurnStarted -= OnTurnStart;
     }
 
+    public abstract Texture2D GetSprite();
+    public abstract string GetUnitName();
+
     private void OnTurnStart(int turn)
     {
         if (!Multiplayer.IsServer()) return;
@@ -225,8 +228,6 @@ public abstract partial class BaseUnit : Sprite2D
         HasActedThisTurn = false;
         HasMovedThisTurn = false;
     }
-
-    public abstract Texture2D GetSprite();
 
     public EmpireController GetOwnerEmpire()
     {

@@ -1,0 +1,56 @@
+[gd_scene format=3 uid="uid://dg6thvenjwum"]
+
+[node name="Selected Unit View" type="Control" unique_id=636892946]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1152.0
+offset_bottom = -648.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1873959765]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -288.0
+offset_top = -98.0
+offset_right = 288.0
+grow_horizontal = 2
+grow_vertical = 0
+color = Color(0.34, 0.31302667, 0.2822, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=975254454]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -288.0
+offset_top = -98.0
+offset_right = 288.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Unit View Content VBox" type="VBoxContainer" parent="MarginContainer" unique_id=1596842284]
+layout_mode = 2
+
+[node name="Unit Name Panel" type="PanelContainer" parent="MarginContainer/Unit View Content VBox" unique_id=1643730942]
+layout_mode = 2
+
+[node name="UnitNameLabel" type="Label" parent="MarginContainer/Unit View Content VBox/Unit Name Panel" unique_id=1909572159]
+layout_mode = 2
+text = "Unit name here"
+
+[node name="Action Button Container" type="HBoxContainer" parent="MarginContainer/Unit View Content VBox" unique_id=322920011]
+layout_mode = 2

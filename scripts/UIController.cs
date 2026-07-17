@@ -9,6 +9,8 @@ public partial class UIController : Node2D
     [Export]
     private Control ownedCityViewControl = null!;
     [Export]
+    private Control selectedUnitViewControl = null!;
+    [Export]
 	private Label coinsLabel = null!;
     [Export]
     private Label turnCountLabel = null!;
@@ -123,6 +125,7 @@ public partial class UIController : Node2D
     public void OnEntitySelectionChanged(EmpireController empire)
     {
         HideOwnedCityView();
+        HideSelectedUnitView();
         HideReachableTileIndicators();
         HideSelectedTileIndicator();
         HideUnitMovementPathLine();
@@ -141,6 +144,7 @@ public partial class UIController : Node2D
         else if (empire.TryGetSelectedUnit(out var unit))
         {
             ShowSelectedTileIndicator(unit!.TilePosition);
+            ShowSelectedUnitView(unit);
 
             if (empire.IsOwnUnitSelected && empire.TryGetReachableTileCostMap(out var costMap))
             {
@@ -218,6 +222,18 @@ public partial class UIController : Node2D
         var buildButton = (Button)ownedCityViewControl.FindChild("Build Button");
         buildButton.Disabled = true;
         ownedCityViewControl.Hide();
+    }
+
+    public void ShowSelectedUnitView(BaseUnit unit)
+    {
+        selectedUnitViewControl.Show();
+        var nameLabel = (Label)selectedUnitViewControl.FindChild("UnitNameLabel");
+        nameLabel.Text = unit.GetUnitName();
+    }
+
+    public void HideSelectedUnitView()
+    {
+        selectedUnitViewControl.Hide();
     }
 
     public void SetCoinBalanceText(int coins, int delta)

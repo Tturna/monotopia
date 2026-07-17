@@ -22,6 +22,7 @@
 [ext_resource type="PackedScene" uid="uid://cpc1ij2wjxypk" path="res://scenes/WinOverlay.tscn" id="16_1gdd5"]
 [ext_resource type="PackedScene" uid="uid://1dota62uermp" path="res://scenes/OwnedCityView.tscn" id="17_426vi"]
 [ext_resource type="PackedScene" uid="uid://d2nlqqu8jsp7" path="res://scenes/LoseOverlay.tscn" id="18_45i86"]
+[ext_resource type="PackedScene" uid="uid://dg6thvenjwum" path="res://scenes/SelectedUnitView.tscn" id="23_bneo8"]
 
 [node name="GameRoot" type="Node2D" unique_id=1161755743]
 
@@ -39,9 +40,10 @@ script = ExtResource("7_bneo8")
 script = ExtResource("9_jbgew")
 UnitsContainer = NodePath("../Units Parent")
 
-[node name="UIController" type="Node2D" parent="." unique_id=170486342 node_paths=PackedStringArray("ownedCityViewControl", "coinsLabel", "turnCountLabel", "turnTimerLabel", "endTurnButton", "winOverlayControl", "loseOverlayControl")]
+[node name="UIController" type="Node2D" parent="." unique_id=170486342 node_paths=PackedStringArray("ownedCityViewControl", "selectedUnitViewControl", "coinsLabel", "turnCountLabel", "turnTimerLabel", "endTurnButton", "winOverlayControl", "loseOverlayControl")]
 script = ExtResource("11_jhsr3")
 ownedCityViewControl = NodePath("../CanvasLayer/AspectRatioContainer/Owned City View")
+selectedUnitViewControl = NodePath("../CanvasLayer/AspectRatioContainer/Selected Unit View")
 coinsLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox/Coins Label")
 turnCountLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Right HBox/VBoxContainer/Turn Count Label")
 turnTimerLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/Turn Timer Label")
@@ -215,3 +217,9 @@ text = "Disconnect"
 [node name="Owned City View" parent="CanvasLayer/AspectRatioContainer" unique_id=82809476 instance=ExtResource("17_426vi")]
 visible = false
 layout_mode = 2
+
+[node name="Selected Unit View" parent="CanvasLayer/AspectRatioContainer" unique_id=82257399 instance=ExtResource("23_bneo8")]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
