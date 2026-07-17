@@ -40,8 +40,7 @@ public partial class UnitSpawner : Node2D
 
         BaseUnit unit = unitType switch
         {
-            BuildController.BuildableItemType.Warrior => new WarriorUnit(ownerEmpire),
-            BuildController.BuildableItemType.Archer => new ArcherUnit(ownerEmpire),
+            BuildController.BuildableItemType.Founder => new FounderUnit(ownerEmpire),
             _ => throw new ArgumentOutOfRangeException(nameof(unitType))
         };
 

@@ -13,19 +13,16 @@ public abstract partial class BaseUnit : Sprite2D
     public Vector2I TilePosition { get; private set; } = Vector2I.Zero;
 
     protected int MovementRange { get; init; } = 1;
-    protected int AttackRange { get; init; } = 1;
-    protected int Damage { get; init; } = 1;
-    protected int Defense { get; init; } = 1;
     protected int MaxHealth { get; private set; } = 10;
     protected int Health { get; private set; }
-    protected bool CanMoveAfterAttacking { get; private set; }
-    protected bool CanAttackAfterMoving { get; private set; }
+    protected bool CanMoveAfterActing { get; private set; }
+    protected bool CanActAfterMoving { get; private set; }
 
     protected EmpireController OwnerEmpire;
     protected TurnSystem TurnSystem = null!;
 
     protected int MovementRangeLeft { get; private set; }
-    protected bool HasAttackedThisTurn { get; private set; }
+    protected bool HasActedThisTurn { get; private set; }
     protected bool HasMovedThisTurn { get; private set; }
 
     public BaseUnit(EmpireController unitOwner)
@@ -160,7 +157,7 @@ public abstract partial class BaseUnit : Sprite2D
             throw new InvalidOperationException("Tried to move a unit directly from a client");
         }
 
-        if (HasAttackedThisTurn && !CanMoveAfterAttacking) return false;
+        if (HasActedThisTurn && !CanMoveAfterActing) return false;
 
         // TODO: Tile based path finding. How to get from current
         // position to target position, how many tiles would the unit
@@ -225,7 +222,7 @@ public abstract partial class BaseUnit : Sprite2D
     public void ResetTurnState()
     {
         MovementRangeLeft = MovementRange;
-        HasAttackedThisTurn = false;
+        HasActedThisTurn = false;
         HasMovedThisTurn = false;
     }
 
@@ -283,53 +280,5 @@ public abstract partial class BaseUnit : Sprite2D
     {
         EntitySelector.SetUnit(TilePosition, null);
         QueueFree();
-    }
-
-    [Rpc(mode: MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-    public void RequestAttackUnit(Vector2I targetUnitTilePosition)
-    {
-        if (!Multiplayer.IsServer())
-        {
-            RpcId(1, MethodName.RequestAttackUnit, targetUnitTilePosition);
-            return;
-        }
-
-        TryAttackUnit(targetUnitTilePosition);
-    }
-
-    public bool TryAttackUnit(Vector2I targetUnitTilePosition)
-    {
-        if (!Multiplayer.IsServer())
-        {
-            throw new InvalidOperationException("Tried to attack a unit directly from a client");
-        }
-
-        if (HasAttackedThisTurn) return false;
-        if (HasMovedThisTurn && !CanAttackAfterMoving) return false;
-
-        if (!EntitySelector.TryGetUnit(targetUnitTilePosition, out var targetUnit)) return false;
-
-        if (targetUnit is null)
-        {
-            throw new ArgumentException("Given unit does not exist.");
-        }
-
-        // Attack range uses Chebyshev distance (max(|dx|,|dy|)) because the
-        // grid allows 8-directional movement and all tiles currently have equal
-        // cost with no obstacles. This is more efficient than running full A*
-        // just to only compare against the node count in the found path.
-        // If impassable terrain or line-of-sight blocking
-        // is added later, swap this for a bounded BFS: expand outward layer by
-        // layer up to AttackRange depth and return true if the target is found.
-        // A bounded BFS stops at the range boundary without exploring the whole
-        // grid, unlike full A*, and naturally routes around blocked tiles.
-        int dx = Mathf.Abs(TilePosition.X - targetUnit.TilePosition.X);
-        int dy = Mathf.Abs(TilePosition.Y - targetUnit.TilePosition.Y);
-        if (Mathf.Max(dx, dy) > AttackRange) return false;
-
-        targetUnit.SyncTakeDamage(Damage);
-        HasAttackedThisTurn = true;
-
-        return true;
     }
 }

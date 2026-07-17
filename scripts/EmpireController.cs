@@ -42,8 +42,6 @@ public partial class EmpireController : Node2D
 	{
 		if (selectedUnit is not null && !unit.GetOwnerEmpire().IsPlayerEmpire)
 		{
-			// Try attacking clicked unit with selected unit
-			selectedUnit.RequestAttackUnit(unit.TilePosition);
 		}
 		else
 		{
