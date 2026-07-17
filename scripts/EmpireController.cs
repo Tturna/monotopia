@@ -316,7 +316,8 @@ public partial class EmpireController : Node2D
 
 	public static int GetAliveEmpireCount(Node rootNode)
 	{
-		var empires = GodotUtilities.FindNodesOfType<EmpireController>(rootNode);
+		var empiresDict = EntitySelector.GetEmpiresDict();
+		var empires = empiresDict.Values;
 		var aliveCount = 0;
 
 		foreach (EmpireController empire in empires)
@@ -332,7 +333,8 @@ public partial class EmpireController : Node2D
 
 	public static void FreezeAllEmpires(Node rootNode)
 	{
-		var empires = GodotUtilities.FindNodesOfType<EmpireController>(rootNode);
+		var empiresDict = EntitySelector.GetEmpiresDict();
+		var empires = empiresDict.Values;
 
 		foreach (EmpireController empire in empires)
 		{
