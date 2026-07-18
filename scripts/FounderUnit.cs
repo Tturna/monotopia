@@ -1,3 +1,4 @@
+using System;
 using Godot;
 
 public partial class FounderUnit : BaseUnit, IBuildable
@@ -15,4 +16,11 @@ public partial class FounderUnit : BaseUnit, IBuildable
 
     public override Texture2D GetSprite() => Sprite;
     public override string GetUnitName() => ItemName;
+
+    public override UnitAction[] GetUnitActions()
+    {
+        return [
+            new (ActionName: "Found HQ", ActionCallback: () => { throw new NotImplementedException(); })
+        ];
+    }
 }

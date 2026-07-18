@@ -51,6 +51,25 @@ public abstract partial class BaseUnit : Sprite2D
 
     public abstract Texture2D GetSprite();
     public abstract string GetUnitName();
+    public abstract UnitAction[] GetUnitActions();
+
+    public UnitAction[] GetBaseUnitActions()
+    {
+        return [
+            new (ActionName: "Sell unit", ActionCallback: () => { throw new NotImplementedException(); })
+        ];
+    }
+
+    public UnitAction[] GetCombinedUnitActions()
+    {
+        var baseActions = GetBaseUnitActions();
+        var uniqueActions = GetUnitActions();
+        var allActions = new UnitAction[baseActions.Length + uniqueActions.Length];
+        baseActions.CopyTo(allActions, 0);
+        uniqueActions.CopyTo(allActions, baseActions.Length);
+
+        return allActions;
+    }
 
     private void OnTurnStart(int turn)
     {

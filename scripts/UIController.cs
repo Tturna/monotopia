@@ -229,11 +229,29 @@ public partial class UIController : Node2D
         selectedUnitViewControl.Show();
         var nameLabel = (Label)selectedUnitViewControl.FindChild("UnitNameLabel");
         nameLabel.Text = unit.GetUnitName();
+
+        var unitActions = unit.GetCombinedUnitActions();
+        var actionButtonContainer = selectedUnitViewControl.FindChild("Action Button Container");
+        
+        foreach (var unitAction in unitActions)
+        {
+            var button = new Button();
+            button.Text = unitAction.ActionName;
+            actionButtonContainer.AddChild(button);
+            button.Pressed += unitAction.ActionCallback;
+        }
     }
 
     public void HideSelectedUnitView()
     {
         selectedUnitViewControl.Hide();
+
+        var actionButtonContainer = selectedUnitViewControl.FindChild("Action Button Container");
+
+        while (actionButtonContainer.GetChildCount() > 0)
+        {
+            actionButtonContainer.GetChild(0).QueueFree();
+        }
     }
 
     public void SetCoinBalanceText(int coins, int delta)
