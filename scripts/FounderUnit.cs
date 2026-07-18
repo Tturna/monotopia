@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 
 public partial class FounderUnit : BaseUnit, IBuildable
@@ -17,10 +18,35 @@ public partial class FounderUnit : BaseUnit, IBuildable
     public override Texture2D GetSprite() => Sprite;
     public override string GetUnitName() => ItemName;
 
+    [Rpc(mode: MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+    private void RequestSpawnHQ()
+    {
+        if (Multiplayer.GetUniqueId() != 1)
+        {
+            RpcId(1, MethodName.RequestSpawnHQ);
+            return;
+        }
+
+        var cityUid = Guid.NewGuid().ToString();
+        OwnerEmpire.AddNewCityToEmpire(TilePosition, cityUid);
+        Rpc(MethodName.SyncSpawnHQ, cityUid);
+    }
+
+    [Rpc()]
+    private void SyncSpawnHQ(string cityUid)
+    {
+        OwnerEmpire.AddNewCityToEmpire(TilePosition, cityUid);
+    }
+
     public override UnitAction[] GetUnitActions()
     {
-        return [
-            new (ActionName: "Found HQ", ActionCallback: () => { throw new NotImplementedException(); })
-        ];
+        List<UnitAction> actionList = new();
+
+        if (!OwnerEmpire.HasCitiesRemaining())
+        {
+            actionList.Add(new (ActionName: "Found HQ", ActionCallback: RequestSpawnHQ, IsSingleUse: true));
+        }
+
+        return actionList.ToArray();
     }
 }

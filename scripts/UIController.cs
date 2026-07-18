@@ -238,7 +238,19 @@ public partial class UIController : Node2D
             var button = new Button();
             button.Text = unitAction.ActionName;
             actionButtonContainer.AddChild(button);
-            button.Pressed += unitAction.ActionCallback;
+
+            if (unitAction.IsSingleUse)
+            {
+                button.Pressed += () => {
+                    unitAction.ActionCallback();
+                    actionButtonContainer.RemoveChild(button);
+                    button.QueueFree();
+                };
+            }
+            else
+            {
+                button.Pressed += unitAction.ActionCallback;
+            }
         }
     }
 
