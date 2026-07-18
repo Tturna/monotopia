@@ -16,6 +16,12 @@ export_credentials.cfg
 data_*/
 mono_crash.*.json
 
+# Builds
+export_presets.cfg
+build/*
+builds/*
+
 # etc.
 *temp*
 tmp/
+
