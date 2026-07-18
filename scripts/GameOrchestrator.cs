@@ -26,11 +26,13 @@ public partial class GameOrchestrator : Node2D
 		var allPeerIds = new List<int>(Multiplayer.GetPeers());
 		allPeerIds.Add(1);
 
+		Dictionary<EmpireController, Vector2I> playerSpawnTilePositionsDict = new();
+
 		foreach (var peerId in allPeerIds)
 		{
-			if (!TileGrid.TryGetVillageTileSpawnPoint(out var capitalCityTilePosition))
+			if (!TileGrid.TryGetPlayerTileSpawnPoint(out var playerSpawnTilePosition))
 			{
-				throw new InvalidOperationException("No capital city spawn points left");
+				throw new InvalidOperationException("No player spawn points left");
 			}
 			
 			var empire = (EmpireController)empireScene.Instantiate();
@@ -47,8 +49,8 @@ public partial class GameOrchestrator : Node2D
 			ConnectEmpireToOrchestrator(empire);
 			empire.InitializeEmpire(peerId, empireUid, empirePrimaryColor, isPlayerEmpire);
 			empiresParent.AddChild(empire, forceReadableName: true);
-			empire.AddNewCityToEmpire(capitalCityTilePosition, capitalUid);
 			EntitySelector.SetEmpire(empireUid, empire);
+			playerSpawnTilePositionsDict.Add(empire, playerSpawnTilePosition);
 
 			if (isPlayerEmpire)
 			{
@@ -60,9 +62,17 @@ public partial class GameOrchestrator : Node2D
 				MethodName.SyncCreateEmpire,
 				peerId,
 				empireUid,
-				capitalCityTilePosition,
+				playerSpawnTilePosition,
 				empirePrimaryColor,
 				capitalUid);
+		}
+
+		foreach (var (empire, playerSpawnTilePosition) in playerSpawnTilePositionsDict)
+		{
+			UnitSpawner.Instance.SpawnAndSyncUnit(
+				unitType: BuildController.BuildableItemType.Founder,
+				tilePosition: playerSpawnTilePosition,
+				ownerEmpire: empire);
 		}
 	}
 	
@@ -81,7 +91,6 @@ public partial class GameOrchestrator : Node2D
 		ConnectEmpireToUI(empire);
 		empire.InitializeEmpire(empireOwnerPeerId, empireUid, empirePrimaryColor, isPlayerEmpire);
 		empiresParent.AddChild(empire, forceReadableName: true);
-		empire.AddNewCityToEmpire(capitalCityTilePosition, capitalCityUid);
 		EntitySelector.SetEmpire(empireUid, empire);
 
 		if (isPlayerEmpire)

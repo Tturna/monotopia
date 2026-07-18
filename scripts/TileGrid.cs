@@ -20,7 +20,7 @@ public partial class TileGrid : Node2D
     public static TileGrid Instance = null!;
 
     private static int tileGap = 2;
-    private static Vector2I[] villageTileSpawnPoints => [
+    private static Vector2I[] playerTileSpawnPoints => [
         new(0, 0),
         new(4, 3),
         new(6, 5),
@@ -33,7 +33,7 @@ public partial class TileGrid : Node2D
     public override void _EnterTree()
     {
         Instance = this;
-        spawnPointsLeft = villageTileSpawnPoints.Length;
+        spawnPointsLeft = playerTileSpawnPoints.Length;
     }
 
 	public override void _Ready()
@@ -103,17 +103,17 @@ public partial class TileGrid : Node2D
         return mapElementInstance;
     }
 
-    public static bool TryGetVillageTileSpawnPoint(out Vector2I tileSpawnPoint)
+    public static bool TryGetPlayerTileSpawnPoint(out Vector2I tileSpawnPoint)
     {
         tileSpawnPoint = Vector2I.Zero;
 
         if (spawnPointsLeft == 0)
         {
-            GD.PrintErr("No village spawn points left!");
+            GD.PrintErr("No player spawn points left!");
             return false;
         }
 
-        tileSpawnPoint = villageTileSpawnPoints[villageTileSpawnPoints.Length - spawnPointsLeft];
+        tileSpawnPoint = playerTileSpawnPoints[playerTileSpawnPoints.Length - spawnPointsLeft];
         spawnPointsLeft--;
 
         return true;
