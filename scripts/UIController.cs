@@ -248,9 +248,9 @@ public partial class UIController : Node2D
 
         var actionButtonContainer = selectedUnitViewControl.FindChild("Action Button Container");
 
-        while (actionButtonContainer.GetChildCount() > 0)
+        for (var i = 0; i < actionButtonContainer.GetChildCount(); i++)
         {
-            actionButtonContainer.GetChild(0).QueueFree();
+            actionButtonContainer.GetChild(i).QueueFree();
         }
     }
 
