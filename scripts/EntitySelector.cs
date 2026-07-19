@@ -52,6 +52,9 @@ public static class EntitySelector
     {
         if (!unitMap.ContainsKey(tilePosition))
         {
+            // If setting a non existent entry to null, don't bother
+            if (unitOnTile is null) return;
+
             unitMap.Add(tilePosition, unitOnTile);
 
             return;

@@ -35,19 +35,20 @@ public partial class EmpireController : Node2D
 
 	public bool IsActivePlayerEmpire()
 	{
-		return (IsPlayerEmpire || !IsFrozen);
+		return (IsPlayerEmpire && !IsFrozen);
 	}
 
 	public void HandleUnitSelection(BaseUnit unit)
 	{
-		if (selectedUnit is not null && !unit.GetOwnerEmpire().IsPlayerEmpire)
+		Deselect();
+
+		if (unit.GetOwnerEmpire().IsPlayerEmpire)
 		{
+			HandleOwnUnitSelection(unit);
 		}
 		else
 		{
-			// No unit selected or selecting another own unit
-			Deselect();
-			HandleOwnUnitSelection(unit);
+			HandleForeignUnitSelection(unit);
 		}
 	}
 
@@ -67,6 +68,13 @@ public partial class EmpireController : Node2D
 			}
 		}
 
+		SelectionChanged?.Invoke(this);
+	}
+
+	private void HandleForeignUnitSelection(BaseUnit unit)
+	{
+		selectedUnit = unit;
+		HasSelection = true;
 		SelectionChanged?.Invoke(this);
 	}
 

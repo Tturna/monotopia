@@ -25,6 +25,8 @@ public abstract partial class BaseUnit : Sprite2D
     protected bool HasActedThisTurn { get; private set; }
     protected bool HasMovedThisTurn { get; private set; }
 
+    private bool hasInitializedPosition;
+
     public BaseUnit(EmpireController unitOwner)
     {
         OwnerEmpire = unitOwner;
@@ -223,7 +225,18 @@ public abstract partial class BaseUnit : Sprite2D
             GD.PushWarning("Setting unit tile position without RPC. Position is probably desynced.");
         }
 
-        EntitySelector.SetUnit(TilePosition, null);
+        // Set entity at previous position to null except if setting initial position
+        // right after spawning to prevent other existing entities from being untracked
+        // if they happen to be at (0, 0).
+        if (hasInitializedPosition)
+        {
+            EntitySelector.SetUnit(TilePosition, null);
+        }
+        else
+        {
+            hasInitializedPosition = true;
+        }
+
         TilePosition = tilePosition;
         MovementRangeLeft = newAvailableMovementRange;
         Position = TileGrid.TileToWorldPosition(tilePosition);
