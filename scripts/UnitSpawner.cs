@@ -45,6 +45,7 @@ public partial class UnitSpawner : Node2D
         };
 
         UnitsContainer.AddChild(unit, forceReadableName: true);
+        unit.ResetTurnState();
 
         if (Multiplayer.IsServer())
         {
