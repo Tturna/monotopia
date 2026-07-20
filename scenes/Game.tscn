@@ -22,7 +22,7 @@
 [ext_resource type="PackedScene" uid="uid://cpc1ij2wjxypk" path="res://scenes/WinOverlay.tscn" id="16_1gdd5"]
 [ext_resource type="PackedScene" uid="uid://1dota62uermp" path="res://scenes/OwnedCityView.tscn" id="17_426vi"]
 [ext_resource type="PackedScene" uid="uid://d2nlqqu8jsp7" path="res://scenes/LoseOverlay.tscn" id="18_45i86"]
-[ext_resource type="PackedScene" uid="uid://dg6thvenjwum" path="res://scenes/SelectedUnitView.tscn" id="23_bneo8"]
+[ext_resource type="PackedScene" uid="uid://c3555l7i2drjl" path="res://scenes/SelectedUnitView.tscn" id="23_bneo8"]
 
 [node name="GameRoot" type="Node2D" unique_id=1161755743]
 
