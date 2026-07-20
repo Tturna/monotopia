@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bynu3i6uj6t7r" path="res://scripts/TileGrid.cs" id="1_vjgi4"]
 [ext_resource type="PackedScene" uid="uid://bvkmb23pk35le" path="res://scenes/Tile.tscn" id="2_kyk2p"]
 [ext_resource type="PackedScene" uid="uid://c4ae5yt0wa1il" path="res://scenes/City.tscn" id="3_45i86"]
+[ext_resource type="PackedScene" uid="uid://rxuropmlnqyg" path="res://scenes/ResidentialTile.tscn" id="3_ocgqw"]
 [ext_resource type="Texture2D" uid="uid://drabk7btini6x" path="res://sprites/villagetile.png" id="4_sv1m6"]
 [ext_resource type="Texture2D" uid="uid://ceb6fnywpv652" path="res://sprites/towntile.png" id="5_a8wo8"]
 [ext_resource type="Script" uid="uid://14p5a2axlcx1" path="res://scripts/TurnSystem.cs" id="7_bneo8"]
@@ -29,6 +30,7 @@
 [node name="TileGrid" type="Node2D" parent="." unique_id=1726203210]
 script = ExtResource("1_vjgi4")
 TileScene = ExtResource("2_kyk2p")
+ResidentialTileScene = ExtResource("3_ocgqw")
 CityScene = ExtResource("3_45i86")
 villageTileTexture = ExtResource("4_sv1m6")
 townTileTexture = ExtResource("5_a8wo8")

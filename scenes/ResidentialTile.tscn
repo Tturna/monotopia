@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://rxuropmlnqyg"]
+
+[ext_resource type="Script" uid="uid://mcxu7srwmq4v" path="res://scripts/ResidentialTileController.cs" id="1_1tgfn"]
+[ext_resource type="PackedScene" uid="uid://bvkmb23pk35le" path="res://scenes/Tile.tscn" id="2_xaord"]
+[ext_resource type="Texture2D" uid="uid://b1xanc8whtjei" path="res://sprites/residentialtile.png" id="3_1tgfn"]
+
+[node name="City" type="Node2D" unique_id=1510732706]
+script = ExtResource("1_1tgfn")
+
+[node name="Sprite2D" parent="." unique_id=1765061921 instance=ExtResource("2_xaord")]
+show_behind_parent = true
+texture = ExtResource("3_1tgfn")
+script = null

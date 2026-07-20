@@ -8,6 +8,8 @@ public partial class TileGrid : Node2D
     [Export]
     public required PackedScene TileScene;
     [Export]
+    public required PackedScene ResidentialTileScene;
+    [Export]
     public required PackedScene CityScene;
     [Export]
     public required Texture2D villageTileTexture;
@@ -29,6 +31,12 @@ public partial class TileGrid : Node2D
     ];
     private static int spawnPointsLeft;
     private static AStar2D astar = null!;
+    private static Vector2I[] tempResidentialTilePositions = [
+        new (0, 4),
+        new (2, 7),
+        new (5, 1),
+        new (7, 4)
+    ];
 
     public override void _EnterTree()
     {
@@ -36,11 +44,29 @@ public partial class TileGrid : Node2D
         spawnPointsLeft = playerTileSpawnPoints.Length;
     }
 
-	public override void _Ready()
-	{
+    public override void _Ready()
+    {
         InitializeGeneralTileSize();
         astar = new();
 
+        GenerateBaseGrid(astar);
+        ConnectAstarNeighbors(astar);
+        GenerateResidentialTiles();
+    }
+
+    private void InitializeGeneralTileSize()
+    {
+        var tileSceneState = TileScene.GetState();
+        var nodeIndex = 0; // First node in the scene
+        var propertyIndex = 0; // First propery in the node (should be texture for Sprite2D)
+        var tileTextureVariant = tileSceneState.GetNodePropertyValue(nodeIndex, propertyIndex);
+        var tileTexture = (Texture2D)tileTextureVariant;
+        var textureSize = tileTexture.GetSize();
+        TilePixelSize = new Vector2I((int)textureSize.X, (int)textureSize.Y);
+    }
+
+    private void GenerateBaseGrid(AStar2D astar)
+    {
         for (var y = 0; y < TilesHeight; y++)
         {
             for (var x = 0; x < TilesWidth; x++)
@@ -51,7 +77,10 @@ public partial class TileGrid : Node2D
                 astar.AddPoint(astar.GetPointCount(), tilePos);
             }
         }
+    }
 
+    private void ConnectAstarNeighbors(AStar2D astar)
+    {
         for (var y = 0; y < TilesHeight; y++)
         {
             for (var x = 0; x < TilesWidth; x++)
@@ -67,17 +96,6 @@ public partial class TileGrid : Node2D
                 }
             }
         }
-	}
-
-    private void InitializeGeneralTileSize()
-    {
-        var tileSceneState = TileScene.GetState();
-        var nodeIndex = 0; // First node in the scene
-        var propertyIndex = 0; // First propery in the node (should be texture for Sprite2D)
-        var tileTextureVariant = tileSceneState.GetNodePropertyValue(nodeIndex, propertyIndex);
-        var tileTexture = (Texture2D)tileTextureVariant;
-        var textureSize = tileTexture.GetSize();
-        TilePixelSize = new Vector2I((int)textureSize.X, (int)textureSize.Y);
     }
 
     private TileController InstantiateMapElement(PackedScene scene)
@@ -101,6 +119,23 @@ public partial class TileGrid : Node2D
         mapElementInstance.TilePosition = tilePosition;
 
         return mapElementInstance;
+    }
+
+    private void GenerateResidentialTiles()
+    {
+        foreach (var tilePosition in tempResidentialTilePositions)
+        {
+            var residentialTileNode = Instance.AddMapElement(tilePosition, Instance.ResidentialTileScene);
+            var residentialTile = (ResidentialTileController)residentialTileNode;
+            residentialTile.Initialize();
+            EntitySelector.SetTile(tilePosition, residentialTile);
+
+            var residentsLabel = new Label();
+            residentsLabel.Text = residentialTile.Residents.ToString();
+            residentsLabel.Size = TilePixelSize;
+            residentsLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            residentialTile.AddChild(residentsLabel);
+        }
     }
 
     public static bool TryGetPlayerTileSpawnPoint(out Vector2I tileSpawnPoint)
@@ -182,12 +217,12 @@ public partial class TileGrid : Node2D
     public static CityController? GetTileOwner(Vector2I tilePosition)
     {
         if (!EntitySelector.TryGetTile(tilePosition, out var tileController)
-            || tileController is null)
+                || tileController is null)
         {
             throw new ArgumentOutOfRangeException(
-                paramName: nameof(tilePosition),
-                message: "Given tile position is out of bounds."
-            );
+                    paramName: nameof(tilePosition),
+                    message: "Given tile position is out of bounds."
+                    );
         }
 
         return tileController.OwnerCity;
