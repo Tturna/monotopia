@@ -230,26 +230,29 @@ public partial class UIController : Node2D
         var nameLabel = (Label)selectedUnitViewControl.FindChild("UnitNameLabel");
         nameLabel.Text = unit.GetUnitName();
 
-        var unitActions = unit.GetCombinedUnitActions();
-        var actionButtonContainer = selectedUnitViewControl.FindChild("Action Button Container");
-        
-        foreach (var unitAction in unitActions)
+        if (unit.GetOwnerEmpire().IsPlayerEmpire)
         {
-            var button = new Button();
-            button.Text = unitAction.ActionName;
-            actionButtonContainer.AddChild(button);
+            var unitActions = unit.GetCombinedUnitActions();
+            var actionButtonContainer = selectedUnitViewControl.FindChild("Action Button Container");
 
-            if (unitAction.IsSingleUse)
+            foreach (var unitAction in unitActions)
             {
-                button.Pressed += () => {
-                    unitAction.ActionCallback();
-                    actionButtonContainer.RemoveChild(button);
-                    button.QueueFree();
-                };
-            }
-            else
-            {
-                button.Pressed += unitAction.ActionCallback;
+                var button = new Button();
+                button.Text = unitAction.ActionName;
+                actionButtonContainer.AddChild(button);
+
+                if (unitAction.IsSingleUse)
+                {
+                    button.Pressed += () => {
+                        unitAction.ActionCallback();
+                        actionButtonContainer.RemoveChild(button);
+                        button.QueueFree();
+                    };
+                }
+                else
+                {
+                    button.Pressed += unitAction.ActionCallback;
+                }
             }
         }
     }

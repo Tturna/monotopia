@@ -27,6 +27,19 @@ public partial class FounderUnit : BaseUnit, IBuildable
             return;
         }
 
+        var requesterPeerId = Multiplayer.GetRemoteSenderId();
+
+        // The server doesn't send an RPC so remote sender ID doesn't match its peer ID.
+        if (requesterPeerId == 0)
+        {
+            requesterPeerId = 1;
+        }
+
+        if (requesterPeerId != OwnerEmpire.GetOwnerPeerId())
+        {
+            throw new InvalidOperationException("Requested HQ spawn from an unowned unit.");
+        }
+
         var cityUid = Guid.NewGuid().ToString();
         OwnerEmpire.AddNewCityToEmpire(TilePosition, cityUid);
         Rpc(MethodName.SyncSpawnHQ, cityUid);
