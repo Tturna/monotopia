@@ -4,55 +4,55 @@ using Godot;
 #nullable enable
 public static class EntitySelector
 {
-    private static Dictionary<Vector2I, BaseUnit?> unitMap = new();
-    private static Dictionary<Vector2I, TileController> tileMap = new();
-    private static Dictionary<string, CityController> cityIdMap = new();
-    private static Dictionary<string, EmpireController> empireIdMap = new();
+	private static Dictionary<Vector2I, BaseUnit?> unitMap = new();
+	private static Dictionary<Vector2I, TileController> tileMap = new();
+	private static Dictionary<string, CityController> cityIdMap = new();
+	private static Dictionary<string, EmpireController> empireIdMap = new();
 
-    public static void AddTile(Vector2I tilePosition, TileController tileController)
-    {
-        tileMap.Add(tilePosition, tileController);
-    }
+	public static void AddTile(Vector2I tilePosition, TileController tileController)
+	{
+		tileMap.Add(tilePosition, tileController);
+	}
 
-    public static void SetTile(Vector2I tilePosition, TileController tileController)
-    {
-        if (!tileMap.ContainsKey(tilePosition))
-        {
-            tileMap.Add(tilePosition, tileController);
+	public static void SetTile(Vector2I tilePosition, TileController tileController)
+	{
+		if (!tileMap.ContainsKey(tilePosition))
+		{
+			tileMap.Add(tilePosition, tileController);
 
-            return;
-        }
+			return;
+		}
 
-        tileMap[tilePosition].QueueFree();
-        tileMap[tilePosition] = tileController;
-    }
+		tileMap[tilePosition].QueueFree();
+		tileMap[tilePosition] = tileController;
+	}
 
-    public static bool TrySetTileOwner(Vector2I tilePosition, CityController? ownerCity)
-    {
-        if (!TryGetTile(tilePosition, out var tileController)) return false;
-        if (tileController is null) return false;
+	public static bool TrySetTileOwner(Vector2I tilePosition, CityController? ownerCity)
+	{
+		if (!TryGetTile(tilePosition, out var tileController)) return false;
+		if (tileController is null) return false;
 
-        tileController.OwnerCity = ownerCity;
+		tileController.OwnerCity = ownerCity;
 
-        return true;
-    }
+		return true;
+	}
 
-    public static bool TryGetTile(Vector2I tilePosition, out TileController? tileController)
-    {
-        tileController = null;
+	public static bool TryGetTile(Vector2I tilePosition, out TileController? tileController)
+	{
+		tileController = null;
 
-        if (!tileMap.ContainsKey(tilePosition)) return false;
+		if (!tileMap.ContainsKey(tilePosition)) return false;
 
-        tileController = tileMap[tilePosition];
+		tileController = tileMap[tilePosition];
 
-        return true;
-    }
+		return true;
+	}
 
-    public static void SetUnit(Vector2I tilePosition, BaseUnit? unitOnTile)
-    {
-        if (!unitMap.ContainsKey(tilePosition))
-        {
-            // If setting a non existent entry to null, don't bother
+	public static void SetUnit(Vector2I tilePosition, BaseUnit? unitOnTile)
+	{
+		if (!unitMap.ContainsKey(tilePosition))
+		{
+			// If setting a non existent entry to null, don't bother
             if (unitOnTile is null) return;
 
             unitMap.Add(tilePosition, unitOnTile);
