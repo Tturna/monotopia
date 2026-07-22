@@ -10,6 +10,8 @@ public partial class FounderUnit : BaseUnit, IBuildable
     public static bool IsUnit => true;
     public static Texture2D Sprite => (Texture2D)GD.Load("res://sprites/warrior.png");
 
+    private InfluenceSystem influenceSystem;
+
     public FounderUnit(EmpireController unitOwner) : base(unitOwner)
     {
         MovementRange = 2;
@@ -17,6 +19,11 @@ public partial class FounderUnit : BaseUnit, IBuildable
 
     public override Texture2D GetSprite() => Sprite;
     public override string GetUnitName() => ItemName;
+
+    public override void _Ready()
+    {
+        influenceSystem = GodotUtilities.FindNodeOfType<InfluenceSystem>(GetTree().Root);
+    }
 
     [Rpc(mode: MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
     private void RequestSpawnHQ()
@@ -43,6 +50,8 @@ public partial class FounderUnit : BaseUnit, IBuildable
         var cityUid = Guid.NewGuid().ToString();
         OwnerEmpire.AddNewCityToEmpire(TilePosition, cityUid);
         Rpc(MethodName.SyncSpawnHQ, cityUid);
+
+        influenceSystem.RequestAddAreaOfInfluence(TilePosition, influenceAmount: 4, radius: 2);
     }
 
     [Rpc()]

@@ -154,7 +154,7 @@ public partial class EmpireController : Node2D
 		}
 
 		cities.Add(targetCity);
-		targetCity.SetOwnerEmpire(this, cities[0].BorderColor);
+		targetCity.SetOwnerEmpire(this);
 		DebugUtility.Print($"Sync annex city {targetCityUid} for empire {EmpireUid}. Empire {EmpireUid} now has {cities.Count} cities");
 
 		if (IsPlayerEmpire || Multiplayer.IsServer())
