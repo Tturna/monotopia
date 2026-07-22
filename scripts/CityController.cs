@@ -51,10 +51,6 @@ public partial class CityController : TileController
         TakeControlOfTile(CityTilePosition + new Vector2I(0, 2));
         TakeControlOfTile(CityTilePosition + new Vector2I(2, 0));
         TakeControlOfTile(CityTilePosition + new Vector2I(-2, 0));
-
-        var a = 0.65f;
-        var empirePrimaryColor = ownerEmpire.EmpirePrimaryColor;
-        empirePrimaryColor.A = a;
     }
 
     public void SetOwnerEmpire(EmpireController newOwner)

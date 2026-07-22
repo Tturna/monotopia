@@ -347,4 +347,19 @@ public partial class EmpireController : Node2D
 			empire.IsFrozen = true;
 		}
 	}
+
+    public static EmpireController GetPeerEmpire(long peerId)
+    {
+        var empiresDict = EntitySelector.GetEmpiresDict();
+
+        foreach (var empire in empiresDict.Values)
+        {
+            if (empire.GetOwnerPeerId() == peerId)
+            {
+                return empire;
+            }
+        }
+
+        throw new InvalidOperationException("No empire found for given peer ID");
+    }
 }

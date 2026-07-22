@@ -8,6 +8,10 @@ public partial class InfluenceSystem : Node
     // Each tile (Vector2I) has a dictionary of players' peer IDs (long) and
     // their influence (int) over the tile
     private Dictionary<Vector2I, Dictionary<long, int>> tileInfluences = new();
+    // Each tile has a peer ID that controls the most influence over it
+    private Dictionary<Vector2I, long> topTileInfluencers = new();
+    // Each peer has a hash set of tiles they have the most influence over.
+    private Dictionary<long, HashSet<Vector2I>> playerTopInfluenceTiles = new();
     private Dictionary<long, Polygon2D> playerInfluencePolygons = new();
 
     // temp
@@ -79,6 +83,8 @@ public partial class InfluenceSystem : Node
             requesterPeedId = 1;
         }
 
+        List<long> peersWhosePolygonsNeedUpdating = new();
+
         for (var yOffset = -radius; yOffset <= radius; yOffset++)
         {
             for (var xOffset = -radius; xOffset <= radius; xOffset++)
@@ -102,9 +108,106 @@ public partial class InfluenceSystem : Node
                 var influenceGain = influenceAmount * influenceFalloffMultiplier;
                 playerInfluencesDict[requesterPeedId] += (int)influenceGain;
 
+                List<long> peersSharingHighestInfluence = new();
+                var highestInfluence = 0;
+
+                foreach (var (peerId, influence) in playerInfluencesDict)
+                {
+                    if (influence > highestInfluence)
+                    {
+                        highestInfluence = influence;
+                        peersSharingHighestInfluence.Clear();
+                        peersSharingHighestInfluence.Add(peerId);
+                    }
+                    else if (influence == highestInfluence)
+                    {
+                        peersSharingHighestInfluence.Add(peerId);
+                    }
+                }
+
+                // debug
+                if (tilePos.X == 3 && tilePos.Y == 1)
+                {
+                    DebugUtility.Print($"The following peers share the highest influence on tile {tilePos}:");
+                    foreach (var peerId in peersSharingHighestInfluence)
+                    {
+                        DebugUtility.Print(peerId.ToString());
+                    }
+                    DebugUtility.Print("-----");
+                }
+
+                long topInfluencer = 0;
+
+                // Only randomize real owner when the it's relevant for the requester.
+                // Otherwise the ambiguity between players can resolve differently
+                // when another party changes their own influence over this tile even if
+                // the influence wouldn't be significant.
+                if (peersSharingHighestInfluence.Contains(requesterPeedId))
+                {
+                    var randomPeerIndex = Random.Shared.Next(0, peersSharingHighestInfluence.Count);
+                    topInfluencer = peersSharingHighestInfluence[randomPeerIndex];
+                }
+
+                long oldTopInfluencer = 0;
+
+                if (!topTileInfluencers.ContainsKey(tilePos))
+                {
+                    topTileInfluencers.Add(tilePos, 0);
+                }
+                else
+                {
+                    oldTopInfluencer = topTileInfluencers[tilePos];
+
+                    if (topInfluencer == 0)
+                    {
+                        topInfluencer = oldTopInfluencer;
+                    }
+                }
+
+                topTileInfluencers[tilePos] = topInfluencer;
+
+                var oldTopIsNewTop = oldTopInfluencer == topInfluencer;
+
+                if (oldTopInfluencer > 0 && !oldTopIsNewTop)
+                {
+                    playerTopInfluenceTiles[oldTopInfluencer].Remove(tilePos);
+                    peersWhosePolygonsNeedUpdating.Add(oldTopInfluencer);
+                }
+
+                if (!playerTopInfluenceTiles.ContainsKey(topInfluencer))
+                {
+                    playerTopInfluenceTiles.Add(topInfluencer, new());
+                }
+
+                if (!playerTopInfluenceTiles[topInfluencer].Contains(tilePos))
+                {
+                    playerTopInfluenceTiles[topInfluencer].Add(tilePos);
+                    peersWhosePolygonsNeedUpdating.Add(topInfluencer);
+                }
+
                 // TODO: Consider whether it would be better to RPC all updated tiles at once instead
                 Rpc(MethodName.SyncTileInfluenceForPeer, tilePos, requesterPeedId, playerInfluencesDict[requesterPeedId]);
             }
+        }
+
+        foreach (var peerId in peersWhosePolygonsNeedUpdating)
+        {
+            if (!playerInfluencePolygons.ContainsKey(peerId))
+            {
+                var newPolygon = new Polygon2D();
+                playerInfluencePolygons.Add(peerId, newPolygon);
+                AddChild(newPolygon);
+                newPolygon.GlobalPosition = Vector2I.Zero;
+            }
+
+            var tiles = new Vector2I[playerTopInfluenceTiles[peerId].Count];
+            playerTopInfluenceTiles[peerId].CopyTo(tiles, 0);
+            var polygonVertices = CityBorderBuilder.Polygon2DFromTilePositions(tiles);
+            playerInfluencePolygons[peerId].Polygon = polygonVertices;
+
+            var empireColor = EmpireController.GetPeerEmpire(peerId).EmpirePrimaryColor;
+            empireColor.A = 0.65f;
+            playerInfluencePolygons[peerId].Color = empireColor;
         }
     }
 }
