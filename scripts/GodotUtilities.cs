@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Godot;
 
@@ -34,11 +35,17 @@ public static class GodotUtilities
 	}
 
     /// <summary>
-    /// Find the first node of type T from the given parent node's children.
+    /// Find the first node of type T from the given parent node's children. Throws if none are found.
     /// </summary>
     public static T FindNodeOfType<T>(Node parentNode, bool recursive = true) where T : Node
     {
         var results = FindNodesOfType<T>(parentNode, recursive, maxResults: 1);
+
+        if (results.Length == 0)
+        {
+            throw new InvalidOperationException("Given node type was not found from the node tree.");
+        }
+
         return results[0];
     }
 }
