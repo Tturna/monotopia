@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://ceb6fnywpv652" path="res://sprites/towntile.png" id="5_a8wo8"]
 [ext_resource type="Script" uid="uid://14p5a2axlcx1" path="res://scripts/TurnSystem.cs" id="7_bneo8"]
 [ext_resource type="Script" uid="uid://bgap8x3lwh8dn" path="res://scripts/InfluenceSystem.cs" id="8_jbgew"]
+[ext_resource type="Script" uid="uid://by83tppbseicc" path="res://scripts/InfluencePolygonBuilder.cs" id="9_a85ww"]
 [ext_resource type="Script" uid="uid://cg1myavcyc6vy" path="res://scripts/UnitSpawner.cs" id="9_jbgew"]
 [ext_resource type="PackedScene" uid="uid://cmjujoq33e31k" path="res://scenes/TileSelection.tscn" id="10_a8wo8"]
 [ext_resource type="PackedScene" uid="uid://p68qne1qiojk" path="res://scenes/ReachableTileIndicator.tscn" id="11_attvq"]
@@ -41,6 +42,9 @@ script = ExtResource("7_bneo8")
 
 [node name="InfluenceSystem" type="Node2D" parent="." unique_id=1964608359]
 script = ExtResource("8_jbgew")
+
+[node name="InfluencePolygonBuilder" type="Node2D" parent="InfluenceSystem" unique_id=377117743]
+script = ExtResource("9_a85ww")
 
 [node name="UnitSpawner" type="Node2D" parent="." unique_id=1947486371 node_paths=PackedStringArray("UnitsContainer")]
 script = ExtResource("9_jbgew")

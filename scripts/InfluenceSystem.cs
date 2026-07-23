@@ -11,8 +11,9 @@ public partial class InfluenceSystem : Node
     // Each tile has a peer ID that controls the most influence over it
     private Dictionary<Vector2I, long> topTileInfluencers = new();
     // Each peer has a hash set of tiles they have the most influence over.
-    private Dictionary<long, HashSet<Vector2I>> playerTopInfluenceTiles = new();
-    private Dictionary<long, Polygon2D> playerInfluencePolygons = new();
+    private Dictionary<long, HashSet<Vector2I>> peerTopInfluenceTiles = new();
+
+    private InfluencePolygonBuilder polygonBuilder = null!;
 
     // temp
     private PlayerInputController inputController = null!;
@@ -20,6 +21,7 @@ public partial class InfluenceSystem : Node
     public override void _Ready()
     {
         inputController = GodotUtilities.FindNodeOfType<PlayerInputController>(GetTree().Root);
+        polygonBuilder = GodotUtilities.FindNodeOfType<InfluencePolygonBuilder>(GetTree().Root);
     }
 
     public override void _Input(InputEvent inputEvent)
@@ -159,18 +161,18 @@ public partial class InfluenceSystem : Node
 
                 if (oldTopInfluencer > 0 && !oldTopIsNewTop)
                 {
-                    playerTopInfluenceTiles[oldTopInfluencer].Remove(tilePos);
+                    peerTopInfluenceTiles[oldTopInfluencer].Remove(tilePos);
                     peersWhosePolygonsNeedUpdating.Add(oldTopInfluencer);
                 }
 
-                if (!playerTopInfluenceTiles.ContainsKey(topInfluencer))
+                if (!peerTopInfluenceTiles.ContainsKey(topInfluencer))
                 {
-                    playerTopInfluenceTiles.Add(topInfluencer, new());
+                    peerTopInfluenceTiles.Add(topInfluencer, new());
                 }
 
-                if (!playerTopInfluenceTiles[topInfluencer].Contains(tilePos))
+                if (!peerTopInfluenceTiles[topInfluencer].Contains(tilePos))
                 {
-                    playerTopInfluenceTiles[topInfluencer].Add(tilePos);
+                    peerTopInfluenceTiles[topInfluencer].Add(tilePos);
                     peersWhosePolygonsNeedUpdating.Add(topInfluencer);
                 }
 
@@ -181,23 +183,9 @@ public partial class InfluenceSystem : Node
 
         foreach (var peerId in peersWhosePolygonsNeedUpdating)
         {
-            if (!playerInfluencePolygons.ContainsKey(peerId))
-            {
-                var newPolygon = new Polygon2D();
-                playerInfluencePolygons.Add(peerId, newPolygon);
-                AddChild(newPolygon);
-                newPolygon.GlobalPosition = Vector2I.Zero;
-            }
-
-            var tiles = new Vector2I[playerTopInfluenceTiles[peerId].Count];
-            playerTopInfluenceTiles[peerId].CopyTo(tiles, 0);
-
-            var polygonVertices = CityBorderBuilder.Polygon2DFromTilePositions(tiles);
-            playerInfluencePolygons[peerId].Polygon = polygonVertices;
-
             var empireColor = EmpireController.GetPeerEmpire(peerId).EmpirePrimaryColor;
             empireColor.A = 0.65f;
-            playerInfluencePolygons[peerId].Color = empireColor;
+            polygonBuilder.SetPeerInfluenceTiles(peerId, peerTopInfluenceTiles[peerId], empireColor);
         }
     }
 }
