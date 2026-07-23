@@ -83,7 +83,7 @@ public partial class InfluenceSystem : Node
             requesterPeedId = 1;
         }
 
-        List<long> peersWhosePolygonsNeedUpdating = new();
+        HashSet<long> peersWhosePolygonsNeedUpdating = new();
 
         for (var yOffset = -radius; yOffset <= radius; yOffset++)
         {
@@ -123,17 +123,6 @@ public partial class InfluenceSystem : Node
                     {
                         peersSharingHighestInfluence.Add(peerId);
                     }
-                }
-
-                // debug
-                if (tilePos.X == 3 && tilePos.Y == 1)
-                {
-                    DebugUtility.Print($"The following peers share the highest influence on tile {tilePos}:");
-                    foreach (var peerId in peersSharingHighestInfluence)
-                    {
-                        DebugUtility.Print(peerId.ToString());
-                    }
-                    DebugUtility.Print("-----");
                 }
 
                 long topInfluencer = 0;
@@ -202,6 +191,7 @@ public partial class InfluenceSystem : Node
 
             var tiles = new Vector2I[playerTopInfluenceTiles[peerId].Count];
             playerTopInfluenceTiles[peerId].CopyTo(tiles, 0);
+
             var polygonVertices = CityBorderBuilder.Polygon2DFromTilePositions(tiles);
             playerInfluencePolygons[peerId].Polygon = polygonVertices;
 

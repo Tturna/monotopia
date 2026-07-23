@@ -137,6 +137,20 @@ public static class CityBorderBuilder
             }
         }
 
+        DebugUtility.Print("Edges touching vertices:");
+
+        foreach (var (vertex, edges) in edgesTouchingVertices)
+        {
+            DebugUtility.Print($"> Edges touching vertex {vertex}:");
+
+            foreach (var edge in edges)
+            {
+                DebugUtility.Print($"- - - A: {edge.A}, B: {edge.B}");
+            }
+
+            DebugUtility.Print("=====");
+        }
+
         List<Vector2I> orderedBorderTileVertices = new();
 
         var currentEdge = unorderedBorderEdges[0];
