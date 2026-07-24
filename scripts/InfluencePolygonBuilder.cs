@@ -26,8 +26,30 @@ public partial class InfluencePolygonBuilder : Node
             }
 
             // TODO: Pool polygons
-            tilePolygons[tile].QueueFree();
-            tilePolygons.Remove(tile);
+
+            // Remove tile unless someone else controls it at this point. This can happen if
+            // influence tiles are updated and the control of a tile changes from one player
+            // to another in one frame. If the new tile controller is updated first, this
+            // would take away their polygon unless we check for that here.
+
+            var otherControllerExists = false;
+
+            foreach (var (peerId, influenceTilesSet) in peerInfluenceTiles)
+            {
+                if (peerId == peer) continue;
+
+                if (influenceTilesSet.Contains(tile))
+                {
+                    otherControllerExists = true;
+                    break;
+                }
+            }
+
+            if (!otherControllerExists)
+            {
+                tilePolygons[tile].QueueFree();
+                tilePolygons.Remove(tile);
+            }
         }
 
         peerInfluenceTiles[peer] = newTiles;
