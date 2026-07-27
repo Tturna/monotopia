@@ -7,14 +7,21 @@ public partial class InfluencePolygonBuilder : Node
     private static Dictionary<long, HashSet<Vector2I>> peerInfluenceTiles = new();
     private static Dictionary<Vector2I, Polygon2D> tilePolygons = new();
 
-    public void SetPeerInfluenceTiles(long peer, IEnumerable<Vector2I> tilePositions, Color peerColor)
+    [Rpc(CallLocal = true)]
+    private void SetPeerInfluenceTiles(long peer, Vector2[] tilePositions, Color peerColor)
     {
         if (!peerInfluenceTiles.ContainsKey(peer))
         {
             peerInfluenceTiles.Add(peer, new());
         }
 
-        HashSet<Vector2I> newTiles = new(tilePositions);
+        HashSet<Vector2I> newTiles = new();
+
+        foreach (var tilePosition in tilePositions)
+        {
+            newTiles.Add(new Vector2I((int)tilePosition.X, (int)tilePosition.Y));
+        }
+
         var tilesNoLongerControlled = peerInfluenceTiles[peer];
         tilesNoLongerControlled.ExceptWith(newTiles);
 
@@ -78,5 +85,15 @@ public partial class InfluencePolygonBuilder : Node
                 tilePolygons.Add(tile, newPolygon);
             }
         }
+    }
+
+    public void SyncPeerInfluenceTiles(long peer, Vector2[] tilePositions, Color peerColor)
+    {
+        if (!Multiplayer.IsServer())
+        {
+            throw new InvalidOperationException("Tried to sync peer influence tiles directly from a client.");
+        }
+
+        Rpc(MethodName.SetPeerInfluenceTiles, peer, tilePositions, peerColor);
     }
 }

@@ -71,7 +71,7 @@ public partial class InfluenceSystem : Node
     [Rpc(mode: MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
     public void RequestAddAreaOfInfluence(Vector2I centerTilePosition, int influenceAmount, int radius = 1)
     {
-        if (Multiplayer.GetUniqueId() != 1)
+        if (!Multiplayer.IsServer())
         {
             RpcId(1, MethodName.RequestAddAreaOfInfluence, centerTilePosition, influenceAmount, radius);
             return;
@@ -185,7 +185,15 @@ public partial class InfluenceSystem : Node
         {
             var empireColor = EmpireController.GetPeerEmpire(peerId).EmpirePrimaryColor;
             empireColor.A = 0.65f;
-            polygonBuilder.SetPeerInfluenceTiles(peerId, peerTopInfluenceTiles[peerId], empireColor);
+            var influenceTiles = new Vector2[peerTopInfluenceTiles[peerId].Count];
+            var i = 0;
+
+            foreach (var topInfluenceTile in peerTopInfluenceTiles[peerId])
+            {
+                influenceTiles[i++] = (Vector2)topInfluenceTile;
+            }
+
+            polygonBuilder.SyncPeerInfluenceTiles(peerId, influenceTiles, empireColor);
         }
     }
 }
