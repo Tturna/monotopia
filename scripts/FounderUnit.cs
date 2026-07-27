@@ -23,6 +23,7 @@ public partial class FounderUnit : BaseUnit, IBuildable
     public override void _Ready()
     {
         influenceSystem = GodotUtilities.FindNodeOfType<InfluenceSystem>(GetTree().Root);
+        base._Ready();
     }
 
     [Rpc(mode: MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]

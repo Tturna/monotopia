@@ -26,6 +26,7 @@ public abstract partial class BaseUnit : Sprite2D
 	protected bool HasMovedThisTurn { get; private set; }
 
 	private bool hasInitializedPosition;
+    private bool readyCalled;
 
 	public BaseUnit(EmpireController unitOwner)
 	{
@@ -36,6 +37,7 @@ public abstract partial class BaseUnit : Sprite2D
 
 	public override void _Ready()
 	{
+        readyCalled = true;
 		ResetTurnState();
 		Health = MaxHealth;
 		TurnSystem = GodotUtilities.FindNodeOfType<TurnSystem>(GetTree().Root);
@@ -54,6 +56,14 @@ public abstract partial class BaseUnit : Sprite2D
 	public abstract Texture2D GetSprite();
 	public abstract string GetUnitName();
 	public abstract UnitAction[] GetUnitActions();
+
+    private void CheckBaseUnitSetup()
+    {
+        if (!readyCalled)
+        {
+            GD.PushWarning($"BaseUnit _Ready() not called for unit {GetUnitName()} at {TilePosition}. This will probably cause issues. Make sure to call base functions when overriding Godot callbacks.");
+        }
+    }
 
 	public UnitAction[] GetBaseUnitActions()
 	{
@@ -78,9 +88,10 @@ public abstract partial class BaseUnit : Sprite2D
 		if (!Multiplayer.IsServer()) return;
 
 		var ownerEmpire = GetOwnerEmpire();
+        var ownerPeer = ownerEmpire.GetOwnerPeerId();
 
 		ResetTurnState();
-		RpcId(ownerEmpire.GetOwnerPeerId(), MethodName.ResetTurnState);
+		RpcId(ownerPeer, MethodName.ResetTurnState);
 	}
 
 	public Dictionary<Vector2I, int> GetReachableTilesWithCosts()
@@ -143,6 +154,8 @@ public abstract partial class BaseUnit : Sprite2D
 	[Rpc(mode: MultiplayerApi.RpcMode.AnyPeer)]
 	public void RequestMoveToTile(Vector2I tilePosition)
 	{
+        CheckBaseUnitSetup();
+
 		if (!Multiplayer.IsServer())
 		{
 			RpcId(1, MethodName.RequestMoveToTile, tilePosition);
