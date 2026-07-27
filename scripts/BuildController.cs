@@ -5,7 +5,8 @@ public partial class BuildController : Node2D
 {
     public enum BuildableItemType
     {
-        Founder
+        Founder,
+        ExpansionTeam
     }
 
     public static BuildController Instance;
@@ -25,7 +26,7 @@ public partial class BuildController : Node2D
 
     public static BuildableItemInfo GetBuildableItemInfo(BuildableItemType itemType) => itemType switch
     {
-        BuildableItemType.Founder => InfoFrom<FounderUnit>(),
+        BuildableItemType.ExpansionTeam => InfoFrom<ExpansionTeamUnit>(),
         _ => throw new ArgumentOutOfRangeException(nameof(itemType))
     };
 
@@ -35,7 +36,7 @@ public partial class BuildController : Node2D
 	{
 		return
 		[
-			BuildController.BuildableItemType.Founder
+			BuildController.BuildableItemType.ExpansionTeam
 		];
 	}
 

@@ -231,6 +231,12 @@ public partial class EmpireController : Node2D
 		DebugUtility.Print($"Empire {EmpireUid} now has {cities.Count} cities");
 	}
 
+    public void AddNewStoreToEmpire(Vector2I tilePosition, string newStoreUid)
+    {
+        var storeController = TileGrid.AddStore(tilePosition);
+        storeController.InitializeStore(tilePosition, newStoreUid);
+    }
+
 	[Rpc(mode: MultiplayerApi.RpcMode.AnyPeer)]
 	public void RequestAnnexCity(string targetCityUid)
 	{

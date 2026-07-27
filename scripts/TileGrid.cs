@@ -12,6 +12,8 @@ public partial class TileGrid : Node2D
     [Export]
     public required PackedScene CityScene;
     [Export]
+    public required PackedScene StoreScene;
+    [Export]
     public required Texture2D villageTileTexture;
     [Export]
     public required Texture2D townTileTexture;
@@ -154,13 +156,22 @@ public partial class TileGrid : Node2D
         return true;
     }
 
+    private static T AddSpecialTile<T>(Vector2I tilePosition, PackedScene scene) where T : TileController
+    {
+        var node = Instance.AddMapElement(tilePosition, scene);
+        var controller = (T)node;
+        EntitySelector.SetTile(tilePosition, controller);
+        return controller;
+    }
+
     public static CityController AddCity(Vector2I tilePosition)
     {
-        var cityNode = Instance.AddMapElement(tilePosition, Instance.CityScene);
-        var cityController = (CityController)cityNode;
-        EntitySelector.SetTile(tilePosition, cityController);
+        return AddSpecialTile<CityController>(tilePosition, Instance.CityScene);
+    }
 
-        return cityController;
+    public static StoreTileController AddStore(Vector2I tilePosition)
+    {
+        return AddSpecialTile<StoreTileController>(tilePosition, Instance.StoreScene);
     }
 
     public static Vector2 TileToWorldPosition(Vector2I tilePosition)

@@ -2,12 +2,8 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
-public partial class FounderUnit : BaseUnit, IBuildable
+public partial class FounderUnit : BaseUnit
 {
-    public static BuildController.BuildableItemType ItemType => BuildController.BuildableItemType.Founder;
-    public static string ItemName => "Founder";
-    public static int Cost => 2;
-    public static bool IsUnit => true;
     public static Texture2D Sprite => (Texture2D)GD.Load("res://sprites/warrior.png");
 
     private InfluenceSystem influenceSystem;
@@ -18,7 +14,7 @@ public partial class FounderUnit : BaseUnit, IBuildable
     }
 
     public override Texture2D GetSprite() => Sprite;
-    public override string GetUnitName() => ItemName;
+    public override string GetUnitName() => "Founder";
 
     public override void _Ready()
     {
@@ -29,7 +25,7 @@ public partial class FounderUnit : BaseUnit, IBuildable
     [Rpc(mode: MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
     private void RequestSpawnHQ()
     {
-        if (Multiplayer.GetUniqueId() != 1)
+        if (!Multiplayer.IsServer())
         {
             RpcId(1, MethodName.RequestSpawnHQ);
             return;
