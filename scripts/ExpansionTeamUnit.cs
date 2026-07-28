@@ -32,9 +32,18 @@ public partial class ExpansionTeamUnit : BaseUnit, IBuildable
             return;
         }
 
-        OwnerEmpire.AddNewStoreToEmpire(TilePosition, Guid.NewGuid().ToString());
+        var storeUid = Guid.NewGuid().ToString();
+        OwnerEmpire.AddNewStoreToEmpire(TilePosition, storeUid);
+        Rpc(MethodName.SyncSpawnStore, storeUid);
+
         influenceSystem.RequestAddAreaOfInfluence(TilePosition, influenceAmount: 4, radius: 3);
         RequestDeath();
+    }
+
+    [Rpc()]
+    private void SyncSpawnStore(string storeUid)
+    {
+        OwnerEmpire.AddNewStoreToEmpire(TilePosition, storeUid);
     }
 
     public override UnitAction[] GetUnitActions()
