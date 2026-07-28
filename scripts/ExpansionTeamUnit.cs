@@ -34,7 +34,7 @@ public partial class ExpansionTeamUnit : BaseUnit, IBuildable
 
         OwnerEmpire.AddNewStoreToEmpire(TilePosition, Guid.NewGuid().ToString());
         influenceSystem.RequestAddAreaOfInfluence(TilePosition, influenceAmount: 4, radius: 3);
-        Death();
+        RequestDeath();
     }
 
     public override UnitAction[] GetUnitActions()

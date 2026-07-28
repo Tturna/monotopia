@@ -315,16 +315,29 @@ public abstract partial class BaseUnit : Sprite2D
 		if (Health <= 0)
 		{
 			Health = 0;
-			Death();
+			RequestDeath();
 			return false;
 		}
 
 		return true;
 	}
 
-	public void Death()
-	{
+    [Rpc(CallLocal = true)]
+    private void SyncDeath()
+    {
 		EntitySelector.SetUnit(TilePosition, null);
 		QueueFree();
+    }
+
+    [Rpc()]
+	public void RequestDeath()
+	{
+        if (!Multiplayer.IsServer())
+        {
+            RpcId(1, MethodName.RequestDeath);
+            return;
+        }
+
+        Rpc(MethodName.SyncDeath);
 	}
 }
