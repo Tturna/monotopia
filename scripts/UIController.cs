@@ -11,6 +11,8 @@ public partial class UIController : Node2D
     [Export]
     private Control selectedUnitViewControl = null!;
     [Export]
+	private Label customersLabel = null!;
+    [Export]
 	private Label coinsLabel = null!;
     [Export]
     private Label turnCountLabel = null!;
@@ -267,6 +269,11 @@ public partial class UIController : Node2D
         {
             actionButtonContainer.GetChild(i).QueueFree();
         }
+    }
+
+    public void SetCustomerCountText(int customerCount)
+    {
+        customersLabel.Text = customerCount.ToString();
     }
 
     public void SetCoinBalanceText(int coins, int delta)

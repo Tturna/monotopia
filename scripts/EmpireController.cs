@@ -15,23 +15,28 @@ public partial class EmpireController : Node2D
 	public bool IsOwnUnitSelected { get; private set; }
 	public TileController? SelectedTile { get; private set; }
 	public bool HasSelection { get; private set; }
+    public int CustomerCount { get; private set; }
 
 	private List<CityController> cities = new();
 	
 	private long? ownerPeerId = null;
 	private BaseUnit? selectedUnit;
 	private Dictionary<Vector2I, int>? reachableTileCostMap;
+    private InfluenceSystem influenceSystem = null!;
 
 	public delegate void SelectionChangedHandler(EmpireController empire);
-	public delegate void CityAnnexedHandler();
 	public delegate void CoinsUpdatedHandler(int balance, int income);
-	public delegate void GameEndedHandler(bool isWinner);
+	public delegate void CustomersUpdatedHandler(int amount);
 	public delegate void UnitMovementPathUpdatedHandler(Vector2[] pathTiles);
 	public event SelectionChangedHandler? SelectionChanged;
-	public event CityAnnexedHandler? CityAnnexed;
 	public event CoinsUpdatedHandler? CoinsUpdated;
-	public event GameEndedHandler? GameEnded;
+	public event CustomersUpdatedHandler? CustomersUpdated;
 	public event UnitMovementPathUpdatedHandler? UnitMovementPathUpdated;
+
+    public override void _Ready()
+    {
+        influenceSystem = GodotUtilities.FindNodeOfType<InfluenceSystem>(GetTree().Root);
+    }
 
 	public bool IsActivePlayerEmpire()
 	{
@@ -128,61 +133,6 @@ public partial class EmpireController : Node2D
 	}
 
 	[Rpc(CallLocal = true)]
-	private void SyncReleaseCity(string targetCityUid)
-	{
-		var targetCity = cities.Find(city => city.CityUid == targetCityUid)!;
-		cities.Remove(targetCity);
-		DebugUtility.Print($"Sync release city {targetCityUid} from empire {EmpireUid}. Empire {EmpireUid} now has {cities.Count} cities");
-
-		if (IsPlayerEmpire || Multiplayer.IsServer())
-		{
-			TotalCoinIncome -= targetCity.CoinsGenerated;
-		}
-
-		if (IsPlayerEmpire && cities.Count == 0)
-		{
-			GameEnded?.Invoke(isWinner: false);
-		}
-	}
-
-	[Rpc(CallLocal = true)]
-	private void SyncAnnexCity(string targetCityUid)
-	{
-		if (!EntitySelector.TryGetCity(targetCityUid, out var targetCity) || targetCity is null)
-		{
-			throw new ArgumentException($"No city with given UID {targetCityUid} in empire {EmpireUid}. {EmpireUid} has {cities.Count} cities.");
-		}
-
-		cities.Add(targetCity);
-		targetCity.SetOwnerEmpire(this);
-		DebugUtility.Print($"Sync annex city {targetCityUid} for empire {EmpireUid}. Empire {EmpireUid} now has {cities.Count} cities");
-
-		if (IsPlayerEmpire || Multiplayer.IsServer())
-		{
-			TotalCoinIncome += targetCity.CoinsGenerated;
-		}
-
-		if (GetAliveEmpireCount(GetTree().Root) == 1)
-		{
-			FreezeAllEmpires(GetTree().Root);
-
-			if (IsPlayerEmpire)
-			{
-				GameEnded?.Invoke(isWinner: true);
-			}
-			else
-			{
-				GameEnded?.Invoke(isWinner: false);
-			}
-		}
-
-		if (Multiplayer.IsServer())
-		{
-			CityAnnexed?.Invoke();
-		}
-	}
-
-	[Rpc(CallLocal = true)]
 	private void SyncSetCoinState(int newCoinBalance, int newCoinIncome)
 	{
 		Coins = newCoinBalance;
@@ -222,13 +172,6 @@ public partial class EmpireController : Node2D
 		cityController.InitializeCity(tilePosition, ownerEmpire: this, newCityUid);
 		cities.Add(cityController);
 		EntitySelector.SetCity(newCityUid, cityController);
-
-		if (IsPlayerEmpire || Multiplayer.IsServer())
-		{
-			TotalCoinIncome += cityController.CoinsGenerated;
-		}
-
-		DebugUtility.Print($"Empire {EmpireUid} now has {cities.Count} cities");
 	}
 
     public void AddNewStoreToEmpire(Vector2I tilePosition, string newStoreUid)
@@ -236,32 +179,6 @@ public partial class EmpireController : Node2D
         var storeController = TileGrid.AddStore(tilePosition);
         storeController.InitializeStore(tilePosition, newStoreUid);
     }
-
-	[Rpc(mode: MultiplayerApi.RpcMode.AnyPeer)]
-	public void RequestAnnexCity(string targetCityUid)
-	{
-		if (!Multiplayer.IsServer())
-		{
-			RpcId(1, MethodName.RequestAnnexCity, targetCityUid);
-			return;
-		}
-
-		DebugUtility.Print($"Annexing city {targetCityUid} for empire {EmpireUid}");
-		Rpc(MethodName.SyncAnnexCity, targetCityUid);
-	}
-
-	[Rpc(mode: MultiplayerApi.RpcMode.AnyPeer)]
-	public void RequestReleaseCity(string targetCityUid)
-	{
-		if (!Multiplayer.IsServer())
-		{
-			RpcId(1, MethodName.RequestReleaseCity, targetCityUid);
-			return;
-		}
-
-		DebugUtility.Print($"Releasing city {targetCityUid} from empire {EmpireUid}");
-		Rpc(MethodName.SyncReleaseCity, targetCityUid);
-	}
 
 	public void RequestUpdateCoins(int change)
 	{
@@ -325,6 +242,33 @@ public partial class EmpireController : Node2D
 	{
 		return cities.Count > 0;
 	}
+
+    public void RecalculateCustomerCount()
+    {
+        var topInfluenceTiles = influenceSystem.GetPeerTopInfluenceTiles(GetOwnerPeerId());
+        var totalTopInfluenceResidents = 0;
+
+        foreach (var tilePosition in topInfluenceTiles)
+        {
+            if (!EntitySelector.TryGetTile(tilePosition, out var tileController))
+            {
+                throw new InvalidOperationException($"No tile at given position {tilePosition}");
+            }
+
+            if (tileController is not ResidentialTileController residentialController) continue;
+
+            totalTopInfluenceResidents += residentialController.Residents;
+        }
+
+        CustomerCount = totalTopInfluenceResidents;
+        TotalCoinIncome = CustomerCount;
+
+        if (IsPlayerEmpire)
+        {
+            CustomersUpdated?.Invoke(CustomerCount);
+            CoinsUpdated?.Invoke(Coins, TotalCoinIncome);
+        }
+    }
 
 	public static int GetAliveEmpireCount(Node rootNode)
 	{

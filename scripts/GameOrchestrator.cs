@@ -46,7 +46,6 @@ public partial class GameOrchestrator : Node2D
 			var capitalUid = Guid.NewGuid().ToString();
 
 			ConnectEmpireToUI(empire);
-			ConnectEmpireToOrchestrator(empire);
 			empire.InitializeEmpire(peerId, empireUid, empirePrimaryColor, isPlayerEmpire);
 			empiresParent.AddChild(empire, forceReadableName: true);
 			EntitySelector.SetEmpire(empireUid, empire);
@@ -105,21 +104,11 @@ public partial class GameOrchestrator : Node2D
 		SyncAllEmpireCoins(updateBalance: true);
 	}
 
-	private void ConnectEmpireToOrchestrator(EmpireController empire)
-	{
-		if (!Multiplayer.IsServer())
-		{
-			throw new InvalidOperationException("Don't connect the game orchestrator to empires on clients. Server should do all the syncing.");
-		}
-
-		empire.CityAnnexed += () => SyncAllEmpireCoins();
-	}
-
 	private void ConnectEmpireToUI(EmpireController empire)
 	{
 		empire.SelectionChanged += uiController.OnEntitySelectionChanged;
+        empire.CustomersUpdated += uiController.SetCustomerCountText;
 		empire.CoinsUpdated += uiController.SetCoinBalanceText;
-		empire.GameEnded += uiController.ShowGameEndedOverlay;
 		empire.UnitMovementPathUpdated += uiController.SetUnitMovementPathPoints;
 	}
 

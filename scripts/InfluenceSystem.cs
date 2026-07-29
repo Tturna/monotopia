@@ -49,7 +49,7 @@ public partial class InfluenceSystem : Node
     }
 
     [Rpc()]
-    private void SyncTileInfluenceForPeer(Vector2I tilePosition, long peerId, int influence)
+    private void SyncTileInfluenceForPeer(long targetPeerId, Vector2I tilePosition, int targetPeerInfluence, long topInfluencerId)
     {
         if (!tileInfluences.ContainsKey(tilePosition))
         {
@@ -58,14 +58,41 @@ public partial class InfluenceSystem : Node
 
         var playerInfluencesDict = tileInfluences[tilePosition];
 
-        if (!playerInfluencesDict.ContainsKey(peerId))
+        if (!playerInfluencesDict.ContainsKey(targetPeerId))
         {
-            playerInfluencesDict.Add(peerId, influence);
+            playerInfluencesDict.Add(targetPeerId, targetPeerInfluence);
         }
         else
         {
-            playerInfluencesDict[peerId] = influence;
+            playerInfluencesDict[targetPeerId] = targetPeerInfluence;
         }
+
+        if (!topTileInfluencers.ContainsKey(tilePosition))
+        {
+            topTileInfluencers.Add(tilePosition, topInfluencerId);
+        }
+        else
+        {
+            topTileInfluencers[tilePosition] = topInfluencerId;
+        }
+
+        if (!peerTopInfluenceTiles.ContainsKey(topInfluencerId))
+        {
+            peerTopInfluenceTiles.Add(topInfluencerId, new());
+        }
+
+        peerTopInfluenceTiles[topInfluencerId].Add(tilePosition);
+    }
+
+    [Rpc(CallLocal = true)]
+    private void SyncRecalculateCustomers(string empireUid)
+    {
+        if (!EntitySelector.TryGetEmpire(empireUid, out var empire) || empire is null)
+        {
+            throw new InvalidOperationException($"No empire with uid {empireUid}");
+        }
+
+        empire.RecalculateCustomerCount();
     }
 
     [Rpc(mode: MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
@@ -92,6 +119,8 @@ public partial class InfluenceSystem : Node
             for (var xOffset = -radius; xOffset <= radius; xOffset++)
             {
                 var tilePos = centerTilePosition + new Vector2I(xOffset, yOffset);
+
+                if (!TileGrid.IsTileInBounds(tilePos)) continue;
 
                 if (!tileInfluences.ContainsKey(tilePos))
                 {
@@ -177,13 +206,19 @@ public partial class InfluenceSystem : Node
                 }
 
                 // TODO: Consider whether it would be better to RPC all updated tiles at once instead
-                Rpc(MethodName.SyncTileInfluenceForPeer, tilePos, requesterPeedId, playerInfluencesDict[requesterPeedId]);
+                Rpc(MethodName.SyncTileInfluenceForPeer,
+                    requesterPeedId,                        // targetPeerId
+                    tilePos,                                // tilePosition
+                    playerInfluencesDict[requesterPeedId],  // targetPeerInfluence
+                    topInfluencer                           // topInfluencerId
+                );
             }
         }
 
         foreach (var peerId in peersWhosePolygonsNeedUpdating)
         {
-            var empireColor = EmpireController.GetPeerEmpire(peerId).EmpirePrimaryColor;
+            var empire = EmpireController.GetPeerEmpire(peerId);
+            var empireColor = empire.EmpirePrimaryColor;
             empireColor.A = 0.65f;
             var influenceTiles = new Vector2[peerTopInfluenceTiles[peerId].Count];
             var i = 0;
@@ -194,6 +229,20 @@ public partial class InfluenceSystem : Node
             }
 
             polygonBuilder.SyncPeerInfluenceTiles(peerId, influenceTiles, empireColor);
+
+            empire.RecalculateCustomerCount();
+            RpcId(empire.GetOwnerPeerId(), MethodName.SyncRecalculateCustomers, empire.EmpireUid);
         }
+    }
+
+    public HashSet<Vector2I> GetPeerTopInfluenceTiles(long peerId)
+    {
+        if (!peerTopInfluenceTiles.ContainsKey(peerId))
+        {
+            GD.PushWarning($"{Multiplayer.GetUniqueId()} says: Peer {peerId} doesn't have top influence tiles");
+            return new();
+        }
+
+        return peerTopInfluenceTiles[peerId];
     }
 }

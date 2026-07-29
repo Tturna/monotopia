@@ -213,15 +213,6 @@ public abstract partial class BaseUnit : Sprite2D
 
 		Rpc(MethodName.SetUnitTilePosition, tilePosition, MovementRangeLeft);
 
-		if (EntitySelector.TryGetTile(tilePosition, out var tile) && tile is CityController city)
-		{
-			if (city.OwnerEmpire != OwnerEmpire)
-			{
-				city.OwnerEmpire.RequestReleaseCity(city.CityUid);
-				OwnerEmpire.RequestAnnexCity(city.CityUid);
-			}
-		}
-
 		return true;
 	}
 
