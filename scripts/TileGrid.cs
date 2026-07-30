@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using Godot;
 
@@ -17,28 +18,17 @@ public partial class TileGrid : Node2D
     public required Texture2D villageTileTexture;
     [Export]
     public required Texture2D townTileTexture;
-    public static int TilesWidth = 10;
-    public static int TilesHeight = 10;
+    public static int TilesWidth = 40;
+    public static int TilesHeight = 40;
     public static Vector2I TilePixelSize { get; private set; } = Vector2I.Zero;
 
     public static TileGrid Instance = null!;
 
     private static int tileGap = 2;
-    private static Vector2I[] playerTileSpawnPoints => [
-        new(0, 0),
-        new(4, 3),
-        new(6, 5),
-        new(7, 7),
-        new(TilesWidth - 1, TilesHeight - 1)
-    ];
+    private static Vector2I[] playerTileSpawnPoints = new Vector2I[4];
     private static int spawnPointsLeft;
     private static AStar2D astar = null!;
-    private static Vector2I[] tempResidentialTilePositions = [
-        new (0, 4),
-        new (2, 7),
-        new (5, 1),
-        new (7, 4)
-    ];
+    private static Vector2I[] tempResidentialTilePositions = new Vector2I[8];
 
     public override void _EnterTree()
     {
@@ -48,6 +38,34 @@ public partial class TileGrid : Node2D
 
     public override void _Ready()
     {
+        for (var i = 0; i < playerTileSpawnPoints.Length; i++)
+        {
+            var randomX = Random.Shared.Next(0, TilesWidth);
+            var randomY = Random.Shared.Next(0, TilesHeight);
+            var randomSpawnPoint = new Vector2I(randomX, randomY);
+            playerTileSpawnPoints[i] = randomSpawnPoint;
+        }
+
+        for (var i = 0; i < tempResidentialTilePositions.Length; i++)
+        {
+            var randomX = Random.Shared.Next(0, TilesWidth);
+            var randomY = Random.Shared.Next(0, TilesHeight);
+            var randomSpawnPoint = new Vector2I(randomX, randomY);
+
+            // somewhat stupid
+            while (playerTileSpawnPoints.Any(x => x == randomSpawnPoint))
+            {
+                randomSpawnPoint = new Vector2I(randomX, randomY);
+            }
+
+            while (tempResidentialTilePositions.Any(x => x == randomSpawnPoint))
+            {
+                randomSpawnPoint = new Vector2I(randomX, randomY);
+            }
+
+            tempResidentialTilePositions[i] = randomSpawnPoint;
+        }
+
         InitializeGeneralTileSize();
         astar = new();
 
