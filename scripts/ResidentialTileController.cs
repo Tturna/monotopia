@@ -5,7 +5,7 @@ public partial class ResidentialTileController : TileController
 {
     public int Residents { get; private set; } = -1;
 
-    public void Initialize()
+    public void Initialize(int residentCount = -1)
     {
         if (Residents >= 0)
         {
@@ -13,6 +13,13 @@ public partial class ResidentialTileController : TileController
             return;
         }
 
-        Residents = Random.Shared.Next(1, 4);
+        if (residentCount >= 0)
+        {
+            Residents = residentCount;
+        }
+        else
+        {
+            Residents = Random.Shared.Next(1, 4);
+        }
     }
 }

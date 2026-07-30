@@ -71,7 +71,11 @@ public partial class TileGrid : Node2D
 
         GenerateBaseGrid(astar);
         ConnectAstarNeighbors(astar);
-        GenerateResidentialTiles();
+
+        if (Multiplayer.IsServer())
+        {
+            GenerateResidentialTiles();
+        }
     }
 
     private void InitializeGeneralTileSize()
@@ -141,6 +145,21 @@ public partial class TileGrid : Node2D
         return mapElementInstance;
     }
 
+    [Rpc()]
+    private void SyncResidentialTile(Vector2I tilePosition, int residentCount)
+    {
+        var residentialTileNode = Instance.AddMapElement(tilePosition, Instance.ResidentialTileScene);
+        var residentialTile = (ResidentialTileController)residentialTileNode;
+        residentialTile.Initialize(residentCount);
+        EntitySelector.SetTile(tilePosition, residentialTile);
+
+        var residentsLabel = new Label();
+        residentsLabel.Text = residentialTile.Residents.ToString();
+        residentsLabel.Size = TilePixelSize;
+        residentsLabel.HorizontalAlignment = HorizontalAlignment.Center;
+        residentialTile.AddChild(residentsLabel);
+    }
+
     private void GenerateResidentialTiles()
     {
         foreach (var tilePosition in tempResidentialTilePositions)
@@ -155,6 +174,8 @@ public partial class TileGrid : Node2D
             residentsLabel.Size = TilePixelSize;
             residentsLabel.HorizontalAlignment = HorizontalAlignment.Center;
             residentialTile.AddChild(residentsLabel);
+
+            Rpc(MethodName.SyncResidentialTile, tilePosition, residentialTile.Residents);
         }
     }
 
