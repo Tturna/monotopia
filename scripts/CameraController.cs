@@ -8,6 +8,7 @@ public partial class CameraController : Node2D
     private Camera2D camera;
     private float minZoom = 0.3f;
     private float maxZoom = 5f;
+    private bool middleMouseHeld;
 
     public override void _Ready()
     {
@@ -24,19 +25,36 @@ public partial class CameraController : Node2D
         Translate(inputVector * totalPanSpeed * (float)delta);
     }
 
-    public override void _UnhandledInput(InputEvent @event)
+    public override void _UnhandledInput(InputEvent inputEvent)
     {
-        if (@event is not InputEventMouseButton buttonEvent) return;
-
-        if (!buttonEvent.IsPressed()) return;
-
-        if (buttonEvent.ButtonIndex == MouseButton.WheelUp)
+        if (inputEvent is InputEventMouseButton buttonEvent)
         {
-            UpdateZoom(buttonEvent.Factor == 0 ? 1 : buttonEvent.Factor);
+            if (buttonEvent.IsPressed())
+            {
+                if (buttonEvent.ButtonIndex == MouseButton.WheelUp)
+                {
+                    UpdateZoom(buttonEvent.Factor == 0 ? 1 : buttonEvent.Factor);
+                }
+                else if (buttonEvent.ButtonIndex == MouseButton.WheelDown)
+                {
+                    UpdateZoom(buttonEvent.Factor == 0 ? -1 : -buttonEvent.Factor);
+                }
+            }
+
+            if (buttonEvent.ButtonIndex == MouseButton.Middle)
+            {
+                middleMouseHeld = buttonEvent.IsPressed();
+            }
         }
-        else if (buttonEvent.ButtonIndex == MouseButton.WheelDown)
+        else if (inputEvent is InputEventMouseMotion mouseMotionEvent && middleMouseHeld)
         {
-            UpdateZoom(buttonEvent.Factor == 0 ? -1 : -buttonEvent.Factor);
+            var motionDelta = mouseMotionEvent.Relative;
+            var x = GetNormalizedZoom();
+            var minZoomMag = 1.25f;
+            var maxZoomMag = 0.25f;
+            var panMagnitude = x * (1f - minZoomMag - (1f - maxZoomMag)) + minZoomMag;
+            // negate to make panning with the mouse feel intuitive
+            Translate(-motionDelta * panMagnitude);
         }
     }
 
