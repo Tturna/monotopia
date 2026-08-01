@@ -14,6 +14,8 @@ public partial class TileGrid : Node2D
     [Export]
     public required PackedScene StoreScene;
     [Export]
+    public required PackedScene FactoryScene;
+    [Export]
     public required Texture2D villageTileTexture;
     [Export]
     public required Texture2D townTileTexture;
@@ -218,6 +220,11 @@ public partial class TileGrid : Node2D
     public static StoreTileController AddStore(Vector2I tilePosition)
     {
         return AddSpecialTile<StoreTileController>(tilePosition, Instance.StoreScene);
+    }
+
+    public static FactoryTileController AddFactory(Vector2I tilePosition)
+    {
+        return AddSpecialTile<FactoryTileController>(tilePosition, Instance.FactoryScene);
     }
 
     public static Vector2 TileToWorldPosition(Vector2I tilePosition)

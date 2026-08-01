@@ -180,6 +180,12 @@ public partial class EmpireController : Node2D
         storeController.InitializeStore(tilePosition, newStoreUid);
     }
 
+    public void AddNewFactoryToEmpire(Vector2I tilePosition, string newFactoryUid)
+    {
+        var factoryController = TileGrid.AddFactory(tilePosition);
+        factoryController.InitializeFactory(tilePosition, newFactoryUid);
+    }
+
 	public void RequestUpdateCoins(int change)
 	{
 		RequestSetCoinState(Coins + change, TotalCoinIncome);

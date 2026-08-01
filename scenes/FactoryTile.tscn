@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://djdljuusxx7ea"]
+
+[ext_resource type="Script" uid="uid://bqnmexo6pc485" path="res://scripts/FactoryTileController.cs" id="1_mmajt"]
+[ext_resource type="PackedScene" uid="uid://bvkmb23pk35le" path="res://scenes/Tile.tscn" id="2_lydqe"]
+[ext_resource type="Texture2D" uid="uid://ba3m01i5gbjp0" path="res://sprites/factorytile.png" id="3_mmajt"]
+
+[node name="City" type="Node2D" unique_id=1510732706]
+script = ExtResource("1_mmajt")
+
+[node name="Sprite2D" parent="." unique_id=1765061921 instance=ExtResource("2_lydqe")]
+show_behind_parent = true
+texture = ExtResource("3_mmajt")
+script = null

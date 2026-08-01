@@ -3,8 +3,6 @@ using Godot;
 
 public partial class ExpansionTeamUnit : BaseUnit, IBuildable
 {
-    public ExpansionTeamUnit(EmpireController unitOwner) : base(unitOwner) { }
-
     public static BuildController.BuildableItemType ItemType => BuildController.BuildableItemType.ExpansionTeam;
     public static string ItemName => "Expansion Team";
     public static int Cost => 2;
@@ -15,6 +13,11 @@ public partial class ExpansionTeamUnit : BaseUnit, IBuildable
     public override string GetUnitName() => ItemName;
 
     private InfluenceSystem influenceSystem;
+
+    public ExpansionTeamUnit(EmpireController unitOwner) : base(unitOwner)
+    {
+        MovementRange = 3;
+    }
 
     public override void _Ready()
     {
@@ -40,16 +43,39 @@ public partial class ExpansionTeamUnit : BaseUnit, IBuildable
         RequestDeath();
     }
 
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+    private void RequestSpawnFactory()
+    {
+        if (!Multiplayer.IsServer())
+        {
+            RpcId(1, MethodName.RequestSpawnFactory);
+            return;
+        }
+
+        var factoryUid = Guid.NewGuid().ToString();
+        OwnerEmpire.AddNewFactoryToEmpire(TilePosition, factoryUid);
+        Rpc(MethodName.SyncSpawnFactory, factoryUid);
+
+        RequestDeath();
+    }
+
     [Rpc()]
     private void SyncSpawnStore(string storeUid)
     {
         OwnerEmpire.AddNewStoreToEmpire(TilePosition, storeUid);
     }
 
+    [Rpc()]
+    private void SyncSpawnFactory(string factoryUid)
+    {
+        OwnerEmpire.AddNewFactoryToEmpire(TilePosition, factoryUid);
+    }
+
     public override UnitAction[] GetUnitActions()
     {
         return [
-            new (ActionName: "Build store", ActionCallback: RequestSpawnStore)
+            new (ActionName: "Build store", ActionCallback: RequestSpawnStore),
+            new (ActionName: "Build factory", ActionCallback: RequestSpawnFactory)
         ];
     }
 }
