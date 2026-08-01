@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using Godot;
 
@@ -25,10 +24,46 @@ public partial class TileGrid : Node2D
     public static TileGrid Instance = null!;
 
     private static int tileGap = 2;
-    private static Vector2I[] playerTileSpawnPoints = new Vector2I[4];
+    private static Vector2I[] playerTileSpawnPoints = new Vector2I[]
+    {
+        new Vector2I(3, 3),
+        new Vector2I(TilesWidth - 3, 3),
+        new Vector2I(3, TilesHeight - 3),
+        new Vector2I(TilesWidth - 3, TilesHeight - 3),
+    };
     private static int spawnPointsLeft;
     private static AStar2D astar = null!;
-    private static Vector2I[] tempResidentialTilePositions = new Vector2I[8];
+    private static Vector2I[] tempResidentialTilePositions = new Vector2I[]
+    {
+        new Vector2I(8, 2),
+        new Vector2I(29, 2),
+        new Vector2I(32, 5),
+        new Vector2I(1, 6),
+        new Vector2I(4, 7),
+        new Vector2I(36, 8),
+        new Vector2I(20, 9),
+        new Vector2I(12, 11),
+        new Vector2I(18, 12),
+        new Vector2I(24, 12),
+        new Vector2I(15, 13),
+        new Vector2I(21, 14),
+        new Vector2I(9, 16),
+        new Vector2I(25, 16),
+        new Vector2I(14, 17),
+        new Vector2I(18, 17),
+        new Vector2I(22, 18),
+        new Vector2I(16, 20),
+        new Vector2I(21, 20),
+        new Vector2I(10, 22),
+        new Vector2I(25, 23),
+        new Vector2I(19, 25),
+        new Vector2I(9, 30),
+        new Vector2I(30, 30),
+        new Vector2I(4, 33),
+        new Vector2I(31, 33),
+        new Vector2I(12, 34),
+        new Vector2I(24, 35),
+    };
 
     public override void _EnterTree()
     {
@@ -38,34 +73,6 @@ public partial class TileGrid : Node2D
 
     public override void _Ready()
     {
-        for (var i = 0; i < playerTileSpawnPoints.Length; i++)
-        {
-            var randomX = Random.Shared.Next(0, TilesWidth);
-            var randomY = Random.Shared.Next(0, TilesHeight);
-            var randomSpawnPoint = new Vector2I(randomX, randomY);
-            playerTileSpawnPoints[i] = randomSpawnPoint;
-        }
-
-        for (var i = 0; i < tempResidentialTilePositions.Length; i++)
-        {
-            var randomX = Random.Shared.Next(0, TilesWidth);
-            var randomY = Random.Shared.Next(0, TilesHeight);
-            var randomSpawnPoint = new Vector2I(randomX, randomY);
-
-            // somewhat stupid
-            while (playerTileSpawnPoints.Any(x => x == randomSpawnPoint))
-            {
-                randomSpawnPoint = new Vector2I(randomX, randomY);
-            }
-
-            while (tempResidentialTilePositions.Any(x => x == randomSpawnPoint))
-            {
-                randomSpawnPoint = new Vector2I(randomX, randomY);
-            }
-
-            tempResidentialTilePositions[i] = randomSpawnPoint;
-        }
-
         InitializeGeneralTileSize();
         astar = new();
 
