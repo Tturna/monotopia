@@ -11,13 +11,14 @@ public partial class EmpireController : Node2D
 	public int Coins { get; private set; }
 	public int TotalCoinIncome { get; private set; }
 	public bool IsFrozen { get; private set; }
-	public bool IsOwnCitySelected { get; private set; }
+	public bool IsOwnHqSelected { get; private set; }
 	public bool IsOwnUnitSelected { get; private set; }
 	public TileController? SelectedTile { get; private set; }
 	public bool HasSelection { get; private set; }
+    public bool IsHqCreated { get; private set; }
     public int CustomerCount { get; private set; }
 
-	private List<CityController> cities = new();
+	private List<FactoryTileController> factories = new();
 	
 	private long? ownerPeerId = null;
 	private BaseUnit? selectedUnit;
@@ -96,7 +97,7 @@ public partial class EmpireController : Node2D
 
 		if (tile == SelectedTile) return;
 
-		IsOwnCitySelected = tile is CityController cityController && cities.Contains(cityController);
+		IsOwnHqSelected = tile is HqController hqController && hqController.OwnerEmpire == this;
 		HasSelection = true;
 		SelectedTile = tile;
 		SelectionChanged?.Invoke(this);
@@ -123,7 +124,7 @@ public partial class EmpireController : Node2D
 	{
 		if (!HasSelection) return;
 
-		IsOwnCitySelected = false;
+		IsOwnHqSelected = false;
 		IsOwnUnitSelected = false;
 		selectedUnit = null;
 		SelectedTile = null;
@@ -166,12 +167,17 @@ public partial class EmpireController : Node2D
 		return (long)ownerPeerId;
 	}
 
-	public void AddNewCityToEmpire(Vector2I tilePosition, string newCityUid)
+	public void AddHqToEmpire(Vector2I tilePosition, string newHqUid)
 	{
-		var cityController = TileGrid.AddCity(tilePosition);
-		cityController.InitializeCity(tilePosition, ownerEmpire: this, newCityUid);
-		cities.Add(cityController);
-		EntitySelector.SetCity(newCityUid, cityController);
+        if (IsHqCreated)
+        {
+            throw new InvalidOperationException("HQ already created");
+        }
+
+		var hqController = TileGrid.AddHq(tilePosition);
+		hqController.InitializeHq(tilePosition, ownerEmpire: this, newHqUid);
+		EntitySelector.SetHq(newHqUid, hqController);
+        IsHqCreated = true;
 	}
 
     public void AddNewStoreToEmpire(Vector2I tilePosition, string newStoreUid)
@@ -206,13 +212,13 @@ public partial class EmpireController : Node2D
 		RpcId(GetOwnerPeerId(), MethodName.SyncSetCoinState, newCoinBalance, newCoinIncome);
 	}
 
-	public bool TryGetSelectedCity(out CityController? city)
+	public bool TryGetSelectedHq(out HqController? hqController)
 	{
-		city = null;
+		hqController = null;
 
-		if (SelectedTile is not null && SelectedTile is CityController cityController)
+		if (SelectedTile is not null && SelectedTile is HqController selectedHqController)
 		{
-			city = cityController;
+			hqController = selectedHqController;
 			return true;
 		}
 
@@ -244,11 +250,6 @@ public partial class EmpireController : Node2D
 		return false;
 	}
 
-	public bool HasCitiesRemaining()
-	{
-		return cities.Count > 0;
-	}
-
     public void RecalculateCustomerCount()
     {
         var topInfluenceTiles = influenceSystem.GetPeerTopInfluenceTiles(GetOwnerPeerId());
@@ -275,23 +276,6 @@ public partial class EmpireController : Node2D
             CoinsUpdated?.Invoke(Coins, TotalCoinIncome);
         }
     }
-
-	public static int GetAliveEmpireCount(Node rootNode)
-	{
-		var empiresDict = EntitySelector.GetEmpiresDict();
-		var empires = empiresDict.Values;
-		var aliveCount = 0;
-
-		foreach (EmpireController empire in empires)
-		{
-			if (empire.HasCitiesRemaining())
-			{
-				aliveCount++;
-			}
-		}
-
-		return aliveCount;
-	}
 
 	public static void FreezeAllEmpires(Node rootNode)
 	{

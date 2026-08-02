@@ -7,7 +7,7 @@ using Godot;
 public partial class UIController : Node2D
 {
     [Export]
-    private Control ownedCityViewControl = null!;
+    private Control ownedHqViewControl = null!;
     [Export]
     private Control selectedUnitViewControl = null!;
     [Export]
@@ -37,7 +37,7 @@ public partial class UIController : Node2D
 
     private PanelContainer? selectedBuildableItemPanel;
     private BuildController.BuildableItemType? selectedBuildable;
-    private CityController? selectedCity;
+    private HqController? selectedHq;
 
     public delegate void EndTurnButtonPressedHandler(UIController uiController);
     public event EndTurnButtonPressedHandler? EndTurnButtonPressed;
@@ -53,14 +53,14 @@ public partial class UIController : Node2D
 		AddChild(unitPathLine);
 		unitPathLine.Hide();
 
-        var buildButton = (Button)ownedCityViewControl.FindChild("Build Button");
+        var buildButton = (Button)ownedHqViewControl.FindChild("Build Button");
         buildButton.Pressed += () =>
         {
             if (selectedBuildable is null) return;
-            if (selectedCity is null) return;
+            if (selectedHq is null) return;
 
             var buildable = (BuildController.BuildableItemType)selectedBuildable;
-            BuildController.Instance.RequestBuildItem((int)buildable, selectedCity.CityUid);
+            BuildController.Instance.RequestBuildItem((int)buildable, selectedHq.HqUid);
         };
 
         endTurnButton.Pressed += () => EndTurnButtonPressed?.Invoke(this);
@@ -85,7 +85,7 @@ public partial class UIController : Node2D
             var highlightColorRect = (ColorRect)selectedBuildableItemPanel.FindChild("Highlight Color");
             highlightColorRect.Show();
 
-            var buildButton = (Button)ownedCityViewControl.FindChild("Build Button");
+            var buildButton = (Button)ownedHqViewControl.FindChild("Build Button");
             buildButton.Disabled = false;
         }
         else if (selectedBuildable != itemType)
@@ -101,7 +101,7 @@ public partial class UIController : Node2D
             highlightColorRect = (ColorRect)selectedBuildableItemPanel.FindChild("Highlight Color");
             highlightColorRect.Show();
 
-            var buildButton = (Button)ownedCityViewControl.FindChild("Build Button");
+            var buildButton = (Button)ownedHqViewControl.FindChild("Build Button");
             buildButton.Disabled = false;
         }
         else // clicked on already selected buildable
@@ -120,13 +120,13 @@ public partial class UIController : Node2D
         highlightColorRect.Hide();
         selectedBuildable = null;
         selectedBuildableItemPanel = null;
-        var buildButton = (Button)ownedCityViewControl.FindChild("Build Button");
+        var buildButton = (Button)ownedHqViewControl.FindChild("Build Button");
         buildButton.Disabled = true;
     }
 
     public void OnEntitySelectionChanged(EmpireController empire)
     {
-        HideOwnedCityView();
+        HideOwnedHqView();
         HideSelectedUnitView();
         HideReachableTileIndicators();
         HideSelectedTileIndicator();
@@ -134,13 +134,13 @@ public partial class UIController : Node2D
 
         if (!empire.HasSelection) return;
 
-        if (empire.TryGetSelectedCity(out var city))
+        if (empire.TryGetSelectedHq(out var hqController))
         {
-            ShowSelectedTileIndicator(city!.TilePosition);
+            ShowSelectedTileIndicator(hqController!.TilePosition);
 
-            if (empire.IsOwnCitySelected)
+            if (empire.IsOwnHqSelected)
             {
-                ShowOwnedCityView(city!);
+                ShowOwnedHqView(hqController!);
             }
         }
         else if (empire.TryGetSelectedUnit(out var unit))
@@ -156,35 +156,33 @@ public partial class UIController : Node2D
         }
     }
 
-    public void ShowOwnedCityView(CityController city)
+    public void ShowOwnedHqView(HqController hqController)
     {
-        if (city is null)
+        if (hqController is null)
         {
-            throw new ArgumentException("Can't show city info for null city", nameof(city));
+            throw new ArgumentException("Can't show HQ info for null HQ", nameof(hqController));
         }
 
-        // Reset all state so that switching directly between city views doesn't keep
-        // old view state.
-        HideOwnedCityView();
+        HideOwnedHqView();
 
-        selectedCity = city;
-        ownedCityViewControl.Show();
+        selectedHq = hqController;
+        ownedHqViewControl.Show();
 
-        var cityNameLabel = (Label)ownedCityViewControl.FindChild("CityNameLabel");
-        cityNameLabel.Text = city!.CityName;
+        var hqNameLabel = (Label)ownedHqViewControl.FindChild("HqNameLabel");
+        hqNameLabel.Text = "HQ name here";
 
-        var coinsGeneratedLabel = (Label)ownedCityViewControl.FindChild("CoinsGeneratedLabel");
-        var prefix = city.CoinsGenerated switch
+        var coinsGeneratedLabel = (Label)ownedHqViewControl.FindChild("CoinsGeneratedLabel");
+        var prefix = hqController.CoinsGenerated switch
         {
             > 0 => "+",
             < 0 => "-",
             _ => ""
         };
-        var coinsText = Math.Abs(city.CoinsGenerated).ToString();
+        var coinsText = Math.Abs(hqController.CoinsGenerated).ToString();
 
         coinsGeneratedLabel.Text = $"Coins generated: {prefix}{coinsText}";
 
-        var buildListScrollVBox = (VBoxContainer)ownedCityViewControl.FindChild("Build List Scroll VBox");
+        var buildListScrollVBox = (VBoxContainer)ownedHqViewControl.FindChild("Build List Scroll VBox");
 
         while (buildListScrollVBox.GetChildCount() > 0)
         {
@@ -216,14 +214,14 @@ public partial class UIController : Node2D
         }
     }
 
-    public void HideOwnedCityView()
+    public void HideOwnedHqView()
     {
-        selectedCity = null;
+        selectedHq = null;
         selectedBuildable = null;
         selectedBuildableItemPanel = null;
-        var buildButton = (Button)ownedCityViewControl.FindChild("Build Button");
+        var buildButton = (Button)ownedHqViewControl.FindChild("Build Button");
         buildButton.Disabled = true;
-        ownedCityViewControl.Hide();
+        ownedHqViewControl.Hide();
     }
 
     public void ShowSelectedUnitView(BaseUnit unit)

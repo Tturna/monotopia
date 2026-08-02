@@ -10,7 +10,7 @@ public partial class TileGrid : Node2D
     [Export]
     public required PackedScene ResidentialTileScene;
     [Export]
-    public required PackedScene CityScene;
+    public required PackedScene HqScene;
     [Export]
     public required PackedScene StoreScene;
     [Export]
@@ -212,9 +212,9 @@ public partial class TileGrid : Node2D
         return controller;
     }
 
-    public static CityController AddCity(Vector2I tilePosition)
+    public static HqController AddHq(Vector2I tilePosition)
     {
-        return AddSpecialTile<CityController>(tilePosition, Instance.CityScene);
+        return AddSpecialTile<HqController>(tilePosition, Instance.HqScene);
     }
 
     public static StoreTileController AddStore(Vector2I tilePosition)
@@ -263,33 +263,6 @@ public partial class TileGrid : Node2D
     public static bool IsTileInBounds(Vector2I tilePosition)
     {
         return EntitySelector.TryGetTile(tilePosition, out var _);
-    }
-
-    public static bool IsTileOwned(Vector2I tilePosition)
-    {
-        if (!EntitySelector.TryGetTile(tilePosition, out var tileController)) return false;
-        if (tileController is null) return false;
-
-        return tileController.OwnerCity is not null;
-    }
-
-    public static bool TrySetTileOwnerCity(Vector2I tilePosition, CityController? owner)
-    {
-        return EntitySelector.TrySetTileOwner(tilePosition, owner);
-    }
-
-    public static CityController? GetTileOwner(Vector2I tilePosition)
-    {
-        if (!EntitySelector.TryGetTile(tilePosition, out var tileController)
-                || tileController is null)
-        {
-            throw new ArgumentOutOfRangeException(
-                    paramName: nameof(tilePosition),
-                    message: "Given tile position is out of bounds."
-                    );
-        }
-
-        return tileController.OwnerCity;
     }
 
     public static Vector2I[] GetTileNeighbors(Vector2I tilePosition)

@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://c4ae5yt0wa1il"]
+
+[ext_resource type="Script" uid="uid://qgwwxsqbl0v6" path="res://scripts/HqController.cs" id="1_ocbyw"]
+[ext_resource type="PackedScene" uid="uid://bvkmb23pk35le" path="res://scenes/Tile.tscn" id="2_2xijs"]
+[ext_resource type="Texture2D" uid="uid://drabk7btini6x" path="res://sprites/villagetile.png" id="3_qpk7e"]
+
+[node name="HQ" type="Node2D" unique_id=1510732706]
+script = ExtResource("1_ocbyw")
+
+[node name="Sprite2D" parent="." unique_id=1765061921 instance=ExtResource("2_2xijs")]
+show_behind_parent = true
+texture = ExtResource("3_qpk7e")

@@ -61,9 +61,7 @@ public partial class GameOrchestrator : Node2D
 				MethodName.SyncCreateEmpire,
 				peerId,
 				empireUid,
-				playerSpawnTilePosition,
-				empirePrimaryColor,
-				capitalUid);
+				empirePrimaryColor);
 		}
 
 		foreach (var (empire, playerSpawnTilePosition) in playerSpawnTilePositionsDict)
@@ -79,9 +77,7 @@ public partial class GameOrchestrator : Node2D
 	private void SyncCreateEmpire(
 		long empireOwnerPeerId,
 		string empireUid,
-		Vector2I capitalCityTilePosition,
-		Color empirePrimaryColor,
-		string capitalCityUid)
+		Color empirePrimaryColor)
 	{
 		var peerId = Multiplayer.GetUniqueId();
 		var isPlayerEmpire = empireOwnerPeerId == peerId;

@@ -6,7 +6,7 @@ public static class EntitySelector
 {
 	private static Dictionary<Vector2I, BaseUnit?> unitMap = new();
 	private static Dictionary<Vector2I, TileController> tileMap = new();
-	private static Dictionary<string, CityController> cityIdMap = new();
+	private static Dictionary<string, HqController> hqIdMap = new();
 	private static Dictionary<string, EmpireController> empireIdMap = new();
 
 	public static void AddTile(Vector2I tilePosition, TileController tileController)
@@ -25,16 +25,6 @@ public static class EntitySelector
 
 		tileMap[tilePosition].QueueFree();
 		tileMap[tilePosition] = tileController;
-	}
-
-	public static bool TrySetTileOwner(Vector2I tilePosition, CityController? ownerCity)
-	{
-		if (!TryGetTile(tilePosition, out var tileController)) return false;
-		if (tileController is null) return false;
-
-		tileController.OwnerCity = ownerCity;
-
-		return true;
 	}
 
 	public static bool TryGetTile(Vector2I tilePosition, out TileController? tileController)
@@ -74,24 +64,24 @@ public static class EntitySelector
         return true;
     }
 
-    public static void SetCity(string cityUid, CityController city)
+    public static void SetHq(string hqUid, HqController hqController)
     {
-        if (!cityIdMap.ContainsKey(cityUid))
+        if (!hqIdMap.ContainsKey(hqUid))
         {
-            cityIdMap.Add(cityUid, city);
+            hqIdMap.Add(hqUid, hqController);
             return;
         }
 
-        cityIdMap[cityUid] = city;
+        hqIdMap[hqUid] = hqController;
     }
 
-    public static bool TryGetCity(string cityUid, out CityController? city)
+    public static bool TryGetHq(string hqUid, out HqController? hqController)
     {
-        city = null;
+        hqController = null;
 
-        if (!cityIdMap.ContainsKey(cityUid)) return false;
+        if (!hqIdMap.ContainsKey(hqUid)) return false;
 
-        city = cityIdMap[cityUid];
+        hqController = hqIdMap[hqUid];
 
         return true;
     }

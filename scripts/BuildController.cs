@@ -30,8 +30,7 @@ public partial class BuildController : Node2D
         _ => throw new ArgumentOutOfRangeException(nameof(itemType))
     };
 
-    // TODO: Figure out a mechanism to determine buildable items based on empire and
-    // city state (server side).
+    // TODO: Figure out a mechanism to determine buildable items based on empire state (server side)
 	public static BuildController.BuildableItemType[] GetBuildableItems()
 	{
 		return
@@ -41,22 +40,22 @@ public partial class BuildController : Node2D
 	}
 
 	[Rpc(mode: MultiplayerApi.RpcMode.AnyPeer)]
-	public void RequestBuildItem(int itemTypeEnum, string cityUid)
+	public void RequestBuildItem(int itemTypeEnum, string hqUid)
 	{
 		if (!Multiplayer.IsServer())
 		{
-			RpcId(1, nameof(RequestBuildItem), itemTypeEnum, cityUid);
+			RpcId(1, nameof(RequestBuildItem), itemTypeEnum, hqUid);
 			return;
 		}
 
 		// TODO: check if item is unlocked and actually available for building
 
-        if (!EntitySelector.TryGetCity(cityUid, out var selectedCity))
+        if (!EntitySelector.TryGetHq(hqUid, out var selectedHq))
         {
-            throw new InvalidOperationException($"Can't find city with UID: {cityUid}");
+            throw new InvalidOperationException($"Can't find HQ with UID: {hqUid}");
         }
 
-        var ownerEmpire = selectedCity.OwnerEmpire;
+        var ownerEmpire = selectedHq.OwnerEmpire;
 		var itemType = (BuildController.BuildableItemType)itemTypeEnum;
 		var itemInfo = BuildController.GetBuildableItemInfo(itemType);
 
@@ -69,13 +68,13 @@ public partial class BuildController : Node2D
 
 		if (itemInfo.IsUnit)
 		{
-			if (EntitySelector.TryGetUnit(selectedCity.CityTilePosition, out var unit) && unit is not null)
+			if (EntitySelector.TryGetUnit(selectedHq.HqTilePosition, out var unit) && unit is not null)
 			{
-				throw new InvalidOperationException($"Can't build unit in an occupied city {selectedCity.Name}");
+				throw new InvalidOperationException($"Can't build unit in an occupied HQ {selectedHq.Name}");
 			}
 
-            DebugUtility.Print($"Spawning unit in city tile position: {selectedCity.CityTilePosition}");
-            UnitSpawner.Instance.SpawnAndSyncUnit(itemType, selectedCity.CityTilePosition, ownerEmpire);
+            DebugUtility.Print($"Spawning unit in HQ tile position: {selectedHq.HqTilePosition}");
+            UnitSpawner.Instance.SpawnAndSyncUnit(itemType, selectedHq.HqTilePosition, ownerEmpire);
 			return; 
 		}
 

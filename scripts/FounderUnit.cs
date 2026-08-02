@@ -44,24 +44,24 @@ public partial class FounderUnit : BaseUnit
             throw new InvalidOperationException("Requested HQ spawn from an unowned unit.");
         }
 
-        var cityUid = Guid.NewGuid().ToString();
-        OwnerEmpire.AddNewCityToEmpire(TilePosition, cityUid);
-        Rpc(MethodName.SyncSpawnHQ, cityUid);
+        var hqUid = Guid.NewGuid().ToString();
+        OwnerEmpire.AddHqToEmpire(TilePosition, hqUid);
+        Rpc(MethodName.SyncSpawnHQ, hqUid);
 
         influenceSystem.RequestAddAreaOfInfluence(TilePosition, influenceAmount: 4, radius: 2);
     }
 
     [Rpc()]
-    private void SyncSpawnHQ(string cityUid)
+    private void SyncSpawnHQ(string hqUid)
     {
-        OwnerEmpire.AddNewCityToEmpire(TilePosition, cityUid);
+        OwnerEmpire.AddHqToEmpire(TilePosition, hqUid);
     }
 
     public override UnitAction[] GetUnitActions()
     {
         List<UnitAction> actionList = new();
 
-        if (!OwnerEmpire.HasCitiesRemaining())
+        if (!OwnerEmpire.IsHqCreated)
         {
             actionList.Add(new (ActionName: "Found HQ", ActionCallback: RequestSpawnHQ, IsSingleUse: true));
         }
