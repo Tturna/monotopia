@@ -8,6 +8,8 @@ public partial class HqController : TileController
     public Vector2I HqTilePosition { get; private set; }
     public EmpireController OwnerEmpire { get; private set; } = null!;
 
+    public readonly int BaseProductsGenerated = 2;
+
     public void InitializeHq(Vector2I tilePosition, EmpireController ownerEmpire, string newHqUid)
     {
         HqUid = newHqUid;

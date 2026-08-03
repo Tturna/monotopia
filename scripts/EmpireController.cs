@@ -8,6 +8,8 @@ public partial class EmpireController : Node2D
 	public string EmpireUid { get; private set; } = null!;
 	public bool IsPlayerEmpire { get; private set; }
 	public Color EmpirePrimaryColor { get; private set; }
+    public int ProductGenerationRate { get; private set; }
+    public int CustomerCount { get; private set; }
 	public int Coins { get; private set; }
 	public int TotalCoinIncome { get; private set; }
 	public bool IsFrozen { get; private set; }
@@ -16,7 +18,6 @@ public partial class EmpireController : Node2D
 	public TileController? SelectedTile { get; private set; }
 	public bool HasSelection { get; private set; }
     public bool IsHqCreated { get; private set; }
-    public int CustomerCount { get; private set; }
 
 	private List<FactoryTileController> factories = new();
 	
@@ -26,12 +27,14 @@ public partial class EmpireController : Node2D
     private InfluenceSystem influenceSystem = null!;
 
 	public delegate void SelectionChangedHandler(EmpireController empire);
+    public delegate void ProductGenerationRateUpdatedHandler(int rate);
+    public delegate void CustomersUpdatedHandler(int amount);
 	public delegate void CoinsUpdatedHandler(int balance, int income);
-	public delegate void CustomersUpdatedHandler(int amount);
 	public delegate void UnitMovementPathUpdatedHandler(Vector2[] pathTiles);
 	public event SelectionChangedHandler? SelectionChanged;
+    public event ProductGenerationRateUpdatedHandler? ProductGenerationRateUpdated;
+    public event CustomersUpdatedHandler? CustomersUpdated;
 	public event CoinsUpdatedHandler? CoinsUpdated;
-	public event CustomersUpdatedHandler? CustomersUpdated;
 	public event UnitMovementPathUpdatedHandler? UnitMovementPathUpdated;
 
     public override void _Ready()
@@ -178,6 +181,8 @@ public partial class EmpireController : Node2D
 		hqController.InitializeHq(tilePosition, ownerEmpire: this, newHqUid);
 		EntitySelector.SetHq(newHqUid, hqController);
         IsHqCreated = true;
+        ProductGenerationRate += hqController.BaseProductsGenerated;
+        ProductGenerationRateUpdated?.Invoke(ProductGenerationRate);
 	}
 
     public void AddNewStoreToEmpire(Vector2I tilePosition, string newStoreUid)
@@ -190,6 +195,8 @@ public partial class EmpireController : Node2D
     {
         var factoryController = TileGrid.AddFactory(tilePosition);
         factoryController.InitializeFactory(tilePosition, newFactoryUid);
+        ProductGenerationRate += factoryController.ProductGenerationRate;
+        ProductGenerationRateUpdated?.Invoke(ProductGenerationRate);
     }
 
 	public void RequestUpdateCoins(int change)

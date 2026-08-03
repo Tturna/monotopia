@@ -103,6 +103,7 @@ public partial class GameOrchestrator : Node2D
 	private void ConnectEmpireToUI(EmpireController empire)
 	{
 		empire.SelectionChanged += uiController.OnEntitySelectionChanged;
+        empire.ProductGenerationRateUpdated += uiController.SetProductGenerationRate;
         empire.CustomersUpdated += uiController.SetCustomerCountText;
 		empire.CoinsUpdated += uiController.SetCoinBalanceText;
 		empire.UnitMovementPathUpdated += uiController.SetUnitMovementPathPoints;

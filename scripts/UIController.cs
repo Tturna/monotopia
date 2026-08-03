@@ -11,6 +11,8 @@ public partial class UIController : Node2D
     [Export]
     private Control selectedUnitViewControl = null!;
     [Export]
+	private Label productsLabel = null!;
+    [Export]
 	private Label customersLabel = null!;
     [Export]
 	private Label coinsLabel = null!;
@@ -267,6 +269,11 @@ public partial class UIController : Node2D
         {
             actionButtonContainer.GetChild(i).QueueFree();
         }
+    }
+
+    public void SetProductGenerationRate(int productGenerationRate)
+    {
+        productsLabel.Text = productGenerationRate.ToString();
     }
 
     public void SetCustomerCountText(int customerCount)
