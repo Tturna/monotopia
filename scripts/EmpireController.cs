@@ -20,6 +20,7 @@ public partial class EmpireController : Node2D
     public bool IsHqCreated { get; private set; }
 
 	private List<FactoryTileController> factories = new();
+	private List<StoreTileController> stores = new();
 	
 	private long? ownerPeerId = null;
 	private BaseUnit? selectedUnit;
@@ -189,6 +190,7 @@ public partial class EmpireController : Node2D
     {
         var storeController = TileGrid.AddStore(tilePosition);
         storeController.InitializeStore(tilePosition, newStoreUid);
+        stores.Add(storeController);
     }
 
     public void AddNewFactoryToEmpire(Vector2I tilePosition, string newFactoryUid)
@@ -260,7 +262,7 @@ public partial class EmpireController : Node2D
     public void RecalculateCustomerCount()
     {
         var topInfluenceTiles = influenceSystem.GetPeerTopInfluenceTiles(GetOwnerPeerId());
-        var totalTopInfluenceResidents = 0;
+        var totalServedCustomers = 0;
 
         foreach (var tilePosition in topInfluenceTiles)
         {
@@ -271,10 +273,39 @@ public partial class EmpireController : Node2D
 
             if (tileController is not ResidentialTileController residentialController) continue;
 
-            totalTopInfluenceResidents += residentialController.Residents;
+            var clientsToServe = residentialController.Residents;
+
+            while (clientsToServe > 0)
+            {
+                StoreTileController? closestAvailableStore = null;
+                var closestStoreDistance = float.MaxValue;
+
+                foreach (var store in stores)
+                {
+                    if (closestAvailableStore is null)
+                    {
+                        closestAvailableStore = store;
+                        continue;
+                    }
+
+                    var storeDistance = tilePosition.DistanceTo(store.TilePosition);
+
+                    if (storeDistance < closestStoreDistance && store.AvailableServiceCapacity > 0)
+                    {
+                        closestAvailableStore = store;
+                        closestStoreDistance = storeDistance;
+                    }
+                }
+
+                if (closestAvailableStore is null) break;
+
+                var servedCustomers = closestAvailableStore.ServeCustomers(clientsToServe);
+                clientsToServe -= servedCustomers;
+                totalServedCustomers += servedCustomers;
+            }
         }
 
-        CustomerCount = totalTopInfluenceResidents;
+        CustomerCount = totalServedCustomers;
         TotalCoinIncome = CustomerCount;
 
         if (IsPlayerEmpire)
