@@ -19,6 +19,7 @@ public partial class EmpireController : Node2D
 	public bool HasSelection { get; private set; }
     public bool IsHqCreated { get; private set; }
 
+    private HqController? hq;
 	private List<FactoryTileController> factories = new();
 	private List<StoreTileController> stores = new();
 	
@@ -179,11 +180,18 @@ public partial class EmpireController : Node2D
         }
 
 		var hqController = TileGrid.AddHq(tilePosition);
+        hq = hqController;
 		hqController.InitializeHq(tilePosition, ownerEmpire: this, newHqUid);
 		EntitySelector.SetHq(newHqUid, hqController);
         IsHqCreated = true;
         ProductGenerationRate += hqController.BaseProductsGenerated;
-        ProductGenerationRateUpdated?.Invoke(ProductGenerationRate);
+        TotalCoinIncome += hqController.CoinsGenerated;
+
+        if (IsPlayerEmpire)
+        {
+            ProductGenerationRateUpdated?.Invoke(ProductGenerationRate);
+            CoinsUpdated?.Invoke(Coins, TotalCoinIncome);
+        }
 	}
 
     public void AddNewStoreToEmpire(Vector2I tilePosition, string newStoreUid)
@@ -259,7 +267,7 @@ public partial class EmpireController : Node2D
 		return false;
 	}
 
-    public void RecalculateCustomerCount()
+    public void RecalculateCustomersAndIncome()
     {
         var topInfluenceTiles = influenceSystem.GetPeerTopInfluenceTiles(GetOwnerPeerId());
         var totalServedCustomers = 0;
@@ -306,7 +314,16 @@ public partial class EmpireController : Node2D
         }
 
         CustomerCount = totalServedCustomers;
-        TotalCoinIncome = CustomerCount;
+        var customerIncome = CustomerCount;
+        var totalIncome = customerIncome;
+
+        // factor in other than customer income
+        if (TryGetHq(out var empireHq) && empireHq is not null)
+        {
+            totalIncome += empireHq.CoinsGenerated;
+        }
+
+        TotalCoinIncome = totalIncome;
 
         if (IsPlayerEmpire)
         {
@@ -339,5 +356,13 @@ public partial class EmpireController : Node2D
         }
 
         throw new InvalidOperationException("No empire found for given peer ID");
+    }
+
+    public bool TryGetHq(out HqController? empireHq)
+    {
+        empireHq = null;
+        if (hq is null) return false;
+        empireHq = hq;
+        return true;
     }
 }

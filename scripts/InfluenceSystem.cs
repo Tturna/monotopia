@@ -92,7 +92,7 @@ public partial class InfluenceSystem : Node
             throw new InvalidOperationException($"No empire with uid {empireUid}");
         }
 
-        empire.RecalculateCustomerCount();
+        empire.RecalculateCustomersAndIncome();
     }
 
     [Rpc(mode: MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
@@ -230,7 +230,7 @@ public partial class InfluenceSystem : Node
 
             polygonBuilder.SyncPeerInfluenceTiles(peerId, influenceTiles, empireColor);
 
-            empire.RecalculateCustomerCount();
+            empire.RecalculateCustomersAndIncome();
             RpcId(empire.GetOwnerPeerId(), MethodName.SyncRecalculateCustomers, empire.EmpireUid);
         }
     }
