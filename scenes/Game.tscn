@@ -26,6 +26,7 @@
 [ext_resource type="LabelSettings" uid="uid://brmmuo7fvryem" path="res://UI_Base_Label_Settings.tres" id="15_jai3c"]
 [ext_resource type="PackedScene" uid="uid://cpc1ij2wjxypk" path="res://scenes/WinOverlay.tscn" id="16_1gdd5"]
 [ext_resource type="PackedScene" uid="uid://1dota62uermp" path="res://scenes/OwnedHqView.tscn" id="17_426vi"]
+[ext_resource type="PackedScene" uid="uid://bmuutyanmrs6i" path="res://scenes/NotificationToast.tscn" id="17_jai3c"]
 [ext_resource type="PackedScene" uid="uid://d2nlqqu8jsp7" path="res://scenes/LoseOverlay.tscn" id="18_45i86"]
 [ext_resource type="Texture2D" uid="uid://dslwqm7g4j3rs" path="res://sprites/customers_icon.png" id="22_0bq3a"]
 [ext_resource type="PackedScene" uid="uid://c3555l7i2drjl" path="res://scenes/SelectedUnitView.tscn" id="23_bneo8"]
@@ -56,7 +57,7 @@ script = ExtResource("9_a85ww")
 script = ExtResource("9_jbgew")
 UnitsContainer = NodePath("../Units Parent")
 
-[node name="UIController" type="Node2D" parent="." unique_id=170486342 node_paths=PackedStringArray("ownedHqViewControl", "selectedUnitViewControl", "productsLabel", "customersLabel", "coinsLabel", "turnCountLabel", "turnTimerLabel", "endTurnButton", "winOverlayControl", "loseOverlayControl")]
+[node name="UIController" type="Node2D" parent="." unique_id=170486342 node_paths=PackedStringArray("ownedHqViewControl", "selectedUnitViewControl", "productsLabel", "customersLabel", "coinsLabel", "turnCountLabel", "turnTimerLabel", "endTurnButton", "winOverlayControl", "loseOverlayControl", "notificationsParent")]
 script = ExtResource("11_jhsr3")
 ownedHqViewControl = NodePath("../CanvasLayer/AspectRatioContainer/Owned HQ View")
 selectedUnitViewControl = NodePath("../CanvasLayer/AspectRatioContainer/Selected Unit View")
@@ -71,6 +72,8 @@ winOverlayControl = NodePath("../CanvasLayer/AspectRatioContainer/MarginContaine
 loseOverlayControl = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Lose Overlay")
 tileSelectionScene = ExtResource("10_a8wo8")
 reachableTileIndicatorScene = ExtResource("11_attvq")
+notificationsParent = NodePath("../CanvasLayer/AspectRatioContainer/Notifications Parent")
+notificationToastScene = ExtResource("17_jai3c")
 
 [node name="PlayerInputController" type="Node2D" parent="." unique_id=55412351]
 script = ExtResource("12_attvq")
@@ -276,3 +279,6 @@ visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
+
+[node name="Notifications Parent" type="Control" parent="CanvasLayer/AspectRatioContainer" unique_id=244805677]
+layout_mode = 2

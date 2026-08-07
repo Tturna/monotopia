@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://bmuutyanmrs6i"]
+
+[node name="NotificationToast" type="Control" unique_id=1694467802]
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1891217788]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -320.0
+offset_top = -160.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="HBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=82766788]
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="PanelContainer/HBoxContainer" unique_id=449249224]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/HBoxContainer/PanelContainer" unique_id=1337836847]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Toast Title" type="Label" parent="PanelContainer/HBoxContainer/PanelContainer/MarginContainer" unique_id=32284267]
+layout_mode = 2
+text = "This is the toast title"
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/HBoxContainer" unique_id=1953258333]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Toast Body" type="Label" parent="PanelContainer/HBoxContainer/MarginContainer" unique_id=384775531]
+custom_minimum_size = Vector2(160, 100)
+layout_mode = 2
+text = "This is the toas body, which could be longer and also wrap when it gets too long. What if this was like crazy long, maybe like an error message? Does it add an ellipsis at some point? Like where's the limit?"
+autowrap_mode = 2
+text_overrun_behavior = 4
+max_lines_visible = 4
