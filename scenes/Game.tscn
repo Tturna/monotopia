@@ -26,8 +26,6 @@
 [ext_resource type="LabelSettings" uid="uid://brmmuo7fvryem" path="res://UI_Base_Label_Settings.tres" id="15_jai3c"]
 [ext_resource type="PackedScene" uid="uid://cpc1ij2wjxypk" path="res://scenes/WinOverlay.tscn" id="16_1gdd5"]
 [ext_resource type="PackedScene" uid="uid://1dota62uermp" path="res://scenes/OwnedHqView.tscn" id="17_426vi"]
-[ext_resource type="PackedScene" uid="uid://bmuutyanmrs6i" path="res://scenes/NotificationToast.tscn" id="17_jai3c"]
-[ext_resource type="Script" uid="uid://d00h3y5rwrhsv" path="res://scripts/NotificationController.cs" id="18_1gdd5"]
 [ext_resource type="PackedScene" uid="uid://d2nlqqu8jsp7" path="res://scenes/LoseOverlay.tscn" id="18_45i86"]
 [ext_resource type="Texture2D" uid="uid://dslwqm7g4j3rs" path="res://sprites/customers_icon.png" id="22_0bq3a"]
 [ext_resource type="PackedScene" uid="uid://c3555l7i2drjl" path="res://scenes/SelectedUnitView.tscn" id="23_bneo8"]
@@ -73,11 +71,6 @@ winOverlayControl = NodePath("../CanvasLayer/AspectRatioContainer/MarginContaine
 loseOverlayControl = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Lose Overlay")
 tileSelectionScene = ExtResource("10_a8wo8")
 reachableTileIndicatorScene = ExtResource("11_attvq")
-
-[node name="NotificationController" type="Node2D" parent="." unique_id=916487851 node_paths=PackedStringArray("notificationsParent")]
-script = ExtResource("18_1gdd5")
-notificationsParent = NodePath("../CanvasLayer/AspectRatioContainer/Notifications Parent")
-notificationToastScene = ExtResource("17_jai3c")
 
 [node name="PlayerInputController" type="Node2D" parent="." unique_id=55412351]
 script = ExtResource("12_attvq")
@@ -283,7 +276,3 @@ visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
-
-[node name="Notifications Parent" type="Control" parent="CanvasLayer/AspectRatioContainer" unique_id=244805677]
-layout_mode = 2
-mouse_filter = 2

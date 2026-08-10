@@ -48,14 +48,14 @@ public partial class MultiplayerController : Node2D
             SubscribeToMultiplayerEvents();
             isMultiplayerPeerActive = true;
             var toastBody = $"Listening on {listenAddress}:{listenPort}";
-            notificationController.ShowNotificationToast("Server started", toastBody, 3);
+            notificationController.ShowNotificationToast("Server started", toastBody, 5);
 
             return true;
         }
         else
         {
             var toastBody = $"Status: {errorStatus.ToString()}";
-            notificationController.ShowNotificationToast("Failed to start server", toastBody, 3);
+            notificationController.ShowNotificationToast("Failed to start server", toastBody, 5);
 
             return false;
         }
@@ -72,14 +72,14 @@ public partial class MultiplayerController : Node2D
             SubscribeToMultiplayerEvents();
             isMultiplayerPeerActive = true;
             var toastBody = $"Target server: {address}:{port}. ID: {Multiplayer.GetUniqueId()}";
-            notificationController.ShowNotificationToast("Client created", toastBody, 3);
+            notificationController.ShowNotificationToast("Client created", toastBody, 5);
 
             return true;
         }
         else
         {
             var toastBody = $"Status: {errorStatus.ToString()}";
-            notificationController.ShowNotificationToast("Failed to create client", toastBody, 3);
+            notificationController.ShowNotificationToast("Failed to create client", toastBody, 5);
 
             return false;
         }
@@ -89,16 +89,17 @@ public partial class MultiplayerController : Node2D
     {
         if (!IsConnectedToMultiplayer()) return;
 
-        DebugUtility.Print("Shutting down server");
+        notificationController.ShowNotificationToast("Server shut down", "Manually stopped the server", 5);
+
         Rpc(MethodName.NotifyServerShutdown);
         DisconnectMultiplayer();
     }
 
-    public void DisconnectClient()
+    public void DisconnectClient(string reason)
     {
         if (!IsConnectedToMultiplayer()) return;
 
-        DebugUtility.Print($"Disconnecting client {Multiplayer.GetUniqueId()}");
+        notificationController.ShowNotificationToast("Disconnecting client", reason, 5);
         Rpc(MethodName.NotifyPlayerDisconnect, Multiplayer.GetUniqueId());
         DisconnectMultiplayer();
     }
@@ -143,15 +144,14 @@ public partial class MultiplayerController : Node2D
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
     private void NotifyPlayerDisconnect(long peerId)
     {
-        DebugUtility.Print($"Peer {peerId} notified that it will disconnect");
+        notificationController.ShowNotificationToast("Client disconnected", $"Peer {peerId} disconnected", 5);
     }
 
     // Called on clients
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false)]
     private void NotifyServerShutdown()
     {
-        DebugUtility.Print("Server notified that it is shutting down");
-        DisconnectClient();
+        DisconnectClient("Server shutting down");
         GetTree().ChangeSceneToFile("res://scenes/MainMenu.tscn");
     }
 
@@ -204,7 +204,7 @@ public partial class MultiplayerController : Node2D
     // Only called on clients
     private void OnConnectedToServer()
     {
-        DebugUtility.Print($"Peer {Multiplayer.GetUniqueId()} says: connected to server.");
+        notificationController.ShowNotificationToast("Connected to server", "Connection successful", 5);
     }
 
     // Only called on clients
@@ -214,7 +214,7 @@ public partial class MultiplayerController : Node2D
     // unexpectedly for example.
     private void OnServerDisconnected()
     {
-        DebugUtility.Print("Disconnected from server.");
+        notificationController.ShowNotificationToast("Disconnected from server", "Unexpectedly disconnected from server", 5);
         DisconnectMultiplayer();
         GetTree().ChangeSceneToFile("res://scenes/MainMenu.tscn");
     }
@@ -222,6 +222,6 @@ public partial class MultiplayerController : Node2D
     // Only called on clients
     private void OnConnectionFailed()
     {
-        DebugUtility.Print($"Peer {Multiplayer.GetUniqueId()} says: failed to connect server.");
+        notificationController.ShowNotificationToast("Connection failed", "Failed to connect to server", 5);
     }
 }

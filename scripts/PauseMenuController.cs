@@ -75,7 +75,7 @@ public partial class PauseMenuController : Node
         }
         else
         {
-            MultiplayerController.Instance.DisconnectClient();
+            MultiplayerController.Instance.DisconnectClient("Manually disconnected");
         }
 
         GetTree().ChangeSceneToFile("res://scenes/MainMenu.tscn");

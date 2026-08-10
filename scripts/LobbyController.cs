@@ -16,9 +16,11 @@ public partial class LobbyController : Node
     private Label buildInfoLabel;
 
     private Dictionary<long, Control> playerListEntries = new();
+    private NotificationController notificationController = null!;
 
     public override void _Ready()
     {
+        notificationController = GodotUtilities.FindNodeOfType<NotificationController>(GetTree().Root);
         backButton.Pressed += OnBackButtonPressed;
 
         if (Multiplayer.IsServer())
@@ -57,7 +59,7 @@ public partial class LobbyController : Node
         }
         else
         {
-            MultiplayerController.Instance.DisconnectClient();
+            MultiplayerController.Instance.DisconnectClient("Manually disconnected");
         }
 
         UnsubscribeFromMultiplayerEvents();
@@ -89,6 +91,7 @@ public partial class LobbyController : Node
     [Rpc(CallLocal = true)]
     private void LoadGameScene()
     {
+        notificationController.ShowNotificationToast("Game started", "Server started the game", 5);
         UnsubscribeFromMultiplayerEvents();
         GetTree().ChangeSceneToFile("res://scenes/Game.tscn");
     }

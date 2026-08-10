@@ -1,8 +1,6 @@
 [gd_scene format=3 uid="uid://eawyb7asi28i"]
 
 [ext_resource type="Script" uid="uid://bt6af0tfbcsa3" path="res://scripts/MainMenuController.cs" id="1_yqorp"]
-[ext_resource type="Script" uid="uid://d00h3y5rwrhsv" path="res://scripts/NotificationController.cs" id="2_2wh52"]
-[ext_resource type="PackedScene" uid="uid://bmuutyanmrs6i" path="res://scenes/NotificationToast.tscn" id="3_ow34m"]
 
 [node name="MainMenuControl" type="Control" unique_id=1244727104 node_paths=PackedStringArray("mainButtonControl", "startServerButton", "connectClientButton", "settingsButton", "quitButton", "startServerControl", "listenAddressLineEdit", "listenPortLineEdit", "confirmStartServerButton", "backStartServerButton", "connectClientControl", "connectAddressLineEdit", "connectPortLineEdit", "confirmConnectButton", "backConnectClientButton", "buildInfoLabel")]
 layout_mode = 3
@@ -152,10 +150,3 @@ layout_mode = 2
 [node name="Build Info Label" type="Label" parent="AspectRatioContainer/MarginContainer/Main VBox/Build Info HBox" unique_id=948108984]
 layout_mode = 2
 text = "Some build info idk"
-
-[node name="Notifications Parent" type="Control" parent="AspectRatioContainer" unique_id=43581318 node_paths=PackedStringArray("notificationsParent")]
-layout_mode = 2
-mouse_filter = 2
-script = ExtResource("2_2wh52")
-notificationsParent = NodePath(".")
-notificationToastScene = ExtResource("3_ow34m")

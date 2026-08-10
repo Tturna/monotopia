@@ -4,13 +4,19 @@ using Godot;
 #nullable enable
 public partial class NotificationController : Node
 {
-    [Export]
-    private Node notificationsParent = null!;
-    [Export]
-    private PackedScene notificationToastScene = null!;
-
+    private PackedScene notificationToastScene => GD.Load<PackedScene>("res://scenes/NotificationToast.tscn");
     private Queue<NotificationToast> activeNotificationToasts = new();
     private NotificationToast? visibleNotificationToast;
+
+    public override void _Ready()
+    {
+        // Add a canvas layer and move this notification controller under it
+        var sceneRoot = GetTree().Root;
+        var canvasLayer = new CanvasLayer();
+        canvasLayer.Layer = 2;
+        sceneRoot.CallDeferred(MethodName.AddChild, canvasLayer);
+        CallDeferred(MethodName.Reparent, canvasLayer);
+    }
 
     public override void _Process(double delta)
     {
@@ -42,7 +48,7 @@ public partial class NotificationController : Node
         toastTitle.Text = title;
         toastBody.Text = body;
         toastControl.Hide();
-        notificationsParent.AddChild(toastControl);
+        AddChild(toastControl);
         activeNotificationToasts.Enqueue(new (toastControl, duration));
     }
 }
