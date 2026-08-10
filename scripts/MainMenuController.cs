@@ -120,7 +120,7 @@ public partial class MainMenuController : Node
 
 		if (!int.TryParse(connectPortLineEdit.Text, out var port))
 		{
-			GD.PushWarning($"Given port is not a string. Got: {connectPortLineEdit.Text}");
+			GD.PushWarning($"Given port is not an integer. Got: {connectPortLineEdit.Text}");
 			return;
 		}
 
