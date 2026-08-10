@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://dn6ieaf0k4qr8"]
 
 [ext_resource type="Script" uid="uid://j4rjxpjgopap" path="res://scripts/LobbyController.cs" id="1_6jt0u"]
+[ext_resource type="Script" uid="uid://d00h3y5rwrhsv" path="res://scripts/NotificationController.cs" id="2_cdhm0"]
+[ext_resource type="PackedScene" uid="uid://bmuutyanmrs6i" path="res://scenes/NotificationToast.tscn" id="3_qbi84"]
 
 [node name="LobbyControl" type="Control" unique_id=775783726 node_paths=PackedStringArray("playerListControl", "backButton", "startGameButton", "clientInfoLabel", "buildInfoLabel")]
 layout_mode = 3
@@ -86,3 +88,10 @@ layout_mode = 2
 [node name="Build Info Label" type="Label" parent="AspectRatioContainer/MarginContainer/Main VBox/Build Info HBox" unique_id=1152193125]
 layout_mode = 2
 text = "Some build info idk"
+
+[node name="Notifications Parent" type="Control" parent="AspectRatioContainer" unique_id=898097749 node_paths=PackedStringArray("notificationsParent")]
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("2_cdhm0")
+notificationsParent = NodePath(".")
+notificationToastScene = ExtResource("3_qbi84")

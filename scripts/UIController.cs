@@ -32,16 +32,10 @@ public partial class UIController : Node2D
 	private PackedScene tileSelectionScene = null!;
     [Export]
 	private PackedScene reachableTileIndicatorScene = null!;
-    [Export]
-    private Node notificationsParent = null!;
-    [Export]
-    private PackedScene notificationToastScene = null!;
 
     private Sprite2D tileSelectionNode = null!;
     private Dictionary<Vector2I, Sprite2D> reachableTileIndicators = new();
 	private Line2D unitPathLine = null!;
-    private Queue<NotificationToast> activeNotificationToasts = new();
-    private NotificationToast? visibleNotificationToast;
 
     private PanelContainer? selectedBuildableItemPanel;
     private BuildController.BuildableItemType? selectedBuildable;
@@ -74,38 +68,10 @@ public partial class UIController : Node2D
         endTurnButton.Pressed += () => EndTurnButtonPressed?.Invoke(this);
     }
 
-    public override void _Process(double delta)
-    {
-        if (activeNotificationToasts.Count == 0 && visibleNotificationToast is null) return;
-
-        if (visibleNotificationToast is null)
-        {
-            var toast = activeNotificationToasts.Peek();
-            visibleNotificationToast = toast;
-            visibleNotificationToast.ToastControl.Show();
-        }
-
-        visibleNotificationToast.DurationLeft -= (float)delta;
-
-        if (visibleNotificationToast.DurationLeft <= 0)
-        {
-            visibleNotificationToast.ToastControl.Hide();
-            visibleNotificationToast.ToastControl.QueueFree();
-            visibleNotificationToast = null;
-            activeNotificationToasts.Dequeue();
-        }
-    }
-
     public override void _Input(InputEvent inputEvent)
     {
         if (inputEvent is not InputEventMouseButton mouseButtonEvent) return;
         if (!mouseButtonEvent.IsPressed()) return;
-
-        if (mouseButtonEvent.ButtonIndex == MouseButton.Left)
-        {
-            ShowNotificationToast("Test toast", "Mouse clicked!", 1);
-        }
-
         if (mouseButtonEvent.ButtonIndex != MouseButton.Right) return;
         if (selectedBuildable is null) return;
 
@@ -408,17 +374,5 @@ public partial class UIController : Node2D
     public void SetUnitMovementPathPoints(Vector2[] points)
     {
         unitPathLine.Points = points;
-    }
-
-    public void ShowNotificationToast(string title, string body, float duration)
-    {
-        var toastControl = notificationToastScene.Instantiate<Control>();
-        var toastTitle = (Label)toastControl.FindChild("Toast Title");
-        var toastBody = (Label)toastControl.FindChild("Toast Body");
-        toastTitle.Text = title;
-        toastBody.Text = body;
-        toastControl.Hide();
-        notificationsParent.AddChild(toastControl);
-        activeNotificationToasts.Enqueue(new (toastControl, duration));
     }
 }

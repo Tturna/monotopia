@@ -18,6 +18,8 @@ public partial class MultiplayerController : Node2D
     private bool isMultiplayerPeerActive;
     private bool isSubscribedToClientEvents;
 
+    private NotificationController notificationController = null!;
+
     public override void _EnterTree()
     {
         if (Instance is not null)
@@ -29,6 +31,11 @@ public partial class MultiplayerController : Node2D
         Instance = this;
     }
 
+    public override void _Ready()
+    {
+        notificationController = GodotUtilities.FindNodeOfType<NotificationController>(GetTree().Root);
+    }
+
     public bool InitializeServer(string? listenAddress = null, int listenPort = DefaultServerListenPort)
     {
         var serverPeer = new ENetMultiplayerPeer();
@@ -38,15 +45,17 @@ public partial class MultiplayerController : Node2D
         if (errorStatus == Error.Ok)
         {
             Multiplayer.MultiplayerPeer = serverPeer;
-            DebugUtility.Print($"Server started. Listening on {listenAddress}:{listenPort}");
             SubscribeToMultiplayerEvents();
             isMultiplayerPeerActive = true;
+            var toastBody = $"Listening on {listenAddress}:{listenPort}";
+            notificationController.ShowNotificationToast("Server started", toastBody, 3);
 
             return true;
         }
         else
         {
-            DebugUtility.Print($"Failed to start server. Status: {errorStatus.ToString()}");
+            var toastBody = $"Status: {errorStatus.ToString()}";
+            notificationController.ShowNotificationToast("Failed to start server", toastBody, 3);
 
             return false;
         }
@@ -61,14 +70,16 @@ public partial class MultiplayerController : Node2D
         {
             Multiplayer.MultiplayerPeer = clientPeer;
             SubscribeToMultiplayerEvents();
-            DebugUtility.Print($"Client created. Target server: {address}:{port}. ID: {Multiplayer.GetUniqueId()}");
             isMultiplayerPeerActive = true;
+            var toastBody = $"Target server: {address}:{port}. ID: {Multiplayer.GetUniqueId()}";
+            notificationController.ShowNotificationToast("Client created", toastBody, 3);
 
             return true;
         }
         else
         {
-            DebugUtility.Print($"Status when creating client: {errorStatus.ToString()}");
+            var toastBody = $"Status: {errorStatus.ToString()}";
+            notificationController.ShowNotificationToast("Failed to create client", toastBody, 3);
 
             return false;
         }
