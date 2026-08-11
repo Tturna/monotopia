@@ -37,17 +37,31 @@ public partial class MainMenuController : Node
 
 	[Export]
 	private Label buildInfoLabel;
+    [Export]
+    private PackedScene connectingIndicatorScene;
+
+    private Control connectingIndicator;
 
 	public override void _Ready()
 	{
+        connectingIndicator = (Control)connectingIndicatorScene.Instantiate();
+        connectingIndicator.Hide();
+        AddChild(connectingIndicator);
+
+        var cancelConnectingButton = GodotUtilities.FindNodeOfType<Button>(connectingIndicator);
+        cancelConnectingButton.Pressed += OnCancelConnectionPressed;
+
 		startServerButton.Pressed += OnStartServerPressed;
 		connectClientButton.Pressed += OnConnectClientPressed;
 		confirmStartServerButton.Pressed += OnConfirmStartServerPressed;
 		confirmConnectButton.Pressed += OnConfirmConnectClientPressed;
 		backStartServerButton.Pressed += OnBackStartServerPressed;
-		backConnectClientButton.Pressed += OnBackConnectClientPressed;
+		backConnectClientButton.Pressed += HideConnectionView;
 		settingsButton.Pressed += () => DebugUtility.Print("Settings button pressed");
 		quitButton.Pressed += () => GetTree().Quit();
+
+        MultiplayerController.Instance.ConnectionToServerFailed += HideConnectionView;
+        MultiplayerController.Instance.ConnectionToServerSucceeded += OnCOnnectionToServerSucceeded;
 
 		if (MultiplayerController.TryGetPreferredListenIPv4Address(out var address))
 		{
@@ -130,7 +144,7 @@ public partial class MainMenuController : Node
 
 		if (connectSucceeded)
 		{
-			GetTree().ChangeSceneToFile("res://scenes/Lobby.tscn");
+            connectingIndicator.Show();
 		}
 	}
 
@@ -140,9 +154,24 @@ public partial class MainMenuController : Node
 		mainButtonControl.Show();
 	}
 
-	private void OnBackConnectClientPressed()
+	private void HideConnectionView()
 	{
 		connectClientControl.Hide();
 		mainButtonControl.Show();
+        connectingIndicator.Hide();
 	}
+
+    private void OnCancelConnectionPressed()
+    {
+        MultiplayerController.Instance.DisconnectClient("Connection cancelled by client");
+        HideConnectionView();
+    }
+
+    private void OnCOnnectionToServerSucceeded()
+    {
+        MultiplayerController.Instance.ConnectionToServerFailed -= HideConnectionView;
+        MultiplayerController.Instance.ConnectionToServerSucceeded -= OnCOnnectionToServerSucceeded;
+
+        GetTree().ChangeSceneToFile("res://scenes/Lobby.tscn");
+    }
 }

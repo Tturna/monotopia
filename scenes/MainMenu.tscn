@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://eawyb7asi28i"]
 
 [ext_resource type="Script" uid="uid://bt6af0tfbcsa3" path="res://scripts/MainMenuController.cs" id="1_yqorp"]
+[ext_resource type="PackedScene" uid="uid://b6ny0spfvrqd0" path="res://scenes/ConnectingIndicator.tscn" id="2_0ykhv"]
 
 [node name="MainMenuControl" type="Control" unique_id=1244727104 node_paths=PackedStringArray("mainButtonControl", "startServerButton", "connectClientButton", "settingsButton", "quitButton", "startServerControl", "listenAddressLineEdit", "listenPortLineEdit", "confirmStartServerButton", "backStartServerButton", "connectClientControl", "connectAddressLineEdit", "connectPortLineEdit", "confirmConnectButton", "backConnectClientButton", "buildInfoLabel")]
 layout_mode = 3
@@ -26,6 +27,7 @@ connectPortLineEdit = NodePath("AspectRatioContainer/MarginContainer/Main VBox/C
 confirmConnectButton = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Connect Client VBox/Button")
 backConnectClientButton = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Connect Client VBox/Back Button")
 buildInfoLabel = NodePath("AspectRatioContainer/MarginContainer/Main VBox/Build Info HBox/Build Info Label")
+connectingIndicatorScene = ExtResource("2_0ykhv")
 
 [node name="AspectRatioContainer" type="AspectRatioContainer" parent="." unique_id=231309563]
 layout_mode = 1

@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://b6ny0spfvrqd0"]
+
+[ext_resource type="PackedScene" uid="uid://dg60jpxvpg1g8" path="res://scenes/FloatingLoadingIndicator.tscn" id="1_715xm"]
+
+[node name="ConnectingIndicator" type="Control" unique_id=65404407]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1604435193]
+custom_minimum_size = Vector2(200, 150)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer" unique_id=988910398]
+custom_minimum_size = Vector2(200, 150)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer" unique_id=2104968660]
+layout_mode = 2
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer" unique_id=1816086066]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=198145889]
+layout_mode = 2
+text = "Connecting..."
+
+[node name="FloatingLoadingIndicator" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=267646179 instance=ExtResource("1_715xm")]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1718092065]
+layout_mode = 2
+text = "Cancel"

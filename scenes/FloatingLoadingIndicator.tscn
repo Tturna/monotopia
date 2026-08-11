@@ -1,0 +1,73 @@
+[gd_scene format=3 uid="uid://dg60jpxvpg1g8"]
+
+[ext_resource type="Texture2D" uid="uid://dfyg3364ufjao" path="res://sprites/loadingicon.png" id="1_km8qs"]
+
+[sub_resource type="Animation" id="Animation_km8qs"]
+resource_name = "LoadingIndicatorSpin"
+length = 2.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TextureRect:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 6.283185307179586]
+}
+
+[sub_resource type="Animation" id="Animation_74cos"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TextureRect:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ydlx0"]
+_data = {
+&"LoadingIndicatorSpin": SubResource("Animation_km8qs"),
+&"RESET": SubResource("Animation_74cos")
+}
+
+[node name="FloatingLoadingIndicator" type="Control" unique_id=267646179]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=2106446299]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset_ratio = Vector2(0.5, 0.5)
+texture = ExtResource("1_km8qs")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1354575539]
+libraries/ = SubResource("AnimationLibrary_ydlx0")
+autoplay = &"LoadingIndicatorSpin"

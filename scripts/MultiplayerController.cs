@@ -15,7 +15,14 @@ public partial class MultiplayerController : Node2D
     public delegate void PlayerDisconnectedHandler(long peerId);
     public event PlayerDisconnectedHandler? PlayerDisconnected;
 
+    public delegate void ConnectionToServerSucceededHandler();
+    public event ConnectionToServerSucceededHandler? ConnectionToServerSucceeded;
+
+    public delegate void ConnectionToServerFailedHandler();
+    public event ConnectionToServerFailedHandler? ConnectionToServerFailed;
+
     private bool isMultiplayerPeerActive;
+    private bool isServerOrConnectedClient;
     private bool isSubscribedToClientEvents;
 
     private NotificationController notificationController = null!;
@@ -47,6 +54,7 @@ public partial class MultiplayerController : Node2D
             Multiplayer.MultiplayerPeer = serverPeer;
             SubscribeToMultiplayerEvents();
             isMultiplayerPeerActive = true;
+            isServerOrConnectedClient = true;
             var toastBody = $"Listening on {listenAddress}:{listenPort}";
             notificationController.ShowNotificationToast("Server started", toastBody, 5);
 
@@ -61,6 +69,11 @@ public partial class MultiplayerController : Node2D
         }
     }
 
+    /// <summary>
+    /// Creates a multiplayer client and returns a boolean indicating creation status.
+    /// Note that this can return true even if the client can't connect to the server.
+    /// You should rely instead of the multiplayer system events.
+    /// </summary>
     public bool InitializeClient(string address, int port = DefaultServerListenPort)
     {
         var clientPeer = new ENetMultiplayerPeer();
@@ -87,21 +100,25 @@ public partial class MultiplayerController : Node2D
 
     public void ShutdownServer()
     {
-        if (!IsConnectedToMultiplayer()) return;
+        if (!IsMultiplayerInitialized()) return;
 
         notificationController.ShowNotificationToast("Server shut down", "Manually stopped the server", 5);
 
         Rpc(MethodName.NotifyServerShutdown);
-        DisconnectMultiplayer();
+        ShutDownMultiplayer();
     }
 
     public void DisconnectClient(string reason)
     {
-        if (!IsConnectedToMultiplayer()) return;
+        if (!IsMultiplayerInitialized()) return;
+
+        if (IsMultiplayerConnected())
+        {
+            Rpc(MethodName.NotifyPlayerDisconnect, Multiplayer.GetUniqueId());
+        }
 
         notificationController.ShowNotificationToast("Disconnecting client", reason, 5);
-        Rpc(MethodName.NotifyPlayerDisconnect, Multiplayer.GetUniqueId());
-        DisconnectMultiplayer();
+        ShutDownMultiplayer();
     }
 
     public static bool TryGetPreferredListenIPv4Address(out string address)
@@ -131,10 +148,11 @@ public partial class MultiplayerController : Node2D
         }
     }
 
-    private void DisconnectMultiplayer()
+    public void ShutDownMultiplayer()
     {
-        if (!IsConnectedToMultiplayer()) return;
+        if (!IsMultiplayerInitialized()) return;
 
+        isServerOrConnectedClient = false;
         Multiplayer.MultiplayerPeer = null;
         isMultiplayerPeerActive = false;
         UnsubscribeFromMultiplayerEvents();
@@ -183,9 +201,14 @@ public partial class MultiplayerController : Node2D
         }
     }
 
-    private bool IsConnectedToMultiplayer()
+    private bool IsMultiplayerInitialized()
     {
         return isMultiplayerPeerActive && Multiplayer.MultiplayerPeer != null;
+    }
+
+    private bool IsMultiplayerConnected()
+    {
+        return IsMultiplayerInitialized() && isServerOrConnectedClient;
     }
 
     private void OnPeerConnected(long id)
@@ -204,7 +227,9 @@ public partial class MultiplayerController : Node2D
     // Only called on clients
     private void OnConnectedToServer()
     {
+        isServerOrConnectedClient = true;
         notificationController.ShowNotificationToast("Connected to server", "Connection successful", 5);
+        ConnectionToServerSucceeded?.Invoke();
     }
 
     // Only called on clients
@@ -214,14 +239,18 @@ public partial class MultiplayerController : Node2D
     // unexpectedly for example.
     private void OnServerDisconnected()
     {
+        isServerOrConnectedClient = false;
         notificationController.ShowNotificationToast("Disconnected from server", "Unexpectedly disconnected from server", 5);
-        DisconnectMultiplayer();
+        ShutDownMultiplayer();
         GetTree().ChangeSceneToFile("res://scenes/MainMenu.tscn");
     }
 
     // Only called on clients
     private void OnConnectionFailed()
     {
+        isServerOrConnectedClient = false;
         notificationController.ShowNotificationToast("Connection failed", "Failed to connect to server", 5);
+        ShutDownMultiplayer();
+        ConnectionToServerFailed?.Invoke();
     }
 }
