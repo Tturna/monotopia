@@ -128,6 +128,7 @@ public partial class MultiplayerController : Node2D
         if (IsMultiplayerConnected())
         {
             Rpc(MethodName.NotifyPlayerDisconnect, Multiplayer.GetUniqueId());
+            Multiplayer.MultiplayerPeer.Close();
         }
 
         notificationController.ShowNotificationToast("Disconnecting client", reason, 5);
