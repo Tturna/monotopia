@@ -36,6 +36,19 @@ public partial class LobbyController : Node
         buildInfoLabel.Text = DebugUtility.GetBriefBuildInfoString();
 
         OnPlayerConnected(Multiplayer.GetUniqueId());
+        var otherPeers = Multiplayer.GetPeers();
+
+        // Run manually so that connecting clients show the correct initial player listing.
+        // This is required because when a client initially joins, they request to join the game
+        // instead of directly loading the lobby (server decides if client can join). During
+        // the time the client waits for a response, the Multiplayer.PeerConnected events
+        // fire. Therefore, a connecting client misses these events because they haven't loaded
+        // the lobby yet.
+        foreach (var peerId in otherPeers)
+        {
+            OnPlayerConnected(peerId);
+        }
+
         SubscribeToMultiplayerEvents();
     }
 
