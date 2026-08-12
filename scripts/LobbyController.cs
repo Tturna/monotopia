@@ -93,6 +93,7 @@ public partial class LobbyController : Node
     {
         notificationController.ShowNotificationToast("Game started", "Server started the game", 5);
         UnsubscribeFromMultiplayerEvents();
+        MultiplayerController.Instance.MarkGameStarted();
         GetTree().ChangeSceneToFile("res://scenes/Game.tscn");
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 using System.Net.Sockets;
 using Godot;
@@ -21,9 +22,16 @@ public partial class MultiplayerController : Node2D
     public delegate void ConnectionToServerFailedHandler();
     public event ConnectionToServerFailedHandler? ConnectionToServerFailed;
 
+    public delegate void GameJoinRequestAcceptedHandler();
+    public event GameJoinRequestAcceptedHandler? GameJoinRequestAccepted;
+
+    public delegate void GameJoinRequestDeniedHandler(string reason);
+    public event GameJoinRequestDeniedHandler? GameJoinRequestDenied;
+
     private bool isMultiplayerPeerActive;
     private bool isServerOrConnectedClient;
     private bool isSubscribedToClientEvents;
+    private bool isGameStarted;
 
     private NotificationController notificationController = null!;
 
@@ -163,6 +171,11 @@ public partial class MultiplayerController : Node2D
         UnsubscribeFromMultiplayerEvents();
     }
 
+    public void MarkGameStarted()
+    {
+        isGameStarted = true;
+    }
+
     // Called on the server
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
     private void NotifyPlayerDisconnect(long peerId)
@@ -235,6 +248,42 @@ public partial class MultiplayerController : Node2D
         isServerOrConnectedClient = true;
         notificationController.ShowNotificationToast("Connected to server", "Connection successful", 5);
         ConnectionToServerSucceeded?.Invoke();
+        RpcId(1, MethodName.RequestJoinGame);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    private void RequestJoinGame()
+    {
+        var remoteSenderId = Multiplayer.GetRemoteSenderId();
+
+        if (!Multiplayer.IsServer() || remoteSenderId == 0)
+        {
+            throw new InvalidOperationException("Tried to request joining game without RPC'ing the server");
+        }
+
+        if (isGameStarted)
+        {
+            RpcId(remoteSenderId, MethodName.RespondToClientJoinDenied, "A game is already in process");
+        }
+        else
+        {
+            RpcId(remoteSenderId, MethodName.RespondToClientJoinAccepted);
+        }
+    }
+
+    [Rpc()]
+    private void RespondToClientJoinAccepted()
+    {
+        GameJoinRequestAccepted?.Invoke();
+    }
+
+    [Rpc()]
+    private void RespondToClientJoinDenied(string reason)
+    {
+        GameJoinRequestDenied?.Invoke(reason);
+        notificationController.ShowNotificationToast("Joining game failed", reason, 5);
+        isServerOrConnectedClient = false;
+        ShutDownMultiplayer();
     }
 
     // Only called on clients

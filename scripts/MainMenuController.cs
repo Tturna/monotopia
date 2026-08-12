@@ -61,7 +61,8 @@ public partial class MainMenuController : Node
 		quitButton.Pressed += () => GetTree().Quit();
 
         MultiplayerController.Instance.ConnectionToServerFailed += HideConnectionView;
-        MultiplayerController.Instance.ConnectionToServerSucceeded += OnConnectionToServerSucceeded;
+        MultiplayerController.Instance.GameJoinRequestAccepted += OnGameJoinRequestAccepted;
+        MultiplayerController.Instance.GameJoinRequestDenied += OnGameJoinRequestDenied;
 
 		if (MultiplayerController.TryGetPreferredListenIPv4Address(out var address))
 		{
@@ -167,11 +168,17 @@ public partial class MainMenuController : Node
         HideConnectionView();
     }
 
-    private void OnConnectionToServerSucceeded()
+    private void OnGameJoinRequestAccepted()
     {
         MultiplayerController.Instance.ConnectionToServerFailed -= HideConnectionView;
-        MultiplayerController.Instance.ConnectionToServerSucceeded -= OnConnectionToServerSucceeded;
+        MultiplayerController.Instance.GameJoinRequestAccepted -= OnGameJoinRequestAccepted;
+        MultiplayerController.Instance.GameJoinRequestDenied -= OnGameJoinRequestDenied;
 
         GetTree().ChangeSceneToFile("res://scenes/Lobby.tscn");
+    }
+
+    private void OnGameJoinRequestDenied(string reason)
+    {
+        HideConnectionView();
     }
 }
