@@ -104,7 +104,12 @@ public partial class MultiplayerController : Node2D
 
         notificationController.ShowNotificationToast("Server shut down", "Manually stopped the server", 5);
 
-        Rpc(MethodName.NotifyServerShutdown);
+        if (IsMultiplayerConnected())
+        {
+            Rpc(MethodName.NotifyServerShutdown);
+            Multiplayer.MultiplayerPeer.Close();
+        }
+
         ShutDownMultiplayer();
     }
 
