@@ -61,7 +61,7 @@ public partial class MainMenuController : Node
 		quitButton.Pressed += () => GetTree().Quit();
 
         MultiplayerController.Instance.ConnectionToServerFailed += HideConnectionView;
-        MultiplayerController.Instance.ConnectionToServerSucceeded += OnCOnnectionToServerSucceeded;
+        MultiplayerController.Instance.ConnectionToServerSucceeded += OnConnectionToServerSucceeded;
 
 		if (MultiplayerController.TryGetPreferredListenIPv4Address(out var address))
 		{
@@ -167,10 +167,10 @@ public partial class MainMenuController : Node
         HideConnectionView();
     }
 
-    private void OnCOnnectionToServerSucceeded()
+    private void OnConnectionToServerSucceeded()
     {
         MultiplayerController.Instance.ConnectionToServerFailed -= HideConnectionView;
-        MultiplayerController.Instance.ConnectionToServerSucceeded -= OnCOnnectionToServerSucceeded;
+        MultiplayerController.Instance.ConnectionToServerSucceeded -= OnConnectionToServerSucceeded;
 
         GetTree().ChangeSceneToFile("res://scenes/Lobby.tscn");
     }
