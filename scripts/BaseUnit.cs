@@ -318,6 +318,15 @@ public abstract partial class BaseUnit : Sprite2D
     {
 		EntitySelector.SetUnit(TilePosition, null);
 		QueueFree();
+
+        var playerEmpire = EmpireController.GetPeerEmpire(Multiplayer.GetUniqueId());
+
+        if (playerEmpire.TryGetSelectedUnit(out var selectedUnit) &&
+            selectedUnit is not null &&
+            selectedUnit == this)
+        {
+            playerEmpire.Deselect();
+        }
     }
 
     [Rpc()]

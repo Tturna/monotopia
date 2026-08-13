@@ -290,7 +290,7 @@ public partial class EmpireController : Node2D
 
                 foreach (var store in stores)
                 {
-                    if (closestAvailableStore is null)
+                    if (closestAvailableStore is null && store.AvailableServiceCapacity > 0)
                     {
                         closestAvailableStore = store;
                         continue;
@@ -308,6 +308,12 @@ public partial class EmpireController : Node2D
                 if (closestAvailableStore is null) break;
 
                 var servedCustomers = closestAvailableStore.ServeCustomers(clientsToServe);
+
+                if (servedCustomers <= 0)
+                {
+                    throw new InvalidOperationException($"Clients to serve still: {clientsToServe}, closest available store: {closestAvailableStore.TilePosition}, store available service capacity: {closestAvailableStore.AvailableServiceCapacity}, served customers: {servedCustomers}");
+                }
+
                 clientsToServe -= servedCustomers;
                 totalServedCustomers += servedCustomers;
             }
