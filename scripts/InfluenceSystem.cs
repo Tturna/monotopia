@@ -32,20 +32,7 @@ public partial class InfluenceSystem : Node
 
         var mouseTilePosition = inputController.GetMouseTilePosition();
 
-        if (!tileInfluences.ContainsKey(mouseTilePosition))
-        {
-            DebugUtility.Print($"No one has influence on tile {mouseTilePosition}");
-            return;
-        }
-
-        DebugUtility.Print($"Tile {mouseTilePosition} influences:");
-
-        foreach (var (peerId, influence) in tileInfluences[mouseTilePosition])
-        {
-            DebugUtility.Print($"Peer {peerId}: {influence}");
-        }
-
-        DebugUtility.Print("---------------");
+        if (!tileInfluences.ContainsKey(mouseTilePosition)) return;
     }
 
     [Rpc()]
