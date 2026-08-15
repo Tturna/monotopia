@@ -9,6 +9,8 @@ public partial class UIController : Node2D
     [Export]
     private Control ownedHqViewControl = null!;
     [Export]
+    private Control ownedFactoryViewControl = null!;
+    [Export]
     private Control selectedUnitViewControl = null!;
     [Export]
 	private Label productsLabel = null!;
@@ -44,6 +46,7 @@ public partial class UIController : Node2D
     private PanelContainer? selectedBuildableItemPanel;
     private BuildController.BuildableItemType? selectedBuildable;
     private HqController? selectedHq;
+    private FactoryTileController? selectedFactory;
     private List<StoreTileController> storesSelectedForSupplyTargets = new();
 
     public bool IsChoosingSupplyTargets { get; private set; }
@@ -72,16 +75,11 @@ public partial class UIController : Node2D
             BuildController.Instance.RequestBuildItem((int)buildable, selectedHq.HqUid);
         };
 
-        var chooseSupplyTargetsButton = (Button)ownedHqViewControl.FindChild("ChooseSupplyTargets");
-        chooseSupplyTargetsButton.Pressed += () =>
-        {
-            DebugUtility.Print("Choosing supply targets");
-            IsChoosingSupplyTargets = true;
-            confirmSupplyTargetSelectionButton.Show();
-            cancelSupplyTargetSelectionButton.Show();
+        var chooseSupplyTargetsButtonHq = (Button)ownedHqViewControl.FindChild("ChooseSupplyTargets");
+        chooseSupplyTargetsButtonHq.Pressed += ChooseSupplyTargets;
 
-            // TODO: If the selected hq/factory already has supply targets, make them visible here
-        };
+        var chooseSupplyTargetsButtonFactory = (Button)ownedFactoryViewControl.FindChild("ChooseSupplyTargets");
+        chooseSupplyTargetsButtonFactory.Pressed += ChooseSupplyTargets;
 
         confirmSupplyTargetSelectionButton.Pressed += () =>
         {
@@ -166,9 +164,20 @@ public partial class UIController : Node2D
         buildButton.Disabled = true;
     }
 
+    private void ChooseSupplyTargets()
+    {
+        DebugUtility.Print("Choosing supply targets");
+        IsChoosingSupplyTargets = true;
+        confirmSupplyTargetSelectionButton.Show();
+        cancelSupplyTargetSelectionButton.Show();
+
+        // TODO: If the selected hq/factory already has supply targets, make them visible here
+    }
+
     public void OnEntitySelectionChanged(EmpireController empire)
     {
         HideOwnedHqView();
+        HideOwnedFactoryView();
         HideSelectedUnitView();
         HideReachableTileIndicators();
         HideSelectedTileIndicator();
@@ -183,6 +192,16 @@ public partial class UIController : Node2D
             if (empire.IsOwnHqSelected)
             {
                 ShowOwnedHqView(hqController!);
+            }
+        }
+        else if (empire.TryGetSelectedFactory(out var factoryController))
+        {
+
+            ShowSelectedTileIndicator(factoryController!.TilePosition);
+
+            if (empire.IsOwnFactorySelected)
+            {
+                ShowOwnedFactoryView(factoryController);
             }
         }
         else if (empire.TryGetSelectedUnit(out var unit))
@@ -264,6 +283,18 @@ public partial class UIController : Node2D
         var buildButton = (Button)ownedHqViewControl.FindChild("Build Button");
         buildButton.Disabled = true;
         ownedHqViewControl.Hide();
+    }
+
+    public void ShowOwnedFactoryView(FactoryTileController factory)
+    {
+        selectedFactory = factory;
+        ownedFactoryViewControl.Show();
+    }
+
+    public void HideOwnedFactoryView()
+    {
+        selectedFactory = null;
+        ownedFactoryViewControl.Hide();
     }
 
     public void ShowSelectedUnitView(BaseUnit unit)
@@ -419,15 +450,32 @@ public partial class UIController : Node2D
     public void AddSupplyTargetSelection(StoreTileController target)
     {
         // If no hq or factory is selected, this function shouldn't even be callable
-        if (selectedHq is null)
+        var hqSelected = selectedHq is not null;
+        var factorySelected = selectedFactory is not null;
+
+        if (!hqSelected && !factorySelected)
         {
             throw new InvalidOperationException("No HQ or factory selected but supply targets are trying to be set");
         }
 
-        if (storesSelectedForSupplyTargets.Count >= selectedHq.BaseProductsGenerated)
+        var suppliesAvailable = 0;
+
+        if (hqSelected)
+        {
+            suppliesAvailable = selectedHq!.BaseProductsGenerated;
+        }
+        else if (factorySelected)
+        {
+            suppliesAvailable = selectedFactory!.ProductGenerationRate;
+        }
+        else
+        {
+            throw new InvalidOperationException("Neither HQ or factory selected. This should never happen.");
+        }
+
+        if (storesSelectedForSupplyTargets.Count >= suppliesAvailable)
         {
             DebugUtility.Print("No more supplies");
-            DebugUtility.Print($"HQ supplies: {selectedHq.BaseProductsGenerated}, supply targets: {storesSelectedForSupplyTargets.Count}");
             return;
         }
 

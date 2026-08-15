@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://0lr8gfkx6h8a"]
+
+[node name="Owned Factory View" type="Control" unique_id=82809476]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -902.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1873959765]
+layout_mode = 0
+offset_right = 250.0
+offset_bottom = 648.0
+color = Color(0.34, 0.31302667, 0.2822, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=975254454]
+layout_mode = 0
+offset_right = 250.0
+offset_bottom = 648.0
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Factory View Content VBox" type="VBoxContainer" parent="MarginContainer" unique_id=1596842284]
+layout_mode = 2
+
+[node name="Factory Name Panel" type="PanelContainer" parent="MarginContainer/Factory View Content VBox" unique_id=1643730942]
+layout_mode = 2
+
+[node name="FactoryNameLabel" type="Label" parent="MarginContainer/Factory View Content VBox/Factory Name Panel" unique_id=1909572159]
+layout_mode = 2
+text = "This is your factory"
+
+[node name="ChooseSupplyTargets" type="Button" parent="MarginContainer/Factory View Content VBox" unique_id=1332503439]
+layout_mode = 2
+text = "Choose Supply Targets"

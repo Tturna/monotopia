@@ -4,11 +4,13 @@ using Godot;
 public partial class FactoryTileController : TileController
 {
     public string FactoryUid { get; private set; } = null!;
+    public EmpireController OwnerEmpire { get; private set; } = null!;
     public int ProductGenerationRate { get; private set; } = 3;
 
-    public void InitializeFactory(Vector2I tilePosition, string factorfactory)
+    public void InitializeFactory(Vector2I tilePosition, EmpireController ownerEmpire, string factorfactory)
     {
         TilePosition = tilePosition;
         FactoryUid = factorfactory;
+        OwnerEmpire = ownerEmpire;
     }
 }

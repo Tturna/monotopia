@@ -30,6 +30,7 @@
 [ext_resource type="Texture2D" uid="uid://dslwqm7g4j3rs" path="res://sprites/customers_icon.png" id="22_0bq3a"]
 [ext_resource type="PackedScene" uid="uid://c3555l7i2drjl" path="res://scenes/SelectedUnitView.tscn" id="23_bneo8"]
 [ext_resource type="Texture2D" uid="uid://d2jwmjxn1rhpb" path="res://sprites/whatthefuck.png" id="23_i4jil"]
+[ext_resource type="PackedScene" uid="uid://0lr8gfkx6h8a" path="res://scenes/OwnedFactoryView.tscn" id="30_jai3c"]
 
 [node name="GameRoot" type="Node2D" unique_id=1161755743]
 
@@ -56,9 +57,10 @@ script = ExtResource("9_a85ww")
 script = ExtResource("9_jbgew")
 UnitsContainer = NodePath("../Units Parent")
 
-[node name="UIController" type="Node2D" parent="." unique_id=170486342 node_paths=PackedStringArray("ownedHqViewControl", "selectedUnitViewControl", "productsLabel", "customersLabel", "coinsLabel", "turnCountLabel", "turnTimerLabel", "endTurnButton", "winOverlayControl", "loseOverlayControl", "confirmSupplyTargetSelectionButton", "cancelSupplyTargetSelectionButton")]
+[node name="UIController" type="Node2D" parent="." unique_id=170486342 node_paths=PackedStringArray("ownedHqViewControl", "ownedFactoryViewControl", "selectedUnitViewControl", "productsLabel", "customersLabel", "coinsLabel", "turnCountLabel", "turnTimerLabel", "endTurnButton", "winOverlayControl", "loseOverlayControl", "confirmSupplyTargetSelectionButton", "cancelSupplyTargetSelectionButton")]
 script = ExtResource("11_jhsr3")
 ownedHqViewControl = NodePath("../CanvasLayer/AspectRatioContainer/Owned HQ View")
+ownedFactoryViewControl = NodePath("../CanvasLayer/AspectRatioContainer/Owned Factory View")
 selectedUnitViewControl = NodePath("../CanvasLayer/AspectRatioContainer/Selected Unit View")
 productsLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox/Center HBox/Products HBox/Products Label")
 customersLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox/Center HBox/Customers HBox/Customers Label")
@@ -297,6 +299,10 @@ layout_mode = 2
 text = "Disconnect"
 
 [node name="Owned HQ View" parent="CanvasLayer/AspectRatioContainer" unique_id=82809476 instance=ExtResource("17_426vi")]
+visible = false
+layout_mode = 2
+
+[node name="Owned Factory View" parent="CanvasLayer/AspectRatioContainer" unique_id=678368324 instance=ExtResource("30_jai3c")]
 visible = false
 layout_mode = 2
 

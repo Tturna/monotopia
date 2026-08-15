@@ -14,6 +14,7 @@ public partial class EmpireController : Node2D
 	public int TotalCoinIncome { get; private set; }
 	public bool IsFrozen { get; private set; }
 	public bool IsOwnHqSelected { get; private set; }
+	public bool IsOwnFactorySelected { get; private set; }
 	public bool IsOwnUnitSelected { get; private set; }
 	public TileController? SelectedTile { get; private set; }
 	public bool HasSelection { get; private set; }
@@ -103,6 +104,7 @@ public partial class EmpireController : Node2D
 		if (tile == SelectedTile) return;
 
 		IsOwnHqSelected = tile is HqController hqController && hqController.OwnerEmpire == this;
+        IsOwnFactorySelected = tile is FactoryTileController factoryController && factoryController.OwnerEmpire == this;
 		HasSelection = true;
 		SelectedTile = tile;
 		SelectionChanged?.Invoke(this);
@@ -130,6 +132,7 @@ public partial class EmpireController : Node2D
 		if (!HasSelection) return;
 
 		IsOwnHqSelected = false;
+        IsOwnFactorySelected = false;
 		IsOwnUnitSelected = false;
 		selectedUnit = null;
 		SelectedTile = null;
@@ -204,7 +207,7 @@ public partial class EmpireController : Node2D
     public void AddNewFactoryToEmpire(Vector2I tilePosition, string newFactoryUid)
     {
         var factoryController = TileGrid.AddFactory(tilePosition);
-        factoryController.InitializeFactory(tilePosition, newFactoryUid);
+        factoryController.InitializeFactory(tilePosition, this, newFactoryUid);
         ProductGenerationRate += factoryController.ProductGenerationRate;
         ProductGenerationRateUpdated?.Invoke(ProductGenerationRate);
     }
@@ -241,6 +244,19 @@ public partial class EmpireController : Node2D
 
 		return false;
 	}
+
+    public bool TryGetSelectedFactory(out FactoryTileController? factoryController)
+    {
+        factoryController = null;
+
+        if (SelectedTile is not null && SelectedTile is FactoryTileController selectedFactoryController)
+        {
+            factoryController = selectedFactoryController;
+            return true;
+        }
+
+        return false;
+    }
 
 	public bool TryGetSelectedUnit(out BaseUnit? unit)
 	{
