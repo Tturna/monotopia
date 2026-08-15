@@ -1,38 +1,22 @@
+using System;
 using Godot;
 
 public partial class StoreTileController : TileController
 {
     public string StoreUid { get; private set; }
     public int AvailableServiceCapacity { get; private set; }
+    public int MaxSupplyCapacity { get; private set; }
+    public int SuppliesCount { get; private set; }
 
     public static readonly int BaseCustomerServiceCapacity = 3;
-
-    private PlayerInputController inputController;
-
-    // Temp
-    public override void _Ready()
-    {
-        inputController = GodotUtilities.FindNodeOfType<PlayerInputController>(GetTree().Root);
-    }
-
-    // Temp
-    public override void _Input(InputEvent inputEvent)
-    {
-        if (inputEvent is not InputEventMouseButton buttonEvent) return;
-        if (buttonEvent.ButtonIndex != MouseButton.Left) return;
-
-        var mouseTilePosition = inputController.GetMouseTilePosition();
-
-        if (mouseTilePosition != TilePosition) return;
-
-        DebugUtility.Print($"Store at {TilePosition} has {AvailableServiceCapacity} available service capacity");
-    }
+    public static readonly int BaseMaxSupplyCapacity = 1;
 
     public void InitializeStore(Vector2I tilePosition, string storeUid)
     {
         TilePosition = tilePosition;
         StoreUid = storeUid;
         AvailableServiceCapacity = BaseCustomerServiceCapacity;
+        MaxSupplyCapacity = BaseMaxSupplyCapacity;
     }
 
     public int ServeCustomers(int amount)
@@ -47,5 +31,15 @@ public partial class StoreTileController : TileController
         AvailableServiceCapacity = 0;
 
         return served;
+    }
+
+    public void AddSupplies(int amount)
+    {
+        if (SuppliesCount + amount > MaxSupplyCapacity)
+        {
+            throw new InvalidOperationException("Tried to add more supplies than store can take");
+        }
+
+        SuppliesCount += amount;
     }
 }

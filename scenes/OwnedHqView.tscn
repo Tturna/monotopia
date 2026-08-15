@@ -71,9 +71,9 @@ text = "City name here"
 layout_mode = 2
 text = "City name here"
 
-[node name="CityNameLabel11" type="Label" parent="MarginContainer/HQ View Content VBox" unique_id=892678009]
+[node name="ChooseSupplyTargets" type="Button" parent="MarginContainer/HQ View Content VBox" unique_id=1332503439]
 layout_mode = 2
-text = "City name here"
+text = "Choose Supply Targets"
 
 [node name="Build List VBox" type="VBoxContainer" parent="MarginContainer/HQ View Content VBox" unique_id=1294284098]
 layout_mode = 2

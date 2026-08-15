@@ -56,21 +56,23 @@ script = ExtResource("9_a85ww")
 script = ExtResource("9_jbgew")
 UnitsContainer = NodePath("../Units Parent")
 
-[node name="UIController" type="Node2D" parent="." unique_id=170486342 node_paths=PackedStringArray("ownedHqViewControl", "selectedUnitViewControl", "productsLabel", "customersLabel", "coinsLabel", "turnCountLabel", "turnTimerLabel", "endTurnButton", "winOverlayControl", "loseOverlayControl")]
+[node name="UIController" type="Node2D" parent="." unique_id=170486342 node_paths=PackedStringArray("ownedHqViewControl", "selectedUnitViewControl", "productsLabel", "customersLabel", "coinsLabel", "turnCountLabel", "turnTimerLabel", "endTurnButton", "winOverlayControl", "loseOverlayControl", "confirmSupplyTargetSelectionButton", "cancelSupplyTargetSelectionButton")]
 script = ExtResource("11_jhsr3")
 ownedHqViewControl = NodePath("../CanvasLayer/AspectRatioContainer/Owned HQ View")
 selectedUnitViewControl = NodePath("../CanvasLayer/AspectRatioContainer/Selected Unit View")
-productsLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox/Products HBox/Products Label")
-customersLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox/Customers HBox/Customers Label")
-coinsLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox/Coins HBox/Coins Label")
-turnCountLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Right HBox/VBoxContainer/Turn Count Label")
-turnTimerLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/Turn Timer Label")
-endTurnButton = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/CenterContainer/End Turn Button")
+productsLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox/Center HBox/Products HBox/Products Label")
+customersLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox/Center HBox/Customers HBox/Customers Label")
+coinsLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox/Center HBox/Coins HBox/Coins Label")
+turnCountLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox/Right HBox/VBoxContainer/Turn Count Label")
+turnTimerLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Bot Row HBox/VBoxContainer/Turn Timer Label")
+endTurnButton = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Bot Row HBox/VBoxContainer/CenterContainer/End Turn Button")
 buildListItemPanel = ExtResource("12_0bq3a")
 winOverlayControl = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Win Overlay")
 loseOverlayControl = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/Lose Overlay")
 tileSelectionScene = ExtResource("10_a8wo8")
 reachableTileIndicatorScene = ExtResource("11_attvq")
+confirmSupplyTargetSelectionButton = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Mid Row VBox/HBoxContainer/ConfirmSupplyTargetSelection")
+cancelSupplyTargetSelectionButton = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Mid Row VBox/HBoxContainer/CancelSupplyTargetSelection")
 
 [node name="PlayerInputController" type="Node2D" parent="." unique_id=55412351]
 script = ExtResource("12_attvq")
@@ -122,113 +124,140 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="Top Row HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer" unique_id=38136347]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer" unique_id=1548321765]
+layout_mode = 2
+
+[node name="Top Row HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer" unique_id=38136347]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
 alignment = 1
 
-[node name="Left HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox" unique_id=432380358]
+[node name="Left HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox" unique_id=432380358]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 size_flags_vertical = 0
 
-[node name="Center HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox" unique_id=2101533760]
+[node name="Center HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox" unique_id=2101533760]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
 alignment = 1
 
-[node name="Products HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox" unique_id=1315405517]
+[node name="Products HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox/Center HBox" unique_id=1315405517]
 layout_mode = 2
 
-[node name="Products Icon" type="TextureRect" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox/Products HBox" unique_id=818472095]
+[node name="Products Icon" type="TextureRect" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox/Center HBox/Products HBox" unique_id=818472095]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 size_flags_vertical = 4
 texture = ExtResource("23_i4jil")
 expand_mode = 2
 
-[node name="Products Label" type="Label" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox/Products HBox" unique_id=101692827]
+[node name="Products Label" type="Label" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox/Center HBox/Products HBox" unique_id=101692827]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "999"
 label_settings = ExtResource("15_jai3c")
 
-[node name="Customers HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox" unique_id=1496179063]
+[node name="Customers HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox/Center HBox" unique_id=1496179063]
 layout_mode = 2
 
-[node name="Customers Icon" type="TextureRect" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox/Customers HBox" unique_id=1088701678]
+[node name="Customers Icon" type="TextureRect" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox/Center HBox/Customers HBox" unique_id=1088701678]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 size_flags_vertical = 4
 texture = ExtResource("22_0bq3a")
 expand_mode = 2
 
-[node name="Customers Label" type="Label" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox/Customers HBox" unique_id=1563459361]
+[node name="Customers Label" type="Label" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox/Center HBox/Customers HBox" unique_id=1563459361]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "999"
 label_settings = ExtResource("15_jai3c")
 
-[node name="Coins HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox" unique_id=1606705952]
+[node name="Coins HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox/Center HBox" unique_id=1606705952]
 layout_mode = 2
 
-[node name="Coins Icon" type="TextureRect" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox/Coins HBox" unique_id=1366772080]
+[node name="Coins Icon" type="TextureRect" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox/Center HBox/Coins HBox" unique_id=1366772080]
 layout_mode = 2
 size_flags_vertical = 4
 texture = ExtResource("14_i4jil")
 stretch_mode = 2
 
-[node name="Coins Label" type="Label" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Center HBox/Coins HBox" unique_id=2049750665]
+[node name="Coins Label" type="Label" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox/Center HBox/Coins HBox" unique_id=2049750665]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
 text = "999"
 label_settings = ExtResource("15_jai3c")
 
-[node name="Right HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox" unique_id=937397110]
+[node name="Right HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox" unique_id=937397110]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 size_flags_vertical = 0
 alignment = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Right HBox" unique_id=829046455]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox/Right HBox" unique_id=829046455]
 layout_mode = 2
 
-[node name="Turn Count Label" type="Label" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Top Row HBox/Right HBox/VBoxContainer" unique_id=1927878021]
+[node name="Turn Count Label" type="Label" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox/Right HBox/VBoxContainer" unique_id=1927878021]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Turn 999"
 label_settings = ExtResource("15_jai3c")
 
-[node name="Bot Row HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer" unique_id=448409960]
+[node name="Mid Row VBox" type="VBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer" unique_id=259589535]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Mid Row VBox" unique_id=1042740848]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 10
+theme_override_constants/separation = 16
+
+[node name="ConfirmSupplyTargetSelection" type="Button" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Mid Row VBox/HBoxContainer" unique_id=843867544]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 10
+text = "Confirm Selection"
+
+[node name="CancelSupplyTargetSelection" type="Button" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Mid Row VBox/HBoxContainer" unique_id=951486074]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 10
+text = "Cancel Selection"
+
+[node name="Bot Row HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer" unique_id=448409960]
 layout_mode = 2
 size_flags_vertical = 8
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox" unique_id=982840399]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Bot Row HBox" unique_id=982840399]
 layout_mode = 2
 size_flags_horizontal = 10
 size_flags_vertical = 8
 
-[node name="Turn Timer Label" type="Label" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer" unique_id=1178126591]
+[node name="Turn Timer Label" type="Label" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Bot Row HBox/VBoxContainer" unique_id=1178126591]
 layout_mode = 2
 size_flags_horizontal = 8
 text = "66:66"
 label_settings = ExtResource("15_jai3c")
 
-[node name="CenterContainer" type="CenterContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer" unique_id=1197203940]
+[node name="CenterContainer" type="CenterContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Bot Row HBox/VBoxContainer" unique_id=1197203940]
 custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
 size_flags_vertical = 0
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/CenterContainer" unique_id=1215099027]
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Bot Row HBox/VBoxContainer/CenterContainer" unique_id=1215099027]
 custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
 color = Color(0.28482667, 0.44, 0.23759998, 1)
 
-[node name="End Turn Button" type="Button" parent="CanvasLayer/AspectRatioContainer/MarginContainer/Bot Row HBox/VBoxContainer/CenterContainer" unique_id=63129807]
+[node name="End Turn Button" type="Button" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Bot Row HBox/VBoxContainer/CenterContainer" unique_id=63129807]
 custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
 theme_override_font_sizes/font_size = 32

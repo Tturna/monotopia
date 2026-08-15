@@ -32,6 +32,10 @@ public partial class UIController : Node2D
 	private PackedScene tileSelectionScene = null!;
     [Export]
 	private PackedScene reachableTileIndicatorScene = null!;
+    [Export]
+    private Button confirmSupplyTargetSelectionButton = null!;
+    [Export]
+    private Button cancelSupplyTargetSelectionButton = null!;
 
     private Sprite2D tileSelectionNode = null!;
     private Dictionary<Vector2I, Sprite2D> reachableTileIndicators = new();
@@ -40,6 +44,9 @@ public partial class UIController : Node2D
     private PanelContainer? selectedBuildableItemPanel;
     private BuildController.BuildableItemType? selectedBuildable;
     private HqController? selectedHq;
+    private List<StoreTileController> storesSelectedForSupplyTargets = new();
+
+    public bool IsChoosingSupplyTargets { get; private set; }
 
     public delegate void EndTurnButtonPressedHandler(UIController uiController);
     public event EndTurnButtonPressedHandler? EndTurnButtonPressed;
@@ -63,6 +70,39 @@ public partial class UIController : Node2D
 
             var buildable = (BuildController.BuildableItemType)selectedBuildable;
             BuildController.Instance.RequestBuildItem((int)buildable, selectedHq.HqUid);
+        };
+
+        var chooseSupplyTargetsButton = (Button)ownedHqViewControl.FindChild("ChooseSupplyTargets");
+        chooseSupplyTargetsButton.Pressed += () =>
+        {
+            DebugUtility.Print("Choosing supply targets");
+            IsChoosingSupplyTargets = true;
+            confirmSupplyTargetSelectionButton.Show();
+            cancelSupplyTargetSelectionButton.Show();
+
+            // TODO: If the selected hq/factory already has supply targets, make them visible here
+        };
+
+        confirmSupplyTargetSelectionButton.Pressed += () =>
+        {
+            DebugUtility.Print("Confirmed supply target selections. Selected stores:");
+            IsChoosingSupplyTargets = false;
+            confirmSupplyTargetSelectionButton.Hide();
+            cancelSupplyTargetSelectionButton.Hide();
+
+            foreach (var store in storesSelectedForSupplyTargets)
+            {
+                store.AddSupplies(1);
+                DebugUtility.Print($"- {store.TilePosition}, supplies: {store.SuppliesCount}/{store.MaxSupplyCapacity}");
+            }
+        };
+
+        cancelSupplyTargetSelectionButton.Pressed += () =>
+        {
+            DebugUtility.Print("Cancelled supply target selections");
+            IsChoosingSupplyTargets = false;
+            confirmSupplyTargetSelectionButton.Hide();
+            cancelSupplyTargetSelectionButton.Hide();
         };
 
         endTurnButton.Pressed += () => EndTurnButtonPressed?.Invoke(this);
@@ -374,5 +414,37 @@ public partial class UIController : Node2D
     public void SetUnitMovementPathPoints(Vector2[] points)
     {
         unitPathLine.Points = points;
+    }
+
+    public void AddSupplyTargetSelection(StoreTileController target)
+    {
+        // If no hq or factory is selected, this function shouldn't even be callable
+        if (selectedHq is null)
+        {
+            throw new InvalidOperationException("No HQ or factory selected but supply targets are trying to be set");
+        }
+
+        if (storesSelectedForSupplyTargets.Count >= selectedHq.BaseProductsGenerated)
+        {
+            DebugUtility.Print("No more supplies");
+            DebugUtility.Print($"HQ supplies: {selectedHq.BaseProductsGenerated}, supply targets: {storesSelectedForSupplyTargets.Count}");
+            return;
+        }
+
+        if (target.SuppliesCount + 1 > target.MaxSupplyCapacity)
+        {
+            DebugUtility.Print("Target can't fit more supplies");
+            return;
+        }
+
+        storesSelectedForSupplyTargets.Add(target);
+        DebugUtility.Print($"Selecting store at {target.TilePosition} as a supply target");
+    }
+
+    public void RemoveSupplyTargetSelection(StoreTileController target)
+    {
+        if (!storesSelectedForSupplyTargets.Contains(target)) return;
+
+        storesSelectedForSupplyTargets.Remove(target);
     }
 }
