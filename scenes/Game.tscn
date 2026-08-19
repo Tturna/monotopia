@@ -25,6 +25,7 @@
 [ext_resource type="Texture2D" uid="uid://dh42xxhofapix" path="res://sprites/coin_icon.png" id="14_i4jil"]
 [ext_resource type="LabelSettings" uid="uid://brmmuo7fvryem" path="res://UI_Base_Label_Settings.tres" id="15_jai3c"]
 [ext_resource type="PackedScene" uid="uid://cpc1ij2wjxypk" path="res://scenes/WinOverlay.tscn" id="16_1gdd5"]
+[ext_resource type="PackedScene" uid="uid://ck355dmdm242d" path="res://scenes/PlusMinusButtons.tscn" id="17_1gdd5"]
 [ext_resource type="PackedScene" uid="uid://1dota62uermp" path="res://scenes/OwnedHqView.tscn" id="17_426vi"]
 [ext_resource type="PackedScene" uid="uid://d2nlqqu8jsp7" path="res://scenes/LoseOverlay.tscn" id="18_45i86"]
 [ext_resource type="Texture2D" uid="uid://dslwqm7g4j3rs" path="res://sprites/customers_icon.png" id="22_0bq3a"]
@@ -75,6 +76,7 @@ tileSelectionScene = ExtResource("10_a8wo8")
 reachableTileIndicatorScene = ExtResource("11_attvq")
 confirmSupplyTargetSelectionButton = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Mid Row VBox/HBoxContainer/ConfirmSupplyTargetSelection")
 cancelSupplyTargetSelectionButton = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Mid Row VBox/HBoxContainer/CancelSupplyTargetSelection")
+plusMinusIconsScene = ExtResource("17_1gdd5")
 
 [node name="PlayerInputController" type="Node2D" parent="." unique_id=55412351]
 script = ExtResource("12_attvq")
@@ -117,10 +119,12 @@ offset_bottom = 648.0
 grow_horizontal = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+mouse_filter = 2
 ratio = 1.7778
 
 [node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/AspectRatioContainer" unique_id=1432756150]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
@@ -128,6 +132,7 @@ theme_override_constants/margin_bottom = 10
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer" unique_id=1548321765]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Top Row HBox" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer" unique_id=38136347]
 layout_mode = 2
@@ -213,11 +218,13 @@ label_settings = ExtResource("15_jai3c")
 [node name="Mid Row VBox" type="VBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer" unique_id=259589535]
 layout_mode = 2
 size_flags_vertical = 3
+mouse_filter = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Mid Row VBox" unique_id=1042740848]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 10
+mouse_filter = 2
 theme_override_constants/separation = 16
 
 [node name="ConfirmSupplyTargetSelection" type="Button" parent="CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Mid Row VBox/HBoxContainer" unique_id=843867544]

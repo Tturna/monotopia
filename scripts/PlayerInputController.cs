@@ -106,19 +106,6 @@ public partial class PlayerInputController : Node2D
 
 		if (!TileGrid.IsTileInBounds(mouseTilePosition)) return;
 
-        if (uiController.IsChoosingSupplyTargets)
-        {
-            if (EntitySelector.TryGetTile(mouseTilePosition, out var genericTile) &&
-                genericTile is not null &&
-                genericTile is StoreTileController storeTile)
-            {
-                DebugUtility.Print("Clicked on store when targeting supplies");
-                uiController.AddSupplyTargetSelection(storeTile);
-            }
-
-            return;
-        }
-
 		if (EntitySelector.TryGetUnit(mouseTilePosition, out var unit) && unit is not null)
 		{
             playerEmpire.HandleUnitSelection(unit);

@@ -38,6 +38,8 @@ public partial class UIController : Node2D
     private Button confirmSupplyTargetSelectionButton = null!;
     [Export]
     private Button cancelSupplyTargetSelectionButton = null!;
+    [Export]
+    private PackedScene plusMinusIconsScene = null!;
 
     private Sprite2D tileSelectionNode = null!;
     private Dictionary<Vector2I, Sprite2D> reachableTileIndicators = new();
@@ -48,6 +50,7 @@ public partial class UIController : Node2D
     private HqController? selectedHq;
     private FactoryTileController? selectedFactory;
     private List<StoreTileController> storesSelectedForSupplyTargets = new();
+    private List<Control> supplyTargetPlusMinusIcons = new();
 
     public bool IsChoosingSupplyTargets { get; private set; }
 
@@ -93,6 +96,8 @@ public partial class UIController : Node2D
                 store.AddSupplies(1);
                 DebugUtility.Print($"- {store.TilePosition}, supplies: {store.SuppliesCount}/{store.MaxSupplyCapacity}");
             }
+
+            HideSupplyTargetPlusMinusIcons();
         };
 
         cancelSupplyTargetSelectionButton.Pressed += () =>
@@ -101,6 +106,7 @@ public partial class UIController : Node2D
             IsChoosingSupplyTargets = false;
             confirmSupplyTargetSelectionButton.Hide();
             cancelSupplyTargetSelectionButton.Hide();
+            HideSupplyTargetPlusMinusIcons();
         };
 
         endTurnButton.Pressed += () => EndTurnButtonPressed?.Invoke(this);
@@ -166,12 +172,46 @@ public partial class UIController : Node2D
 
     private void ChooseSupplyTargets()
     {
-        DebugUtility.Print("Choosing supply targets");
         IsChoosingSupplyTargets = true;
         confirmSupplyTargetSelectionButton.Show();
         cancelSupplyTargetSelectionButton.Show();
 
         // TODO: If the selected hq/factory already has supply targets, make them visible here
+
+        HideSupplyTargetPlusMinusIcons();
+
+        var playerEmpire = EmpireController.GetPeerEmpire(Multiplayer.GetUniqueId());
+        var stores = playerEmpire.GetAllStores();
+
+        foreach (var store in stores)
+        {
+            var plusMinusIconsControl = (Control)plusMinusIconsScene.Instantiate();
+            store.AddChild(plusMinusIconsControl);
+            supplyTargetPlusMinusIcons.Add(plusMinusIconsControl);
+
+            var minusButton = (Button)plusMinusIconsControl.FindChild("MinusButton");
+            var plusButton = (Button)plusMinusIconsControl.FindChild("PlusButton");
+
+            // Can use lambdas because hiding the buttons works by freeing the nodes,
+            // which removes need for unsubscribing from the Pressed event
+            plusButton.Pressed += () => AddSupplyTargetSelection(store);
+            minusButton.Pressed += () => RemoveSupplyTargetSelection(store);
+        }
+    }
+
+    private void HideSupplyTargetPlusMinusIcons()
+    {
+        foreach (var oldIcons in supplyTargetPlusMinusIcons)
+        {
+            var oldMinusButton = (Button)oldIcons.FindChild("MinusButton");
+            var oldPlusButton = (Button)oldIcons.FindChild("PlusButton");
+            // no need to unsubscribe from Pressed event of plus and minus icons because
+            // the nodes are freed
+            oldIcons.QueueFree();
+        }
+
+        supplyTargetPlusMinusIcons.Clear();
+        storesSelectedForSupplyTargets.Clear();
     }
 
     public void OnEntitySelectionChanged(EmpireController empire)
@@ -479,14 +519,15 @@ public partial class UIController : Node2D
             return;
         }
 
-        if (target.SuppliesCount + 1 > target.MaxSupplyCapacity)
+        var timesAlreadySelected = storesSelectedForSupplyTargets.FindAll(m => m == target).Count;
+
+        if (target.SuppliesCount + timesAlreadySelected + 1 > target.MaxSupplyCapacity)
         {
             DebugUtility.Print("Target can't fit more supplies");
             return;
         }
 
         storesSelectedForSupplyTargets.Add(target);
-        DebugUtility.Print($"Selecting store at {target.TilePosition} as a supply target");
     }
 
     public void RemoveSupplyTargetSelection(StoreTileController target)

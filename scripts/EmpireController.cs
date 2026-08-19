@@ -387,4 +387,9 @@ public partial class EmpireController : Node2D
         empireHq = hq;
         return true;
     }
+
+    public List<StoreTileController> GetAllStores()
+    {
+        return stores;
+    }
 }
