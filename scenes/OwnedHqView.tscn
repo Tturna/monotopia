@@ -39,13 +39,13 @@ text = "City name here"
 layout_mode = 2
 text = "Coins generated: 999999"
 
-[node name="CityNameLabel3" type="Label" parent="MarginContainer/HQ View Content VBox" unique_id=1438714515]
+[node name="SuppliesGeneratedLabel" type="Label" parent="MarginContainer/HQ View Content VBox" unique_id=1438714515]
 layout_mode = 2
-text = "City name here"
+text = "Supplies generated: 1"
 
-[node name="CityNameLabel4" type="Label" parent="MarginContainer/HQ View Content VBox" unique_id=1397442149]
+[node name="SuppliesServedLabel" type="Label" parent="MarginContainer/HQ View Content VBox" unique_id=1397442149]
 layout_mode = 2
-text = "City name here"
+text = "Supplies served: 0"
 
 [node name="CityNameLabel5" type="Label" parent="MarginContainer/HQ View Content VBox" unique_id=2028675630]
 layout_mode = 2

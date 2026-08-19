@@ -99,9 +99,17 @@ public partial class UIController : Node2D
                 store.AddSupplies(1);
                 DebugUtility.Print($"- {store.TilePosition}, supplies: {store.SuppliesCount}/{store.MaxSupplyCapacity}");
 
-                if (selectedFactory is not null)
+                if (selectedHq is not null)
+                {
+                    selectedHq.ServeProducts(1);
+                }
+                else if (selectedFactory is not null)
                 {
                     selectedFactory.ServeProducts(1);
+                }
+                else
+                {
+                    throw new InvalidOperationException("Neither HQ or factory selected. This should never happen.");
                 }
             }
 
@@ -288,6 +296,9 @@ public partial class UIController : Node2D
 
         var hqNameLabel = (Label)ownedHqViewControl.FindChild("HqNameLabel");
         hqNameLabel.Text = "HQ name here";
+
+        var productsServedLabel = (Label)ownedHqViewControl.FindChild("SuppliesServedLabel");
+        productsServedLabel.Text = $"Supplies served: {hqController.ProductsSuppliedCount}";
 
         var coinsGeneratedLabel = (Label)ownedHqViewControl.FindChild("CoinsGeneratedLabel");
         var prefix = hqController.CoinsGenerated switch
@@ -537,7 +548,7 @@ public partial class UIController : Node2D
 
         if (hqSelected)
         {
-            suppliesAvailable = selectedHq!.BaseProductsGenerated;
+            suppliesAvailable = selectedHq!.BaseProductsGenerated - selectedHq.ProductsSuppliedCount;
         }
         else if (factorySelected)
         {
