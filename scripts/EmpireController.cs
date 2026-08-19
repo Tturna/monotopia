@@ -15,6 +15,7 @@ public partial class EmpireController : Node2D
 	public bool IsFrozen { get; private set; }
 	public bool IsOwnHqSelected { get; private set; }
 	public bool IsOwnFactorySelected { get; private set; }
+	public bool IsOwnStoreSelected { get; private set; }
 	public bool IsOwnUnitSelected { get; private set; }
 	public TileController? SelectedTile { get; private set; }
 	public bool HasSelection { get; private set; }
@@ -105,6 +106,7 @@ public partial class EmpireController : Node2D
 
 		IsOwnHqSelected = tile is HqController hqController && hqController.OwnerEmpire == this;
         IsOwnFactorySelected = tile is FactoryTileController factoryController && factoryController.OwnerEmpire == this;
+        IsOwnStoreSelected = tile is StoreTileController storeController && storeController.OwnerEmpire == this;
 		HasSelection = true;
 		SelectedTile = tile;
 		SelectionChanged?.Invoke(this);
@@ -133,6 +135,7 @@ public partial class EmpireController : Node2D
 
 		IsOwnHqSelected = false;
         IsOwnFactorySelected = false;
+        IsOwnStoreSelected = false;
 		IsOwnUnitSelected = false;
 		selectedUnit = null;
 		SelectedTile = null;
@@ -200,7 +203,7 @@ public partial class EmpireController : Node2D
     public void AddNewStoreToEmpire(Vector2I tilePosition, string newStoreUid)
     {
         var storeController = TileGrid.AddStore(tilePosition);
-        storeController.InitializeStore(tilePosition, newStoreUid);
+        storeController.InitializeStore(tilePosition, this, newStoreUid);
         stores.Add(storeController);
     }
 
@@ -252,6 +255,19 @@ public partial class EmpireController : Node2D
         if (SelectedTile is not null && SelectedTile is FactoryTileController selectedFactoryController)
         {
             factoryController = selectedFactoryController;
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool TryGetSelectedStore(out StoreTileController? storeController)
+    {
+        storeController = null;
+
+        if (SelectedTile is not null && SelectedTile is StoreTileController selectedStoreController)
+        {
+            storeController = selectedStoreController;
             return true;
         }
 

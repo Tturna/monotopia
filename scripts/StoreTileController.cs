@@ -4,6 +4,7 @@ using Godot;
 public partial class StoreTileController : TileController
 {
     public string StoreUid { get; private set; }
+    public EmpireController OwnerEmpire { get; private set; } = null!;
     public int AvailableServiceCapacity { get; private set; }
     public int MaxSupplyCapacity { get; private set; }
     public int SuppliesCount { get; private set; }
@@ -11,8 +12,9 @@ public partial class StoreTileController : TileController
     public static readonly int BaseCustomerServiceCapacity = 3;
     public static readonly int BaseMaxSupplyCapacity = 1;
 
-    public void InitializeStore(Vector2I tilePosition, string storeUid)
+    public void InitializeStore(Vector2I tilePosition, EmpireController ownerEmpire, string storeUid)
     {
+        OwnerEmpire = ownerEmpire;
         TilePosition = tilePosition;
         StoreUid = storeUid;
         AvailableServiceCapacity = BaseCustomerServiceCapacity;

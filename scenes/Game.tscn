@@ -32,6 +32,7 @@
 [ext_resource type="PackedScene" uid="uid://c3555l7i2drjl" path="res://scenes/SelectedUnitView.tscn" id="23_bneo8"]
 [ext_resource type="Texture2D" uid="uid://d2jwmjxn1rhpb" path="res://sprites/whatthefuck.png" id="23_i4jil"]
 [ext_resource type="PackedScene" uid="uid://0lr8gfkx6h8a" path="res://scenes/OwnedFactoryView.tscn" id="30_jai3c"]
+[ext_resource type="PackedScene" uid="uid://bms8j4ob4bmy6" path="res://scenes/OwnedStoreView.tscn" id="32_426vi"]
 
 [node name="GameRoot" type="Node2D" unique_id=1161755743]
 
@@ -58,10 +59,11 @@ script = ExtResource("9_a85ww")
 script = ExtResource("9_jbgew")
 UnitsContainer = NodePath("../Units Parent")
 
-[node name="UIController" type="Node2D" parent="." unique_id=170486342 node_paths=PackedStringArray("ownedHqViewControl", "ownedFactoryViewControl", "selectedUnitViewControl", "productsLabel", "customersLabel", "coinsLabel", "turnCountLabel", "turnTimerLabel", "endTurnButton", "winOverlayControl", "loseOverlayControl", "confirmSupplyTargetSelectionButton", "cancelSupplyTargetSelectionButton")]
+[node name="UIController" type="Node2D" parent="." unique_id=170486342 node_paths=PackedStringArray("ownedHqViewControl", "ownedFactoryViewControl", "ownedStoreViewControl", "selectedUnitViewControl", "productsLabel", "customersLabel", "coinsLabel", "turnCountLabel", "turnTimerLabel", "endTurnButton", "winOverlayControl", "loseOverlayControl", "confirmSupplyTargetSelectionButton", "cancelSupplyTargetSelectionButton")]
 script = ExtResource("11_jhsr3")
 ownedHqViewControl = NodePath("../CanvasLayer/AspectRatioContainer/Owned HQ View")
 ownedFactoryViewControl = NodePath("../CanvasLayer/AspectRatioContainer/Owned Factory View")
+ownedStoreViewControl = NodePath("../CanvasLayer/AspectRatioContainer/Owned Store View")
 selectedUnitViewControl = NodePath("../CanvasLayer/AspectRatioContainer/Selected Unit View")
 productsLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox/Center HBox/Products HBox/Products Label")
 customersLabel = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Top Row HBox/Center HBox/Customers HBox/Customers Label")
@@ -310,6 +312,10 @@ visible = false
 layout_mode = 2
 
 [node name="Owned Factory View" parent="CanvasLayer/AspectRatioContainer" unique_id=678368324 instance=ExtResource("30_jai3c")]
+visible = false
+layout_mode = 2
+
+[node name="Owned Store View" parent="CanvasLayer/AspectRatioContainer" unique_id=2095669878 instance=ExtResource("32_426vi")]
 visible = false
 layout_mode = 2
 

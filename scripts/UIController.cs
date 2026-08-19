@@ -11,6 +11,8 @@ public partial class UIController : Node2D
     [Export]
     private Control ownedFactoryViewControl = null!;
     [Export]
+    private Control ownedStoreViewControl = null!;
+    [Export]
     private Control selectedUnitViewControl = null!;
     [Export]
 	private Label productsLabel = null!;
@@ -49,6 +51,7 @@ public partial class UIController : Node2D
     private BuildController.BuildableItemType? selectedBuildable;
     private HqController? selectedHq;
     private FactoryTileController? selectedFactory;
+    private StoreTileController? selectedStore;
     private List<StoreTileController> storesSelectedForSupplyTargets = new();
     private List<Control> supplyTargetPlusMinusIcons = new();
 
@@ -95,6 +98,11 @@ public partial class UIController : Node2D
             {
                 store.AddSupplies(1);
                 DebugUtility.Print($"- {store.TilePosition}, supplies: {store.SuppliesCount}/{store.MaxSupplyCapacity}");
+
+                if (selectedFactory is not null)
+                {
+                    selectedFactory.ServeProducts(1);
+                }
             }
 
             HideSupplyTargetPlusMinusIcons();
@@ -218,6 +226,7 @@ public partial class UIController : Node2D
     {
         HideOwnedHqView();
         HideOwnedFactoryView();
+        HideOwnedStoreView();
         HideSelectedUnitView();
         HideReachableTileIndicators();
         HideSelectedTileIndicator();
@@ -236,12 +245,20 @@ public partial class UIController : Node2D
         }
         else if (empire.TryGetSelectedFactory(out var factoryController))
         {
-
             ShowSelectedTileIndicator(factoryController!.TilePosition);
 
             if (empire.IsOwnFactorySelected)
             {
                 ShowOwnedFactoryView(factoryController);
+            }
+        }
+        else if (empire.TryGetSelectedStore(out var storeController))
+        {
+            ShowSelectedTileIndicator(storeController!.TilePosition);
+
+            if (empire.IsOwnStoreSelected)
+            {
+                ShowOwnedStoreView(storeController);
             }
         }
         else if (empire.TryGetSelectedUnit(out var unit))
@@ -329,12 +346,30 @@ public partial class UIController : Node2D
     {
         selectedFactory = factory;
         ownedFactoryViewControl.Show();
+        var suppliesGeneratedLabel = (Label)ownedFactoryViewControl.FindChild("SuppliesGeneratedLabel");
+        var suppliesServedLabel = (Label)ownedFactoryViewControl.FindChild("SuppliesServedLabel");
+        suppliesGeneratedLabel.Text = $"Supplies generated: {factory.ProductGenerationRate}";
+        suppliesServedLabel.Text = $"Supplies served: {factory.ProductsSuppliedCount}";
     }
 
     public void HideOwnedFactoryView()
     {
         selectedFactory = null;
         ownedFactoryViewControl.Hide();
+    }
+
+    public void ShowOwnedStoreView(StoreTileController store)
+    {
+        selectedStore = store;
+        ownedStoreViewControl.Show();
+        var suppliesLabel = (Label)ownedStoreViewControl.FindChild("SuppliesLabel");
+        suppliesLabel.Text = $"Supplies: {store.SuppliesCount}/{store.MaxSupplyCapacity}";
+    }
+
+    public void HideOwnedStoreView()
+    {
+        selectedStore = null;
+        ownedStoreViewControl.Hide();
     }
 
     public void ShowSelectedUnitView(BaseUnit unit)
@@ -506,7 +541,7 @@ public partial class UIController : Node2D
         }
         else if (factorySelected)
         {
-            suppliesAvailable = selectedFactory!.ProductGenerationRate;
+            suppliesAvailable = selectedFactory!.ProductGenerationRate - selectedFactory.ProductsSuppliedCount;
         }
         else
         {
