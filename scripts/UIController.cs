@@ -94,18 +94,26 @@ public partial class UIController : Node2D
             confirmSupplyTargetSelectionButton.Hide();
             cancelSupplyTargetSelectionButton.Hide();
 
+            if (selectedHq is not null && selectedHq.SupplyTarget is not null)
+            {
+                selectedHq.WithdrawProducts();
+            }
+            else if (selectedFactory is not null)
+            {
+                selectedFactory.WithdrawAllProducts();
+            }
+
             foreach (var store in storesSelectedForSupplyTargets)
             {
-                store.AddSupplies(1);
                 DebugUtility.Print($"- {store.TilePosition}, supplies: {store.SuppliesCount}/{store.MaxSupplyCapacity}");
 
                 if (selectedHq is not null)
                 {
-                    selectedHq.ServeProducts(1);
+                    selectedHq.ServeProducts(store, 1);
                 }
                 else if (selectedFactory is not null)
                 {
-                    selectedFactory.ServeProducts(1);
+                    selectedFactory.ServeProducts(store, 1);
                 }
                 else
                 {
@@ -192,12 +200,19 @@ public partial class UIController : Node2D
         confirmSupplyTargetSelectionButton.Show();
         cancelSupplyTargetSelectionButton.Show();
 
-        // TODO: If the selected hq/factory already has supply targets, make them visible here
-
         HideSupplyTargetPlusMinusIcons();
 
         var playerEmpire = EmpireController.GetPeerEmpire(Multiplayer.GetUniqueId());
         var stores = playerEmpire.GetAllStores();
+
+        if (selectedHq is not null && selectedHq.SupplyTarget is not null)
+        {
+            storesSelectedForSupplyTargets = [selectedHq.SupplyTarget];
+        }
+        else if (selectedFactory is not null)
+        {
+            storesSelectedForSupplyTargets = new (selectedFactory.SupplyTargetsAndCounts.Keys);
+        }
 
         foreach (var store in stores)
         {
@@ -544,22 +559,22 @@ public partial class UIController : Node2D
             throw new InvalidOperationException("No HQ or factory selected but supply targets are trying to be set");
         }
 
-        var suppliesAvailable = 0;
+        var totalSuppliesAvailable = 0;
 
         if (hqSelected)
         {
-            suppliesAvailable = selectedHq!.BaseProductsGenerated - selectedHq.ProductsSuppliedCount;
+            totalSuppliesAvailable = selectedHq!.BaseProductsGenerated;
         }
         else if (factorySelected)
         {
-            suppliesAvailable = selectedFactory!.ProductGenerationRate - selectedFactory.ProductsSuppliedCount;
+            totalSuppliesAvailable = selectedFactory!.ProductGenerationRate;
         }
         else
         {
             throw new InvalidOperationException("Neither HQ or factory selected. This should never happen.");
         }
 
-        if (storesSelectedForSupplyTargets.Count >= suppliesAvailable)
+        if (storesSelectedForSupplyTargets.Count >= totalSuppliesAvailable)
         {
             DebugUtility.Print("No more supplies");
             return;

@@ -44,4 +44,14 @@ public partial class StoreTileController : TileController
 
         SuppliesCount += amount;
     }
+
+    public void RemoveSupplies(int amount)
+    {
+        if (SuppliesCount - amount < 0)
+        {
+            throw new InvalidOperationException("Tried to remove more supplies than are in the store");
+        }
+
+        SuppliesCount -= amount;
+    }
 }

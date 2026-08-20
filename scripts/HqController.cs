@@ -11,6 +11,7 @@ public partial class HqController : TileController
     public readonly int CoinsGenerated = 2;
     public readonly int BaseProductsGenerated = 1;
     public int ProductsSuppliedCount { get; private set; }
+    public StoreTileController? SupplyTarget { get; private set; }
 
     public void InitializeHq(Vector2I tilePosition, EmpireController ownerEmpire, string newHqUid)
     {
@@ -24,7 +25,7 @@ public partial class HqController : TileController
         OwnerEmpire = newOwner;
     }
 
-    public void ServeProducts(int amount)
+    public void ServeProducts(StoreTileController targetStore, int amount)
     {
         if (ProductsSuppliedCount + amount > BaseProductsGenerated)
         {
@@ -32,5 +33,19 @@ public partial class HqController : TileController
         }
 
         ProductsSuppliedCount += amount;
+        SupplyTarget = targetStore;
+        targetStore.AddSupplies(amount);
+    }
+
+    public void WithdrawProducts()
+    {
+        if (SupplyTarget is null)
+        {
+            throw new InvalidOperationException("Tried to withdraw products when no supply target is set");
+        }
+
+        SupplyTarget.AddSupplies(1);
+        ProductsSuppliedCount -= 1;
+        SupplyTarget = null;
     }
 }
