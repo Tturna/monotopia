@@ -28,6 +28,8 @@
 [ext_resource type="PackedScene" uid="uid://ck355dmdm242d" path="res://scenes/PlusMinusButtons.tscn" id="17_1gdd5"]
 [ext_resource type="PackedScene" uid="uid://1dota62uermp" path="res://scenes/OwnedHqView.tscn" id="17_426vi"]
 [ext_resource type="PackedScene" uid="uid://d2nlqqu8jsp7" path="res://scenes/LoseOverlay.tscn" id="18_45i86"]
+[ext_resource type="Texture2D" uid="uid://dfp04qgosgxbn" path="res://sprites/circleSupplyIndicatorEmpty.png" id="18_m1oc7"]
+[ext_resource type="Texture2D" uid="uid://cg10s5fkkted3" path="res://sprites/circleSupplyIndicatorFull.png" id="19_kbe8o"]
 [ext_resource type="Texture2D" uid="uid://dslwqm7g4j3rs" path="res://sprites/customers_icon.png" id="22_0bq3a"]
 [ext_resource type="PackedScene" uid="uid://c3555l7i2drjl" path="res://scenes/SelectedUnitView.tscn" id="23_bneo8"]
 [ext_resource type="Texture2D" uid="uid://d2jwmjxn1rhpb" path="res://sprites/whatthefuck.png" id="23_i4jil"]
@@ -79,6 +81,8 @@ reachableTileIndicatorScene = ExtResource("11_attvq")
 confirmSupplyTargetSelectionButton = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Mid Row VBox/HBoxContainer/ConfirmSupplyTargetSelection")
 cancelSupplyTargetSelectionButton = NodePath("../CanvasLayer/AspectRatioContainer/MarginContainer/VBoxContainer/Mid Row VBox/HBoxContainer/CancelSupplyTargetSelection")
 plusMinusIconsScene = ExtResource("17_1gdd5")
+supplyIndicatorEmpty = ExtResource("18_m1oc7")
+supplyIndicatorFull = ExtResource("19_kbe8o")
 
 [node name="PlayerInputController" type="Node2D" parent="." unique_id=55412351]
 script = ExtResource("12_attvq")

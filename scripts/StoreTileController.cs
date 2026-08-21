@@ -10,7 +10,7 @@ public partial class StoreTileController : TileController
     public int SuppliesCount { get; private set; }
 
     public static readonly int BaseCustomerServiceCapacity = 3;
-    public static readonly int BaseMaxSupplyCapacity = 1;
+    public static readonly int BaseMaxSupplyCapacity = 2;
 
     public void InitializeStore(Vector2I tilePosition, EmpireController ownerEmpire, string storeUid)
     {

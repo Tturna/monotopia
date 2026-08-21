@@ -11,3 +11,9 @@ script = ExtResource("1_mdyuy")
 show_behind_parent = true
 texture = ExtResource("2_xo13b")
 script = null
+
+[node name="SupplyIndicatorsParent" type="HBoxContainer" parent="." unique_id=1027074038]
+offset_top = -20.0
+offset_right = 35.0
+offset_bottom = -11.0
+scale = Vector2(2, 2)

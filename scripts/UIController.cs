@@ -42,6 +42,10 @@ public partial class UIController : Node2D
     private Button cancelSupplyTargetSelectionButton = null!;
     [Export]
     private PackedScene plusMinusIconsScene = null!;
+    [Export]
+    private Texture2D supplyIndicatorEmpty = null!;
+    [Export]
+    private Texture2D supplyIndicatorFull = null!;
 
     private Sprite2D tileSelectionNode = null!;
     private Dictionary<Vector2I, Sprite2D> reachableTileIndicators = new();
@@ -211,7 +215,15 @@ public partial class UIController : Node2D
         }
         else if (selectedFactory is not null)
         {
-            storesSelectedForSupplyTargets = new (selectedFactory.SupplyTargetsAndCounts.Keys);
+            foreach (var store in selectedFactory.SupplyTargetsAndCounts.Keys)
+            {
+                var storeSelectedCount = selectedFactory.SupplyTargetsAndCounts[store];
+
+                for (var i = 0; i < storeSelectedCount; i++)
+                {
+                    storesSelectedForSupplyTargets.Add(store);
+                }
+            }
         }
 
         foreach (var store in stores)
@@ -228,6 +240,8 @@ public partial class UIController : Node2D
             plusButton.Pressed += () => AddSupplyTargetSelection(store);
             minusButton.Pressed += () => RemoveSupplyTargetSelection(store);
         }
+
+        ShowStoreSupplyIndicators(stores);
     }
 
     private void HideSupplyTargetPlusMinusIcons()
@@ -241,8 +255,62 @@ public partial class UIController : Node2D
             oldIcons.QueueFree();
         }
 
+        var playerEmpire = EmpireController.GetPeerEmpire(Multiplayer.GetUniqueId());
+        var stores = playerEmpire.GetAllStores();
+
+        HideStoreSupplyIndicators(stores);
+
         supplyTargetPlusMinusIcons.Clear();
         storesSelectedForSupplyTargets.Clear();
+    }
+
+    private void HideStoreSupplyIndicators(IEnumerable<StoreTileController> stores)
+    {
+        foreach (var store in stores)
+        {
+            var supplyIndicatorsParent = store.FindChild("SupplyIndicatorsParent");
+
+            foreach (var child in supplyIndicatorsParent.GetChildren())
+            {
+                child.QueueFree();
+                supplyIndicatorsParent.RemoveChild(child);
+            }
+        }
+    }
+
+    private void ShowStoreSupplyIndicators(IEnumerable<StoreTileController> stores)
+    {
+        foreach (var store in stores)
+        {
+            var supplyIndicatorsParent = store.FindChild("SupplyIndicatorsParent");
+            var storeSelectedCount = storesSelectedForSupplyTargets.FindAll(m => m == store).Count;
+
+            for (var i = 0; i < store.MaxSupplyCapacity; i++)
+            {
+                var indicator = new TextureRect();
+                Texture2D texture;
+                
+                if (i < storeSelectedCount)
+                {
+                    texture = supplyIndicatorFull;
+                }
+                else
+                {
+                    texture = supplyIndicatorEmpty;
+                }
+
+                indicator.Texture = texture;
+                supplyIndicatorsParent.AddChild(indicator);
+            }
+        }
+    }
+
+    private void UpdateStoreSupplyIndicators(IEnumerable<StoreTileController>? targetStores = null)
+    {
+        var playerEmpire = EmpireController.GetPeerEmpire(Multiplayer.GetUniqueId());
+        var stores = targetStores is null ? playerEmpire.GetAllStores() : targetStores;
+        HideStoreSupplyIndicators(stores);
+        ShowStoreSupplyIndicators(stores);
     }
 
     public void OnEntitySelectionChanged(EmpireController empire)
@@ -582,13 +650,14 @@ public partial class UIController : Node2D
 
         var timesAlreadySelected = storesSelectedForSupplyTargets.FindAll(m => m == target).Count;
 
-        if (target.SuppliesCount + timesAlreadySelected + 1 > target.MaxSupplyCapacity)
+        if (timesAlreadySelected + 1 > target.MaxSupplyCapacity)
         {
             DebugUtility.Print("Target can't fit more supplies");
             return;
         }
 
         storesSelectedForSupplyTargets.Add(target);
+        UpdateStoreSupplyIndicators([target]);
     }
 
     public void RemoveSupplyTargetSelection(StoreTileController target)
@@ -596,5 +665,6 @@ public partial class UIController : Node2D
         if (!storesSelectedForSupplyTargets.Contains(target)) return;
 
         storesSelectedForSupplyTargets.Remove(target);
+        UpdateStoreSupplyIndicators([target]);
     }
 }
