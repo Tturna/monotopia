@@ -57,6 +57,7 @@ public partial class UIController : Node2D
     private FactoryTileController? selectedFactory;
     private StoreTileController? selectedStore;
     private List<StoreTileController> storesSelectedForSupplyTargets = new();
+    private List<StoreTileController> notTargetedStoresWithSuppliesWhenChoosingTargets = new();
     private List<Control> supplyTargetPlusMinusIcons = new();
 
     public bool IsChoosingSupplyTargets { get; private set; }
@@ -239,6 +240,14 @@ public partial class UIController : Node2D
             // which removes need for unsubscribing from the Pressed event
             plusButton.Pressed += () => AddSupplyTargetSelection(store);
             minusButton.Pressed += () => RemoveSupplyTargetSelection(store);
+
+            if (!storesSelectedForSupplyTargets.Contains(store))
+            {
+                for (var i = 0; i < store.SuppliesCount; i++)
+                {
+                    notTargetedStoresWithSuppliesWhenChoosingTargets.Add(store);
+                }
+            }
         }
 
         ShowStoreSupplyIndicators(stores);
@@ -262,6 +271,7 @@ public partial class UIController : Node2D
 
         supplyTargetPlusMinusIcons.Clear();
         storesSelectedForSupplyTargets.Clear();
+        notTargetedStoresWithSuppliesWhenChoosingTargets.Clear();
     }
 
     private void HideStoreSupplyIndicators(IEnumerable<StoreTileController> stores)
@@ -284,13 +294,14 @@ public partial class UIController : Node2D
         {
             var supplyIndicatorsParent = store.FindChild("SupplyIndicatorsParent");
             var storeSelectedCount = storesSelectedForSupplyTargets.FindAll(m => m == store).Count;
+            var notSelectedButSuppliedCount = notTargetedStoresWithSuppliesWhenChoosingTargets.FindAll(m => m == store).Count;
 
             for (var i = 0; i < store.MaxSupplyCapacity; i++)
             {
                 var indicator = new TextureRect();
                 Texture2D texture;
                 
-                if (i < storeSelectedCount)
+                if (i < storeSelectedCount || i < notSelectedButSuppliedCount)
                 {
                     texture = supplyIndicatorFull;
                 }
