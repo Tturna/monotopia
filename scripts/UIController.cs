@@ -301,7 +301,7 @@ public partial class UIController : Node2D
                 var indicator = new TextureRect();
                 Texture2D texture;
                 
-                if (i < storeSelectedCount || i < notSelectedButSuppliedCount)
+                if (i < storeSelectedCount + notSelectedButSuppliedCount)
                 {
                     texture = supplyIndicatorFull;
                 }
@@ -660,8 +660,9 @@ public partial class UIController : Node2D
         }
 
         var timesAlreadySelected = storesSelectedForSupplyTargets.FindAll(m => m == target).Count;
+        var timesSuppliedButNotSelected = notTargetedStoresWithSuppliesWhenChoosingTargets.FindAll(m => m == target).Count;
 
-        if (timesAlreadySelected + 1 > target.MaxSupplyCapacity)
+        if (timesAlreadySelected + timesSuppliedButNotSelected + 1 > target.MaxSupplyCapacity)
         {
             DebugUtility.Print("Target can't fit more supplies");
             return;
