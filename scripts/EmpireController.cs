@@ -301,6 +301,11 @@ public partial class EmpireController : Node2D
 
     public void RecalculateCustomersAndIncome()
     {
+        foreach (var store in stores)
+        {
+            store.ResetAvailableServiceCapacity();
+        }
+
         var topInfluenceTiles = influenceSystem.GetPeerTopInfluenceTiles(GetOwnerPeerId());
         var totalServedCustomers = 0;
 
@@ -343,7 +348,7 @@ public partial class EmpireController : Node2D
 
                 if (servedCustomers <= 0)
                 {
-                    throw new InvalidOperationException($"Clients to serve still: {clientsToServe}, closest available store: {closestAvailableStore.TilePosition}, store available service capacity: {closestAvailableStore.AvailableServiceCapacity}, served customers: {servedCustomers}");
+                    throw new InvalidOperationException($"Selected store at {closestAvailableStore.TilePosition} could not serve any customers despite having available service capacity.");
                 }
 
                 clientsToServe -= servedCustomers;

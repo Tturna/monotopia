@@ -9,7 +9,6 @@ public partial class StoreTileController : TileController
     public int MaxSupplyCapacity { get; private set; }
     public int SuppliesCount { get; private set; }
 
-    public static readonly int BaseCustomerServiceCapacity = 3;
     public static readonly int BaseMaxSupplyCapacity = 2;
 
     public void InitializeStore(Vector2I tilePosition, EmpireController ownerEmpire, string storeUid)
@@ -17,21 +16,23 @@ public partial class StoreTileController : TileController
         OwnerEmpire = ownerEmpire;
         TilePosition = tilePosition;
         StoreUid = storeUid;
-        AvailableServiceCapacity = BaseCustomerServiceCapacity;
         MaxSupplyCapacity = BaseMaxSupplyCapacity;
+    }
+
+    public void ResetAvailableServiceCapacity()
+    {
+        AvailableServiceCapacity = SuppliesCount;
     }
 
     public int ServeCustomers(int amount)
     {
-        if (AvailableServiceCapacity >= amount)
+        if (amount < 0)
         {
-            AvailableServiceCapacity -= amount;
-            return amount;
+            throw new ArgumentOutOfRangeException(nameof(amount), "Amount cannot be negative");
         }
 
-        var served = AvailableServiceCapacity;
-        AvailableServiceCapacity = 0;
-
+        var served = Math.Min(amount, Math.Min(AvailableServiceCapacity, SuppliesCount));
+        AvailableServiceCapacity -= served;
         return served;
     }
 

@@ -127,6 +127,15 @@ public partial class UIController : Node2D
             }
 
             HideSupplyTargetPlusMinusIcons();
+
+            if (selectedHq is not null)
+            {
+                selectedHq.OwnerEmpire.RecalculateCustomersAndIncome();
+            }
+            else if (selectedFactory is not null)
+            {
+                selectedFactory.OwnerEmpire.RecalculateCustomersAndIncome();
+            }
         };
 
         cancelSupplyTargetSelectionButton.Pressed += () =>
