@@ -44,7 +44,7 @@ public partial class HqController : TileController
             throw new InvalidOperationException("Tried to withdraw products when no supply target is set");
         }
 
-        SupplyTarget.AddSupplies(1);
+        SupplyTarget.RemoveSupplies(1);
         ProductsSuppliedCount -= 1;
         SupplyTarget = null;
     }
