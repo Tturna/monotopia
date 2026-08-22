@@ -241,12 +241,12 @@ public partial class UIController : Node2D
             plusButton.Pressed += () => AddSupplyTargetSelection(store);
             minusButton.Pressed += () => RemoveSupplyTargetSelection(store);
 
-            if (!storesSelectedForSupplyTargets.Contains(store))
+            var selectedCount = storesSelectedForSupplyTargets.FindAll(m => m == store).Count;
+
+            for (var i = 0; i < store.SuppliesCount; i++)
             {
-                for (var i = 0; i < store.SuppliesCount; i++)
-                {
-                    notTargetedStoresWithSuppliesWhenChoosingTargets.Add(store);
-                }
+                if (i < selectedCount) continue;
+                notTargetedStoresWithSuppliesWhenChoosingTargets.Add(store);
             }
         }
 
